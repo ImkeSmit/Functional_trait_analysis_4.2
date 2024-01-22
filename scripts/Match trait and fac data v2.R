@@ -244,6 +244,7 @@ FT_complete <- FT_sub |>
 
 
 write.csv(FT_complete, "Functional trait data\\FT_match_facilitation_plots_plotspecific_species_20jan.csv") #these species occur in that plot in the facilitation data
+#Also, species that occur in the fac data only are in here with empty trait values.
 
 write.csv2(sp_matches, "Functional trait data\\sp_matches_23Oct.csv")
 
