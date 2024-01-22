@@ -2,13 +2,11 @@
 library(traitstrap)
 library(ggplot2)
 library(tidyverse)
-
-wd <- "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait data"
-setwd(wd)
+library(tidylog)
 
 #import data
 #This data contains species without trait values
-trait_raw <- read.csv("FT_match_facilitation_plots_plotspecific_species.csv", row.names = 1) 
+trait_raw <- read.csv("Functional trait data\\FT_match_facilitation_plots_plotspecific_species_20jan.csv", row.names = 1) 
 #make the data long format to use in traitstrap
 trait_long <-  trait_raw |> 
   rename(taxon = sp_fullname) |> 
@@ -104,9 +102,7 @@ autoplot(trait_filling) +
 
 #import facilitation_species_and_positions, to see if trait filling is just throwing out the nurses.
 #because the nurses are not present in cover_perplot (except if the nurse species also occurs in a microsite)
-wd <- "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait data"
-setwd(wd)
-fac_sp <- read.csv("facilitation_species_and_positions.csv", row.names = 1)
+fac_sp <- read.csv("Functional trait data\\facilitation_species_and_positions.csv", row.names = 1)
 head(fac_sp)
 
 #look at plot for an example
@@ -119,6 +115,32 @@ unique(filled_2$taxon)
 unique(long_2$taxon)
 unique(fac_sp_2$spname)
 unique(cover_2$taxon)
+##TRAITSTRAP is throwing away nurses because they are not in the cover data
+
+matches <- match(unique(filled_2$taxon), unique(long_2$taxon))
+unique(long_2$taxon)[-matches]
+#check if species are fac_only
+sp_matches <- read_csv2("Functional trait data\\sp_matches_23Oct.csv")
+
+#the trait filling is throwing away:
+#Stipa tenacissima - because it is a nurse and is not in the cover data
+#Helanthemum aperta - it is present in the cover data, and in the trait data (with empty trait values because it is a fac_only species)
+#maybe it can't find a trait value for it anywhere and so throws it out. 
+
+trait_long[which(trait_long$taxon == "Helanthemum aperta"), ] #yes the species only occurs once with no trait vals. 
+#so the trait filling throws it out because it can't get a trait value for it anywhere. 
+
+#list missing traits
+missing_traits <- trait_missing(
+  filled_trait = trait_filling,
+  comm = cover_perplot) #why are there entries here with n_traits = 6?
+
+##mmm lets just check these names again... 
+trait_names <- trait_long |> 
+  distinct(taxon) |> 
+  arrange(taxon)
+
+
 
 #look at the raw distributions
 raw_dist_np <- trait_np_bootstrap(
