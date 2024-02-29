@@ -1,8 +1,7 @@
-###Subset the trait data for the sites and sp that are also in the facilitation data
 library(tidyverse)
 library(tidylog)
 library(DescTools)
-
+library(readxl)
 
 #Import the country_v3 data
 data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3")
@@ -14,107 +13,34 @@ for(i in 1:length(data_files)) {
                           data_files[i])))
 }
 
-#Import the information about the facilitation sites
-siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv")
+#Import the information about the biodesert sites
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
+  distinct() |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |> 
+  filter(!is.na(ID))
+  
 
 #Import the DRYPOP trait data
 drypop <- read.csv("Functional trait data\\Raw data\\drypop_20May.csv")
 
+#remove variables we don't need
+FT_allsites <- drypop |> 
+  select(!c(P,Al,Ba,Ca,Cr,Cu,Fe,K,Mg,Mn,Na,Ni,Pb,S,Sr,Ti,Zn,Cd,As,ELE.ALOS30,
+            Lat_decimal,Long_decimal,ASPECT.ALOS30,SLOPE.ALOS30,AMT,RAI,RASE,AI,
+            BS_Tst,SAC.b,WHC.b,pH.b,ORC.b, Phenolics,isotopic_d15N,isotopic_d13C)) |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to merge siteinfo on
+  inner_join(siteinfo, by = "plotref") |>  #only keep obs in drypopo that have a match in siteinfo 
+  select(!c(Country, Site, Plot, plotref, ARIDITY)) |> 
+  relocate(c(ID, COU, SITE, SITE_ID, PLOT, GRAZ, ARIDITY.v3)) #move to the start of the df
 
+##Natab_1 is missing from drypop
+#Santo Hipolito 1 2 4 is missing from siteinfo
+#these plots are not present in FT_allsites
 
-###Subset drypop to include only the plots that are in the facilitation data####
-#DRYPOP only has the site names, not ID or site_ID, so we have to work with the names
-#Get a list of countries and sites in the facilitation dataset
-countrylist <- list(algeria, argentina, australia, chile, chinachong, chinaxin, iranabedi, iranfarzam, israel, 
-                    namibiablaum, namibiawang, southafrica, spainmaestre, spainrey)
-#Get all the sites in each country
-sitedf <- data.frame(matrix(nrow = length(100), ncol = 5))
-colnames(sitedf) <- c("country", "site1", "site2", "site3", "site4")
-l = 1
-for (i in countrylist) {
-  country <- unique(i$COU)
-  site <- unique(i$SITE)
-  
-  sitedf[l,1] <- country[1]
-  sitedf[l,2] <- site[1]
-  sitedf[l,3] <- site[2]
-  sitedf[l,4] <- site[3]
-  sitedf[l,5] <- site[4]
-  l = l+1
-}
-
-#Get a vector of all the sites in all the countries
-fac_sites <- c(sitedf[,2], sitedf[,3], sitedf[,4])
-fac_sites <- fac_sites[-which(is.na(fac_sites))] 
-
-#subset drypop to include only the sites in sitedf
-trait_subset_sites <- drypop |> 
-  filter(Site %in% fac_sites) |> 
-  select(Country, Site, Plot, Genus, Species, coverDryfun20,coverBiodesert100, Life_form, #keep only the columns we need
-         MeanLL, MeanSLA, MeanLDMC, MeanLA, MaxH, MaxLS)
-
-unique(trait_subset_sites$Site)
-
-
-
-##Now add ID, site_ID and graz to trait_subset
-#Add site_ID first
-Site <- c(unique(siteinfo$SITE))
-site_ID <- c(unique(siteinfo$SITE_ID))
-add_site_ID <- data.frame(Site, site_ID) #create dataframe with the variables we want to merge
-
-trait_subset_sites <- trait_subset_sites |> 
-  left_join(add_site_ID, by = "Site")
-
-##Now add ID, site_ID and graz to trait_subset_sites 
-#Make a plot identification variable by pasting the site ID and plot number. We will use this variable to merge on 
-#plotref of trait data
-trait_subset_sites$plotref <- paste(trait_subset_sites$site_ID, trait_subset_sites$Plot , sep = "_")
-
-#plotref of fac data
-add_ID <- data.frame(plotref = c(rep(NA,3)), ID = c(rep(NA,3))) #create dataframe with plotref and ID of the fac data
-
-#loop to get the plotrefs and IDs of each country
-countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
-                  "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
-
-for (t in 1:length(countrynames)) {
-  cou <- get(countrynames[t])
-  
-  if(t ==1) {
-  
-    add_ID$plotref <- c(unique(paste(cou$SITE_ID, cou$PLOT, sep = "_")))
-    add_ID$ID <- c(unique(cou$ID))
-  
-  }else {
-    
-    temp_cou_plotrefs <- c(unique(paste(cou$SITE_ID, cou$PLOT, sep = "_")))
-    temp_cou_IDs <- c(unique(cou$ID))
-    
-    temp_rows <- cbind(plotref = temp_cou_plotrefs, ID = temp_cou_IDs)
-    
-    add_ID <- rbind(add_ID, temp_rows)
-    
-  }
-}
-
-trait_subset_plots <- trait_subset_sites |> 
-  right_join(add_ID, by = "plotref") #do a right join, because we only want to keep ID's that are in the fac data
-  
-
-
-#Add aridity and graz
-add_var <- siteinfo[, c(1, 7, 62)]
-add_var <- add_var[- which(is.na(add_var$ID)) , ]
-add_var$ID <- as.character(add_var$ID)
-
-trait_subset_plots <- trait_subset_plots |> 
-  left_join(add_var, by = "ID")
-
-
-####NOW WE FIX THE TRAIT NAMES TO MATCH THE FACILITATION DATA###
+###Fix and standardise speciesnames before subsetting for the facilitation sites####
 ##CLean up easy mistakes in names:
-trait_subset_plots <- trait_subset_plots |> 
+FT_allsites <- FT_allsites |> 
   mutate(taxon = str_c(Genus, Species, sep = " "), #spnames in one column
          taxon = str_squish(taxon), #remove spaces before and after string
          taxon = str_to_sentence(taxon)) |>  
@@ -123,7 +49,7 @@ trait_subset_plots <- trait_subset_plots |>
                        names = c("split1", "split2", "split3",  "split4"), too_few = "align_start") |> 
   mutate(taxon = str_c(split1, split2, sep = " ")) |> 
   select(!c(split1,split2,split3, split4))
-  
+
 ##NOW RUN NAME TRAIL
 #The sheet names_and_synonyms contains names and their synonyms accross the facilitation, trait and quadrat data.
 #This list was made by comparing only_in_fac to the quadrat data in the script called trait name changing.
@@ -147,44 +73,72 @@ change_tracker <- data.frame(
 
 ###Now standardise each name to the name trail:
 
-data_harmony <- trait_subset_plots
-  
+data_harmony <- FT_allsites
+
 for (i in 1:nrow(data_harmony)) {
   old_sp <- data_harmony[i, which(colnames(data_harmony) == "taxon")]
   new_sp <- NA
   
-
-    found <- FALSE
-    for (j in 1:nrow(name_trail)) { # looks whether species name is a synonym and replaces it with the true_name if it is found to be a synonym
-      found <- grepl(old_sp, name_trail[j, 2]) 
-      
-      if (found){ # only runs if the species is a synonym
-        new_sp <- name_trail[j, 1] # finds the true name of the species and saves it 
-        break
-      }
-    }
+  
+  found <- FALSE
+  for (j in 1:nrow(name_trail)) { # looks whether species name is a synonym and replaces it with the true_name if it is found to be a synonym
+    found <- grepl(old_sp, name_trail[j, 2]) 
     
-    if (found) { # replaces the species in the trait database with the saved true name if "found" is "TRUE"
-      data_harmony[i, which(colnames(data_harmony) == "taxon")] <- new_sp 
-      
-      # add a new row with information about change to the change trackers dataset
-      change_tracker[i, 1] <- old_sp
-      change_tracker[i, 2] <- new_sp
+    if (found){ # only runs if the species is a synonym
+      new_sp <- name_trail[j, 1] # finds the true name of the species and saves it 
+      break
     }
-  } #close the loop through the names in data_harmony
+  }
+  
+  if (found) { # replaces the species in the trait database with the saved true name if "found" is "TRUE"
+    data_harmony[i, which(colnames(data_harmony) == "taxon")] <- new_sp 
+    
+    # add a new row with information about change to the change trackers dataset
+    change_tracker[i, 1] <- old_sp
+    change_tracker[i, 2] <- new_sp
+  }
+} #close the loop through the names in data_harmony
 head(change_tracker, 10)
 
 #export:
-write.csv(data_harmony, "Functional trait data\\FT_match_facilitation_plots.csv")
-#this data has only the plots in the fac data and names are standardised
+write.csv(data_harmony, "Functional trait data\\FT_all_sites.csv")
+#this data has all the FT sites availible with names standardised to the fac and quadrat data
 
 
-####SUBSET TRAIT DATA TO INCLUDE ONLY FACILITATION SPECIES####
+###Subset for facilitation plots####
+#loop to get the IDs of plot in the fac data
+countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
+                  "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
+
+fac_IDs <- c(rep(NA, 3))
+
+for (t in 1:length(countrynames)) {
+  cou <- get(countrynames[t])
+  
+  if(t ==1) {
+    
+    fac_IDs <- c(unique(cou$ID))
+    
+  }else {
+    
+    temp_fac_IDs <- c(unique(cou$ID))
+    fac_IDs <-c(fac_IDs, temp_fac_IDs)
+  }
+}
+
+FT_match_facilitation_plots <- data_harmony |> 
+  filter(ID %in% c(fac_IDs))
+
+#export:
+write.csv(FT_match_facilitation_plots, "Functional trait data\\FT_match_facilitation_plots.csv")
+
+
+###Subset for facilitation species####
+trait_subset_plots <- FT_match_facilitation_plots
 trait_subset_plots <- read.csv("Functional trait data\\FT_match_facilitation_plots.csv", row.names = 1)
 
 ##GET A LIST OF SP IN THE FACILITATION DATA###
 ##Classify each species as a nurse, or as growing in a bare or open microsite
-
 #Bind all the country data together, use only the columns we need
 vars <- c("ID", "Microsite", "ID_Microsite", "Species.within.quadrat" )
 data <- rbind(algeria[ , which(colnames(algeria) %in% vars)], argentina[ , which(colnames(argentina) %in% vars)], australia[ , which(colnames(australia) %in% vars)], chile[ , which(colnames(chile) %in% vars)], 
@@ -207,19 +161,19 @@ for(i in 1:length(IDlist)) {
   
   
   if (i == 1) { #only make a new table for the first plot and nurse condition, we will just attach the results of subsequent plots to this table
-  
+    
     fac_species$ID <- IDlist[i]
     fac_species$condition <- "nurse"
     fac_species$spname <- nurse_names
-  
+    
   } else { #for subsequent plots, put the results in temp_mat and bind it to the result_prelim we make above
     temp_mat <- cbind(rep(IDlist[i], length(nurse_names)) , rep("nurse", length(nurse_names)) , nurse_names)
     colnames(temp_mat) <- c("ID", "condition", "spname")
     fac_species <- rbind(fac_species, temp_mat)
-    }
+  }
   
- 
-   #now result_prelim already exists for us to bind the names of the other conditions to
+  
+  #now result_prelim already exists for us to bind the names of the other conditions to
   micro_nurse_names <- unique(plot[which(plot$Microsite == 2) , which(colnames(plot) == "Species.within.quadrat")])
   micro_nurse_names <- micro_nurse_names[!is.na(micro_nurse_names)] #remove NA
   temp_mat <- cbind(rep(IDlist[i], length(micro_nurse_names)) , rep("micro_nurse", length(micro_nurse_names)) , micro_nurse_names)
@@ -306,7 +260,7 @@ for(i in 1:length(fac_IDs)) {
 #Now we need to add the species that are only present in the facilitation data, and give them NA trait values
 #get the info associated with each ID
 plotinfo <- FT_sub |> 
-  select(ID, Site, Country, Plot, site_ID, GRAZ, ARIDITY.v3) |> 
+  select(ID, SITE, COU, PLOT, SITE_ID, GRAZ, ARIDITY.v3) |> 
   distinct(ID, .keep_all = TRUE) #we only need one record for each ID
 
 #make a table of the fac_only species without traits
@@ -323,7 +277,7 @@ fac_only_df <- sp_matches |>
 
 #now we can rbind fac_only_df to FT sub
 FT_complete <- FT_sub |> 
-  select(!c(Genus, Species, plotref)) |>  #remove these columns, they are uneccesary 
+  select(!c(Genus, Species)) |>  #remove these columns, they are uneccesary 
   bind_rows(fac_only_df)
 
 
@@ -331,10 +285,3 @@ write.csv(FT_complete, "Functional trait data\\FT_match_facilitation_plots_plots
 #Also, species that occur in the fac data only are in here with empty trait values.
 
 write.csv2(sp_matches, "Functional trait data\\sp_matches_31jan.csv")
-
-
-
-
-
-
-

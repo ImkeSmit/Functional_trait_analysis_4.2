@@ -6,11 +6,17 @@ library(tidylog)
 
 #import data
 #This data contains species without trait values
-trait_raw <- read.csv("Functional trait data\\FT_match_facilitation_plots_plotspecific_species_20jan.csv", row.names = 1) 
+trait_raw <- read.csv("Functional trait data\\FT_match_facilitation_plots_plotspecific_species_31jan.csv", row.names = 1) 
+
+#coverDryfun20 - sp cover from trait survey - 20 quadrats per plot
+#coverBiodesert100 - sp cover from quadrat survey - 100 quadrats per plot
+#Both have valuse >100, does this mean they are just sum of cover values?
+
 #make the data long format to use in traitstrap
 trait_long <-  trait_raw |> 
-  rename(taxon = sp_fullname) |> 
-  pivot_longer(cols = c(MeanLL, MeanSLA, MeanLDMC, MeanLA, MaxH, MaxLS), names_to = "trait", values_to = "value") #make it long format
+  pivot_longer(cols = c(MeanLL, MeanSLA, MeanLDMC, MeanLA, MaxH, MaxLS), 
+               names_to = "trait", values_to = "value") #make it long format 
+                        
   
 
 
@@ -40,18 +46,17 @@ ggplot(trait_dat, aes(x = ARIDITY.v3, y = MeanLDMC)) +
   geom_point()
 
 
-
-###get cover per species per plot (over all microsites in a plot) to use to weight trait metrics by abundance
-
+###Weight data with cover from fac data####
+##get cover per species per plot (over all microsites in a plot) to use to weight trait metrics by abundance
 #To get this data we have to import the raw data again
-wd <- "C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation data\\Countriesv2"
+wd <- "C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3"
 ###read in the facilitation data for each country
 data_files <- list.files(wd)
 countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
                   "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
 for(i in 1:length(data_files)) {                              
   assign(paste0(countrynames[i]),                                   
-         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation data\\Countriesv2\\",
+         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3\\",
                           data_files[i])))
 }
 
@@ -79,7 +84,7 @@ cover_perplot <- left_join(coversum, denom, by = "ID") |>
 
 
 #do the trait filling
-trait_filling <- trait_fill(
+trait_fill_fac <- trait_fill(
   comm = cover_perplot, #community data with abundance values
   traits = trait_long, #trait data
   abundance_col = "percent_cover_perplot", #the column with the abundance data

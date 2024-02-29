@@ -1,4 +1,4 @@
-##Playing with the FD package
+####Playing with the FD package
 #install.packages("FD")
 library(FD)
 library(dplyr)
@@ -33,7 +33,7 @@ ft_sa <- trait_dat[which(trait_dat$Country == "South Africa") , ]
 #we will put each x matrix in a list, and then let dbFD run through each list element
 
 IDlist <- c(unique(ft_sa$ID))
-xlist <- vector(mode='list', length = length(IDlist)) #list to put the species x trait matrices in 
+ #list to put the species x trait matrices in 
 
 for (i in 1:length(IDlist)) {
   plot <- ft_sa[which(ft_sa$ID == IDlist[i]) , ]
