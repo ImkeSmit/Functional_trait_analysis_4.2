@@ -3,6 +3,8 @@ library(tidyverse)
 library(tidylog)
 library(ggplot2)
 library(glmmTMB)
+library(car)
+library(emmeans)
 
 #From the filled trait data for plotspecific species
 FT <- read.csv("Functional trait data\\FT_filled_match_facilitation_plots_plotspecific_species_7Feb2024.csv", row.names = 1)
@@ -279,3 +281,44 @@ summary(mod)
 mod2 <- glmmTMB(NIntc_richness_binom ~ Delta_nurse_bare + (1|SITE_ID), family = "binomial", data = pair_dist)
 Anova(mod2)
 summary(mod2)
+
+#Is does the functional distance depend on whether the distance is between nurse and nurse_only species, or nurse and bare_only species, or nurse and both species
+#We need to change the pair_dist data to long format
+
+long_pair_dist <- pair_dist |> 
+  select(ID, SITE_ID, replicate_no, D_bare_only, D_nurse_only, D_both, GRAZ, 
+         ARIDITY.v3, NIntc_richness_binom, NIntc_cover_binom, NInta_richness_binom, NInta_cover_binom) |> 
+  pivot_longer(cols = c(D_bare_only, D_nurse_only, D_both), names_to = "grouping", values_to = "mean_Fdist")
+long_pair_dist$grouping <- as.factor(long_pair_dist$grouping)
+
+mod3 <- glmmTMB(mean_Fdist ~ grouping + GRAZ + ARIDITY.v3 + (1|SITE_ID), data = long_pair_dist)
+Anova(mod3)
+#Graz significant
+summary(mod3)
+emmeans(mod3, specs = c("GRAZ")) #?? does not agree with summary table
+
+#without random effect
+mod4 <- glmmTMB(mean_Fdist ~ grouping + GRAZ + ARIDITY.v3 , data = long_pair_dist)
+Anova(mod4)
+#now graz and aridity is significant
+summary(mod4)
+emmeans(mod4, specs = "GRAZ")
+
+ggplot(long_pair_dist, aes(x = mean_Fdist)) +
+  geom_histogram()
+
+ggplot(long_pair_dist, aes(x = GRAZ, y = mean_Fdist)) +
+  geom_boxplot()
+
+ggplot(long_pair_dist, aes(x = grouping, y = mean_Fdist)) +
+  geom_boxplot()
+
+ggplot(long_pair_dist, aes(x = ARIDITY.v3, y = mean_Fdist)) +
+  geom_jitter(width = 0.1, height = 0.1)
+
+#let's bin aridity
+long_pair_dist <- long_pair_dist |> 
+       mutate(arid_bin = cut(ARIDITY.v3, breaks=4))
+
+ggplot(long_pair_dist, aes(x = arid_bin, y = mean_Fdist)) +
+  geom_boxplot()
