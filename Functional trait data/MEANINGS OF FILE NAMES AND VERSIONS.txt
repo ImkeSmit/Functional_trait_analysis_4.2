@@ -1,5 +1,5 @@
 ###Meanings of file names of the functional trait data
-#script: match trait and fac data v2
+#script: match trait and fac data v3
 
 ##DRYIND
 As downloaded form email with Nico Gross. Traits of every individual measured
@@ -10,8 +10,11 @@ As downloaded from email with Nico Gross. Average trait values for species in ea
 ##drypop_20May
 DRYPOP exported as a csv file
 
+##FT_all_sites
+drypop_20May with names standardised. It has all plots for which trait data were collected. Variables such as graz, aridity site ID and plot ID were added
+
 ##FT_match_facilitation_plots
-drypop_20May subsetted to inlcude only the plots that are also in the facilitation dataset. Variables such as graz, aridity site ID and plot ID were added
+drypop_20May subsetted to inlcude only the plots that are also in the facilitation dataset. 
 
 ##FT_match_facilitation_plots_general_species
 FT_match_facilitation_plots subsetted to include only the species present in the facilitation data. The species in this dataset do not necesarily occur IN THAT SPECIFIC PLOT in the facilitation data. They are just present somewhere in teh facilitation data.
@@ -19,7 +22,7 @@ FT_match_facilitation_plots subsetted to include only the species present in the
 ##FT_match_facilitation_plots_plotspecific_species
 FT_match_facilitation_plots subsetted to include only the species that are present in each plot of the facilitation data. If a species is in a certain plot here, it will be in that same plot in the facilitation data.
 
-##FT_match_facilitation_plots_plotspecific_species_20jan
+##FT_match_facilitation_plots_plotspecific_species_25jan
 The same as above, but now the species that are only in the trait data (not in the facilitation data), have been added with NA trait values.
 
 #sp_matches
@@ -33,3 +36,15 @@ The same as above, but now the species that are only in the trait data (not in t
 
 #facilitation_species_and_positions
 Contains the species names that are in the facilitation dataset, the plot they occur in and whether they are a nurse, occur in nurse microsites (micro_nurse) or a bare microsite (micro_bare). One species may have multiple conditions.
+
+##fac_names
+Unique names in the facilitation dataset
+
+##trait_names
+Unique names in FT_match_facilitation_plots
+
+##Cover quadrats_98sites_16_12_19
+Data from the cover survey as downloaded from email with Victoria
+
+##quadrat_survey_for_facilitation_plots
+Cover quadrats_98sites_16_12_19 was cleaned up and subsetted for only the facilitation plots. Process is in the Trait name changes script.
