@@ -7,7 +7,7 @@ library(ggbiplot)
 library(traitstrap)
 
 #From the filled trait data for plotspecific species
-FT <- read.csv("Functional trait data\\FT_filled_match_facilitation_plots_plotspecific_species_7Feb2024.csv", row.names = 1)
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1)
 
 ##We need to standardise each trait value to mean 0 and variance of 1 with Z = (x-mean)/sd
 ##We need only one trait value per species
@@ -70,7 +70,8 @@ FGR[2] <- rownames(FGR)
 rownames(FGR) <- c(1:nrow(FGR))
 colnames(FGR) <- c("Functional_group", "taxon")
 
-
+write.csv(FGR, "Functional trait data\\results\\Functional_groups3.csv")
+FGR <- read.csv("Functional trait data\\results\\Functional_groups3.csv", row.names = 1)
 
 ###Now we need to see in which FGR nurses and target plants fall on the aridity gradient####
 #We require raw country data
@@ -129,17 +130,18 @@ FGR_cou_ass <- FGR_cou_ass |>
   left_join(siteinfo, by = "ID")
 
 #save the file
-write.csv(FGR_cou_ass, "Functional trait data//Results//FGR_nurse_target_species.csv")
-
+write.csv(FGR_cou_ass, "Functional trait data//results//FGR3_nurse_target_species.csv")
 
 
 ###What traits do each FGR have - PCA####
-FGR_cou_ass <- read.csv("Functional trait data//Results//FGR_nurse_target_species.csv", row.names = 1)
+FGR_cou_ass <- read.csv("Functional trait data//results//FGR3_nurse_target_species.csv", row.names = 1)
 
 FT_wide_FGR <- std_FT_wide |> 
   mutate(taxon = rownames(std_FT_wide)) |> 
   left_join(FGR, by = "taxon")
 FT_wide_FGR$Functional_group <- as.factor(FT_wide_FGR$Functional_group) 
+#write to csv to use in graphing
+write.csv(FT_wide_FGR, "Functional trait data//results//standard_FT_FGR.csv")
 
 
 base_pca <- princomp(FT_wide_FGR[ , -c(8,9)], scores = T)
@@ -269,6 +271,8 @@ nint_result_direction <- nint_result |>
 
 #Get the nurse and target sp associated with these fac rep
 sum_fac_survey <- raw_fac_survey |> 
+  #remove bare microsites
+  filter(Microsite == 2) |> 
   mutate(ID_rep = str_c(ID, Number.of.replicate, sep = "_")) |>  #create an identifier from ID and rep
   #add FGR of nurse sp
   left_join(FGR, by = c("ID_Microsite" = "taxon")) |> #inner join will remove sp that do not have functional group (ie for which we dont have complete FT data)
