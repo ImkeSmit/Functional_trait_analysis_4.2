@@ -1,3 +1,5 @@
+##Cleaning the functional trait data, and subsetting it for the facilitation sites and species
+
 library(tidyverse)
 library(tidylog)
 library(DescTools)
@@ -72,7 +74,6 @@ change_tracker <- data.frame(
   stringsAsFactors=FALSE) 
 
 ###Now standardise each name to the name trail:
-
 data_harmony <- FT_allsites
 
 for (i in 1:nrow(data_harmony)) {
@@ -101,9 +102,26 @@ for (i in 1:nrow(data_harmony)) {
 head(change_tracker, 10)
 
 #export:
-write.csv(data_harmony, "Functional trait data\\FT_all_sites.csv")
+write.csv(data_harmony, "Functional trait data\\Clean data\\FT_all_sites.csv")
 #this data has all the FT sites availible with names standardised to the fac and quadrat data
 
+#How many species and sites in data harmony
+data_harmony <- read.csv("Functional trait data\\Clean data\\FT_all_sites.csv", row.names = 1)
+head(data_harmony)
+nplots <- data_harmony |> 
+  select(ID) |> 
+  distinct(ID) |> 
+  summarise(nplots = n())
+
+nsites <- data_harmony |> 
+  select(SITE_ID) |> 
+  distinct(SITE_ID) |> 
+  summarise(nsites = n())
+
+nsp <- data_harmony |> 
+  select(taxon) |> 
+  distinct(taxon) |> 
+  summarise(nsp = n())
 
 ###Subset for facilitation plots####
 #loop to get the IDs of plot in the fac data
@@ -130,12 +148,12 @@ FT_match_facilitation_plots <- data_harmony |>
   filter(ID %in% c(fac_IDs))
 
 #export:
-write.csv(FT_match_facilitation_plots, "Functional trait data\\FT_match_facilitation_plots.csv")
+write.csv(FT_match_facilitation_plots, "Functional trait data\\Clean data\\FT_match_facilitation_plots.csv")
 
 
 ###Subset for facilitation species####
 trait_subset_plots <- FT_match_facilitation_plots
-trait_subset_plots <- read.csv("Functional trait data\\FT_match_facilitation_plots.csv", row.names = 1)
+trait_subset_plots <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots.csv", row.names = 1)
 
 ##GET A LIST OF SP IN THE FACILITATION DATA###
 ##Classify each species as a nurse, or as growing in a bare or open microsite
@@ -191,14 +209,14 @@ for(i in 1:length(IDlist)) {
 } ###end of loop
 ##Remember the same sp my have multiple conditions
 ##write to a csv file
-write.csv(fac_species, "Functional trait data\\facilitation_species_and_positions.csv")
-fac_species <- read.csv("Functional trait data\\facilitation_species_and_positions.csv", row.names = 1)
+write.csv(fac_species, "Functional trait data\\Clean data\\facilitation_species_and_positions.csv")
+fac_species <- read.csv("Functional trait data\\Clean data\\facilitation_species_and_positions.csv", row.names = 1)
 
 ###Subset trait_subset_plots to include only the species in the facilitation data####
 ##The species in the resulting dataset may not be present in that SPECIFIC PLOT in the facilitation data, they are just present someweher in the facilitatin data
 FT_match_facilitation_plots_general_species <- trait_subset_plots |> 
   filter(taxon %in% fac_species$spname)
-write.csv(FT_match_facilitation_plots_general_species, "Functional trait data\\FT_match_facilitation_plots_general_species_31jan.csv")
+write.csv(FT_match_facilitation_plots_general_species, "Functional trait data\\Clean data\\FT_match_facilitation_plots_general_species.csv")
 
 ###SUBSET THE FT DATA FOR THE SPECIES IN THAT PLOT IN THE FACILITATION DATA####
 #The resulting table will be called FT_sub
@@ -281,7 +299,7 @@ FT_complete <- FT_sub |>
   bind_rows(fac_only_df)
 
 
-write.csv(FT_complete, "Functional trait data\\FT_match_facilitation_plots_plotspecific_species_31jan.csv") #these species occur in that plot in the facilitation data
+write.csv(FT_complete, "Functional trait data\\Clean data\\FT_match_facilitation_plots_plotspecific_species.csv") #these species occur in that plot in the facilitation data
 #Also, species that occur in the fac data only are in here with empty trait values.
 
-write.csv2(sp_matches, "Functional trait data\\sp_matches_31jan.csv")
+write.csv2(sp_matches, "Functional trait data\\Clean data\\sp_matches.csv")
