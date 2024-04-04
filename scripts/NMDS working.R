@@ -110,3 +110,5 @@ ggplot(nmds_scores, aes(NMDS1, NMDS2, colour = position)) +
 
 
 
+
+
