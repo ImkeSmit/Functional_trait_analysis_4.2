@@ -87,23 +87,26 @@ mic_af <- mic_af |>
 #is there a way to do it plot by plot?
 
 
+#finally merge the positions onto std_FT_wide
+FT_positions <- std_FT_wide|> 
+  rownames_to_column(var = "taxon") |> 
+  right_join(mic_af, by  = "taxon")
+row.names(FT_positions) <- FT_positions$taxon
+
+
 
 #do NMDS
-test_nmds <- metaMDS(std_FT_wide, distance = "euclidean")
+test_nmds <- metaMDS(FT_positions[, c(2,3,4,5,6,7,8)], distance = "euclidean")
 #Extract NMDS Scores 
 nmds_scores <-as.data.frame(scores(test_nmds))
+nmds_scores$position <- FT_positions$position
 
-ggplot(nmds_scores, aes(NMDS1, NMDS2)) +
+ggplot(nmds_scores, aes(NMDS1, NMDS2, colour = position)) +
   geom_point()
 
 
-#Now let's get the species that occur in each grazing level, and which of those are nurses and targets
-#all the species in the trait data
-sp_graz <- FT |> 
-  group_by(GRAZ) |> 
-  distinct(taxon) |> 
-  ungroup()
+##ja I dont think we can do permanova with this because the sample sizes of the positins are so uneven
+#the only way is to do this plot by plot
 
 
-##add the grazing levels to std FT wide
 
