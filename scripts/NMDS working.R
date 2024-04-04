@@ -60,6 +60,34 @@ for(t in 1:length(traitlist)) {
   }
 }
 
+FT_sp <- c(rownames(std_FT_wide))
+
+
+##Add the microsite affinity of each species
+mic_af <- read.csv("Functional trait data\\Clean data\\sp_positions.csv", row.names = 1) |> 
+  filter(!is.na(taxon), 
+         !position == "nurse_species", 
+         taxon %in% FT_sp) |> 
+  distinct(taxon, position) |> 
+  arrange(taxon)
+
+#if a species has more than one position, change their position to "both"
+#so if a species ever, in any set of plots occurs in more than one microsite, their microsite affinity is changed to "both"
+for (r in 1:length(FT_sp)) {
+  a_species <- mic_af[mic_af$taxon == FT_sp[r] , ]
+  
+  if(nrow(a_species) > 1) {
+    mic_af[mic_af$taxon == FT_sp[r] , 2] <- "both"
+  }
+}
+
+mic_af <- mic_af |> 
+  distinct(taxon, position)
+###mmm now most species have both as position, this is a problem
+#is there a way to do it plot by plot?
+
+
+
 #do NMDS
 test_nmds <- metaMDS(std_FT_wide, distance = "euclidean")
 #Extract NMDS Scores 
