@@ -176,6 +176,7 @@ for (i in 1:length(IDlist)) {
     l = l+1
   }#loop through reps end
 }#loop through plots end
+
 #get exp_var ready for rda:
 exp_var_inter <- exp_var |> 
   #calculate CN ratio
@@ -191,7 +192,10 @@ only_in_comm_means <- anti_join(comm_means_inter,exp_var_inter, by = "ID_rep")
 #remove rows that do not correspond
 exp_var_final <- exp_var_inter |> 
   filter(!ID_rep %in% c(only_in_exp_var$ID_rep)) |> 
-  column_to_rownames(var = "ID_rep")
+  column_to_rownames(var = "ID_rep") |> 
+  #we also need to standardise aridity |> 
+  mutate(aridity_std = (aridity - mean(aridity)/sd(aridity))) 
+exp_var_final$graz <- as.factor(exp_var_final$graz)
 
 comm_means_final <- comm_means_inter |> 
   filter(!ID_rep %in% c(only_in_comm_means$ID_rep)) |> 
@@ -200,10 +204,11 @@ comm_means_final <- comm_means_inter |>
 
 ##Now we can do the RDA
 ## associated community composition ~ nurse traits + grazing + aridity
-rda_test <- dbrda(comm_means_final ~ aridity + graz + mean_H + mean_LS + C_N_ratio, data = exp_var_final)
+rda_test <- dbrda(comm_means_final ~ aridity_std + graz + mean_H + mean_LS + C_N_ratio, data = exp_var_final)
 plot(rda_test)
+summary(rda_test)
 
 anova(rda_test) #overall significance of rda
-anova(rda_test, by = "axis")
+#anova(rda_test, by = "axis")
 anova(rda_test, by = "terms")
 
