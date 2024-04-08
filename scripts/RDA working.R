@@ -62,32 +62,52 @@ for (i in 1:length(IDlist)) {
     row.names(comm_mat) <- comm_sp
     colnames(comm_mat) <- traits_collected
     
-    #get the trait vals of species in comm_mat
-    for(s in 1:length(comm_sp)) { #for each species
-      for(t in 1:length(traits_collected)) { #and each trait
+      #get the trait vals of species in comm_mat
+      for(s in 1:length(comm_sp)) { #for each species
+        for(t in 1:length(traits_collected)) { #and each trait
+        
+        #isolate the trait value(s) for each species and trait  
+        val <- FT_plot |> 
+          filter(taxon == comm_sp[s], 
+                 trait == traits_collected[t]) |> 
+          select(value) 
       
-      #isolate the trait value(s) for each species and trait  
-      val <- FT_plot |> 
-        filter(taxon == comm_sp[s], 
-               trait == traits_collected[t]) |> 
-        select(value) 
+        #if there are no values for this trait, put NA in the matrix
+        if(nrow(val) == 0) {comm_mat[s,t] <- NA} 
+          #if there are 2 or more trait measurements, get the mean and put that in the matrix
+          else if (nrow(val) > 1) {mean_val <- mean(val$value)
+            comm_mat[s,t] <- mean_val} 
+            #if there is only on trait value, put that in the matrix
+            else {comm_mat[s,t] <- val$value} 
+        }#end loop through traits
+      }#end loop through species
     
-      #if there are no values for this trait, put NA in the matrix
-      if(nrow(val) == 0) {comm_mat[s,t] <- NA} 
-        #if there are 2 or more trait measurements, get the mean and put that in the matrix
-        else if (nrow(val) > 1) {mean_val <- mean(val$value)
-          comm_mat[s,t] <- mean_val} 
-          #if there is only on trait value, put that in the matrix
-          else {comm_mat[s,t] <- val$value} 
-      }#end loop through traits
-    }#end loop through species
-    
-    matlist[[l]] <- comm_mat #put filled matrix in the list
-
-    l = l+1
+      matlist[[l]] <- comm_mat #put filled matrix in the list
+  
+      l = l+1
   }#end loop through reps
 }#end loop through plots
 names(matlist) <- comm_index #name the list elements
+
+
+###Now we need to get the mean trait values for each community####
+comm_means <- data.frame(ID_rep = comm_index, mean_C_N_ratio = NA, meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, 
+                         mean_H = NA, mean_LS = NA)
+
+for (m in 1:length(matlist)) {
+  comm <- matlist[[m]]
+  ID_rep <- names(matlist[m])
+  
+  comm_means[m, 1] <- ID_rep
+  comm_means[m, 2] <- mean(c(comm[, 2]/comm[, 1]), na.rm = T)
+  comm_means[m, 3] <- mean(comm[, 3], na.rm = T)
+  comm_means[m, 4] <- mean(comm[, 4], na.rm = T)
+  comm_means[m, 5] <- mean(comm[, 5], na.rm = T)
+  comm_means[m, 6] <- mean(comm[, 6], na.rm = T)
+  comm_means[m, 7] <- mean(comm[, 7], na.rm = T)
+  comm_means[m, 8] <- mean(comm[, 8], na.rm = T)
+  
+}
 
 
 
