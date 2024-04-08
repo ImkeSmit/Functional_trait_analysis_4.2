@@ -36,12 +36,14 @@ matlist <- list()
 
 l = 1
 for (i in 1:length(IDlist)) {
-  one_plot <- sa[which(sa$ID == IDlist[i]) , ]
+  fac_plot <- sa[which(sa$ID == IDlist[i]) , ]
   
-  replist <- c(unique(one_plot$Number.of.replicate))
+  FT_plot <- FT[which(FT$ID == IDlist[i]) , ]
+  
+  replist <- c(unique(fac_plot$Number.of.replicate))
   
   for (r in 1:length(replist)) {
-    one_rep <- one_plot[which(one_plot$Number.of.replicate == replist[r]) , ]
+    one_rep <- fac_plot[which(fac_plot$Number.of.replicate == replist[r]) , ]
     
     comm_sp <- c(one_rep$Species.within.quadrat)
     
@@ -53,9 +55,35 @@ for (i in 1:length(IDlist)) {
     row.names(comm_mat) <- comm_sp
     colnames(comm_mat) <- traits_collected
     
+    #get the trait vals of species in comm_mat
+    for(s in 1:length(comm_sp)) {
+      for(t in 1:length(traits_collected)) {
+    
+    val <- FT_plot |> 
+      filter(taxon == comm_sp[s], 
+             trait == traits_collected[t]) |> 
+      select(value) 
+    
+    if(nrow(val) == 0) {comm_mat[s,t] <- NA} #if there are no values for this trait, put NA in the matrix
+    else if (nrow(val) > 1) {mean_val <- mean(val$value)#if there are 2 or more trait measurements, get the mean and put that in the matrix
+    comm_mat[s,t] <- mean_val} 
+    else {comm_mat[s,t] <- val$value} #if there is only on trait value, put that in the matrix
+    
+      }
+    }
+    
     matlist[[l]] <- comm_mat
 
     l = l+1
   }
 }
 names(matlist) <- comm_index
+
+
+#now we need to fill these matrices with traits
+for (i in 1:length(IDlist)) {
+  FT_plot <- FT[which(FT$ID == IDlist[i]) , ]
+  
+  
+}
+
