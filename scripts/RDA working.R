@@ -26,9 +26,15 @@ sa <- southafrica |>
 ##!remember that these species were not necessarily filled from the same graz level
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv",
                row.names = 1) |> 
+  #standardise trait values
+  group_by(trait) |> 
+  mutate(sd_value = sd(value), 
+         mean_value = mean(value)) |> 
+  ungroup() |> 
+  mutate(value_std = (value - mean_value)/sd_value) |> 
+  #only work with SA
   filter(COU == "South Africa")
 
-###STANDARDISE TRAIT DATA FIRST###
 
 ###Loop to make sp x trait matrices for each nurse microsite####
 
@@ -72,15 +78,15 @@ for (i in 1:length(IDlist)) {
         val <- FT_plot |> 
           filter(taxon == comm_sp[s], 
                  trait == traits_collected[t]) |> 
-          select(value) 
+          select(value_std) 
       
         #if there are no values for this trait, put NA in the matrix
         if(nrow(val) == 0) {comm_mat[s,t] <- NA} 
           #if there are 2 or more trait measurements, get the mean and put that in the matrix
-          else if (nrow(val) > 1) {mean_val <- mean(val$value)
+          else if (nrow(val) > 1) {mean_val <- mean(val$value_std)
             comm_mat[s,t] <- mean_val} 
             #if there is only on trait value, put that in the matrix
-            else {comm_mat[s,t] <- val$value} 
+            else {comm_mat[s,t] <- val$value_std} 
         }#end loop through traits
       }#end loop through species
     
@@ -150,15 +156,15 @@ for (i in 1:length(IDlist)) {
       val <- FT_plot |> 
         filter(taxon == nurse_sp, 
                trait == traits_collected[t]) |> 
-        select(value)
+        select(value_std)
       
       #if there are no values for this trait, put NA in the matrix
       if(nrow(val) == 0) {exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- NA} 
       #if there are 2 or more trait measurements, get the mean and put that in the matrix
-      else if (nrow(val) > 1) {mean_val <- mean(val$value)
+      else if (nrow(val) > 1) {mean_val <- mean(val$value_std)
       exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- mean_val} 
       #if there is only on trait value, put that in the matrix
-      else {exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- val$value}
+      else {exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- val$value_std}
       }#loop through traits end
     
     #fill the rest of the table
