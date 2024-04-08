@@ -107,6 +107,9 @@ for (m in 1:length(matlist)) {
   comm_means[m, 7] <- mean(comm[, 7], na.rm = T)
   comm_means[m, 8] <- mean(comm[, 8], na.rm = T)
 }
+#remove rows with NA values
+comm_means_inter <- comm_means |> 
+  filter(!is.na(mean_C_N_ratio))
 
 
 ###Loop to create table with explanatory variables####
@@ -119,7 +122,6 @@ exp_var <- data.frame(ID_rep = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_
                       meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
 #columns with trait values in exp_var
 trait_mean_names <- colnames(exp_var)[5:12]
-
 
 ###Loop starts here
 l = 1
@@ -166,6 +168,31 @@ for (i in 1:length(IDlist)) {
     l = l+1
   }#loop through reps end
 }#loop through plots end
+#get exp_var ready for rda:
+exp_var_inter <- exp_var |> 
+  #calculate CN ratio
+  mutate(C_N_ratio = mean_percentC/mean_percentN) |> 
+  select(!c(mean_percentN, mean_percentC)) |> 
+  #remove nurse species without trait values
+  filter(!is.na(C_N_ratio))
+
+#now we need to only work with ID_reps that are in exp_var final and comm_means_final
+only_in_exp_var <- anti_join(exp_var_inter, comm_means_inter, by = "ID_rep")
+only_in_comm_means <- anti_join(comm_means_inter,exp_var_inter, by = "ID_rep")
+
+#remove rows that do not correspond
+exp_var_final <- exp_var_inter |> 
+  filter(!ID_rep %in% c(only_in_exp_var$ID_rep)) |> 
+  column_to_rownames(var = "ID_rep")
+
+comm_means_final <- comm_means_inter |> 
+  filter(!ID_rep %in% c(only_in_comm_means$ID_rep)) |> 
+  column_to_rownames(var = "ID_rep")
+
+
+##Now we can do the RDA
+## associated community composition ~ nurse traits + grazing + aridity
+rda_test <- dbrda(comm_means_final ~ aridity + graz + mean_H + mean_LS + C_N_ratio, data = exp_var_final)
 
 
 
