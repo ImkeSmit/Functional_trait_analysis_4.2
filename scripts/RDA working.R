@@ -106,7 +106,62 @@ for (m in 1:length(matlist)) {
   comm_means[m, 6] <- mean(comm[, 6], na.rm = T)
   comm_means[m, 7] <- mean(comm[, 7], na.rm = T)
   comm_means[m, 8] <- mean(comm[, 8], na.rm = T)
+}
+
+
+###Now we need to get the explanatory variables together####
+#names of the traits collectd
+traits_collected <- c(unique(FT$trait))
+#plot Id's
+IDlist <- c(unique(sa$ID))
+
+exp_var <- data.frame(ID_rep = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_C_N_ratio = NA, meanLL = NA, 
+                      meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
+
+
+
+
+l = 1
+for (i in 1:length(IDlist)) {
   
+  #isolate a plot in the facilitation and FT data
+  fac_plot <- sa[which(sa$ID == IDlist[i]) , ]
+  FT_plot <- FT[which(FT$ID == IDlist[i]) , ]
+  
+  #list of reps in this plot
+  replist <- c(unique(fac_plot$Number.of.replicate))
+  
+  #get the nurse species of each rep
+  for (r in 1:length(replist)) {
+    one_rep <- fac_plot[which(fac_plot$Number.of.replicate == replist[r]) , ]
+    nurse_sp <- c(one_rep$ID_Microsite) 
+    
+    #concatenate ID and repto make an identifier
+    comm_index <- paste(IDlist[i], replist[r], sep = "_")
+    
+    exp_var[l,1] <- comm_index
+    exp_var[l,2] <- nurse_sp
+    
+    #get the traits of that nurse
+    for(t in 1:length(traits_collected)) { #and each trait
+      
+      #isolate the trait value(s) for each species and trait  
+      val <- FT_plot |> 
+        filter(taxon == nurse_sp, 
+               trait == traits_collected[t]) |> 
+        select(value) 
+      
+      #if there are no values for this trait, put NA in the matrix
+      if(nrow(val) == 0) {exp_var[l,t] <- NA} 
+      #if there are 2 or more trait measurements, get the mean and put that in the matrix
+      else if (nrow(val) > 1) {mean_val <- mean(val$value)
+      comm_mat[s,t] <- mean_val} 
+      #if there is only on trait value, put that in the matrix
+      else {comm_mat[s,t] <- val$value} 
+    }#end loop through traits
+    
+    
+  }
 }
 
 
