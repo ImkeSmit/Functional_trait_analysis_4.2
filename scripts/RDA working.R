@@ -109,18 +109,19 @@ for (m in 1:length(matlist)) {
 }
 
 
-###Now we need to get the explanatory variables together####
+###Loop to create table with explanatory variables####
 #names of the traits collectd
 traits_collected <- c(unique(FT$trait))
 #plot Id's
 IDlist <- c(unique(sa$ID))
-
+#empty table with explanatory variables
 exp_var <- data.frame(ID_rep = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_percentN = NA, mean_percentC = NA, 
                       meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
-
+#columns with trait values in exp_var
 trait_mean_names <- colnames(exp_var)[5:12]
 
 
+###Loop starts here
 l = 1
 for (i in 1:length(IDlist)) {
   
@@ -131,20 +132,16 @@ for (i in 1:length(IDlist)) {
   #list of reps in this plot
   replist <- c(unique(fac_plot$Number.of.replicate))
   
-  #get the nurse species of each rep
+  #for each rep:
   for (r in 1:length(replist)) {
     one_rep <- fac_plot[which(fac_plot$Number.of.replicate == replist[r]) , ]
+    #get the nurse species
     nurse_sp <- unique(one_rep$ID_Microsite)
     
     #concatenate ID and rep to make an identifier
     comm_index <- paste(IDlist[i], replist[r], sep = "_")
-
     
-    exp_var[l,1] <- comm_index
-    exp_var[l,2] <- nurse_sp
-    exp_var[l,3] <- one_rep$ARIDITY.v3[1]
-    exp_var[l,4] <- one_rep$GRAZ[1]
-    
+    #get the trait values of the nurse species
     for (t in 1:length(traits_collected)) {
       val <- FT_plot |> 
         filter(taxon == nurse_sp, 
@@ -158,13 +155,17 @@ for (i in 1:length(IDlist)) {
       exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- mean_val} 
       #if there is only on trait value, put that in the matrix
       else {exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- val$value}
-      
-    }
+      }#loop through traits end
     
+    #fill the rest of the table
+    exp_var[l,1] <- comm_index
+    exp_var[l,2] <- nurse_sp
+    exp_var[l,3] <- one_rep$ARIDITY.v3[1]
+    exp_var[l,4] <- one_rep$GRAZ[1]
     
     l = l+1
-  }
-}
+  }#loop through reps end
+}#loop through plots end
 
 
 
