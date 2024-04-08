@@ -28,6 +28,8 @@ FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_
                row.names = 1) |> 
   filter(COU == "South Africa")
 
+###STANDARDISE TRAIT DATA FIRST###
+
 ###Loop to make sp x trait matrices for each nurse microsite####
 
 #names of the traits collectd
@@ -193,7 +195,9 @@ comm_means_final <- comm_means_inter |>
 ##Now we can do the RDA
 ## associated community composition ~ nurse traits + grazing + aridity
 rda_test <- dbrda(comm_means_final ~ aridity + graz + mean_H + mean_LS + C_N_ratio, data = exp_var_final)
+plot(rda_test)
 
-
-
+anova(rda_test) #overall significance of rda
+anova(rda_test, by = "axis")
+anova(rda_test, by = "terms")
 
