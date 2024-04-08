@@ -115,10 +115,10 @@ traits_collected <- c(unique(FT$trait))
 #plot Id's
 IDlist <- c(unique(sa$ID))
 
-exp_var <- data.frame(ID_rep = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_C_N_ratio = NA, meanLL = NA, 
-                      meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
+exp_var <- data.frame(ID_rep = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_percentN = NA, mean_percentC = NA, 
+                      meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
 
-
+trait_mean_names <- colnames(exp_var)[5:12]
 
 
 l = 1
@@ -134,33 +134,35 @@ for (i in 1:length(IDlist)) {
   #get the nurse species of each rep
   for (r in 1:length(replist)) {
     one_rep <- fac_plot[which(fac_plot$Number.of.replicate == replist[r]) , ]
-    nurse_sp <- c(one_rep$ID_Microsite) 
+    nurse_sp <- unique(one_rep$ID_Microsite)
     
-    #concatenate ID and repto make an identifier
+    #concatenate ID and rep to make an identifier
     comm_index <- paste(IDlist[i], replist[r], sep = "_")
+
     
     exp_var[l,1] <- comm_index
     exp_var[l,2] <- nurse_sp
+    exp_var[l,3] <- one_rep$ARIDITY.v3[1]
+    exp_var[l,4] <- one_rep$GRAZ[1]
     
-    #get the traits of that nurse
-    for(t in 1:length(traits_collected)) { #and each trait
-      
-      #isolate the trait value(s) for each species and trait  
+    for (t in 1:length(traits_collected)) {
       val <- FT_plot |> 
         filter(taxon == nurse_sp, 
                trait == traits_collected[t]) |> 
-        select(value) 
+        select(value)
       
       #if there are no values for this trait, put NA in the matrix
-      if(nrow(val) == 0) {exp_var[l,t] <- NA} 
+      if(nrow(val) == 0) {exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- NA} 
       #if there are 2 or more trait measurements, get the mean and put that in the matrix
       else if (nrow(val) > 1) {mean_val <- mean(val$value)
-      comm_mat[s,t] <- mean_val} 
+      exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- mean_val} 
       #if there is only on trait value, put that in the matrix
-      else {comm_mat[s,t] <- val$value} 
-    }#end loop through traits
+      else {exp_var[l, which(colnames(exp_var) == trait_mean_names[t])] <- val$value}
+      
+    }
     
     
+    l = l+1
   }
 }
 
