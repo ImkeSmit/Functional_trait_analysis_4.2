@@ -125,8 +125,8 @@ traits_collected <- c(unique(FT$trait))
 #plot Id's
 IDlist <- c(unique(sa$ID))
 #empty table with explanatory variables
-exp_var <- data.frame(ID_rep = NA, site_ID , = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_percentN = NA, mean_percentC = NA, 
-                      meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
+exp_var <- data.frame(ID_rep = NA,nurse_sp = NA, aridity = NA, graz = NA, mean_percentN = NA, mean_percentC = NA, 
+                      meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA, site_ID = NA)
 #columns with trait values in exp_var
 trait_mean_names <- colnames(exp_var)[5:12]
 
@@ -171,6 +171,7 @@ for (i in 1:length(IDlist)) {
     exp_var[l,2] <- nurse_sp
     exp_var[l,3] <- one_rep$ARIDITY.v3[1]
     exp_var[l,4] <- one_rep$GRAZ[1]
+    exp_var[l,13] <- one_rep$SITE_ID[1]
     
     l = l+1
   }#loop through reps end
@@ -224,6 +225,9 @@ nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation a
 #join these nint results to exp_var
 modeldat <- exp_var_inter |> 
   inner_join(nint_result, by = "ID_rep")
-modeldat$graz <- as.factor(modeldat$graz) 
+modeldat$graz <- as.factor(modeldat$graz)
+modeldat$site_ID <- as.factor(modeldat$site_ID)
 
-glmmTMB(NIntc_richness_binom ~ mean_LS + mean_H + C_N_ratio + graz + aridity + (1|site_ID), family = binomial, data = modeldat)
+nint_trait_model <- glmmTMB(NIntc_richness_binom ~ mean_LS + mean_H + C_N_ratio + meanSLA +(1|nurse_sp), family = binomial, data = modeldat)
+summary(nint_trait_model)
+Anova(nint_trait_model)
