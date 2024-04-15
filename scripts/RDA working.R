@@ -125,7 +125,7 @@ traits_collected <- c(unique(FT$trait))
 #plot Id's
 IDlist <- c(unique(sa$ID))
 #empty table with explanatory variables
-exp_var <- data.frame(ID_rep = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_percentN = NA, mean_percentC = NA, 
+exp_var <- data.frame(ID_rep = NA, site_ID , = NA, nurse_sp = NA, aridity = NA, graz = NA, mean_percentN = NA, mean_percentC = NA, 
                       meanLL = NA, meanSLA = NA, meanLDMC = NA, meanLA = NA, mean_H = NA, mean_LS = NA)
 #columns with trait values in exp_var
 trait_mean_names <- colnames(exp_var)[5:12]
@@ -207,7 +207,23 @@ rda_test <- dbrda(comm_means_final ~ aridity_std + graz + mean_H + mean_LS + C_N
 plot(rda_test)
 summary(rda_test)
 
-anova(rda_test) #overall significance of rda
+t1 <- anova(rda_test) #overall significance of rda
 #anova(rda_test, by = "axis")
-anova(rda_test, by = "terms")
+t2 <- anova(rda_test, by = "terms")
 
+
+###model with NIntc####
+#import nint results
+nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) |> 
+  filter(country == "southafrica", 
+         !is.na(NIntc_richness)) |> 
+  mutate(ID_rep = paste(ID, replicate_no, sep = "_")) |> 
+  mutate(NIntc_richness_binom = (NIntc_richness + 1)/2) |> 
+  select(ID_rep, NIntc_richness_binom)
+
+#join these nint results to exp_var
+modeldat <- exp_var_inter |> 
+  inner_join(nint_result, by = "ID_rep")
+modeldat$graz <- as.factor(modeldat$graz) 
+
+glmmTMB(NIntc_richness_binom ~ mean_LS + mean_H + C_N_ratio + graz + aridity + (1|site_ID), family = binomial, data = modeldat)
