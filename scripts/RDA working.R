@@ -5,7 +5,7 @@ library(tidylog)
 library(vegan)
 
 ##Import raw countries data
-data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3")
+data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3")
 countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
                   "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
 for(i in 1:length(data_files)) {                              
@@ -37,7 +37,6 @@ FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_
 
 
 ###Loop to make sp x trait matrices for each nurse microsite####
-
 #names of the traits collectd
 traits_collected <- c(unique(FT$trait))
 #plot Id's
@@ -185,7 +184,7 @@ exp_var_inter <- exp_var |>
   #remove nurse species without trait values
   filter(!is.na(C_N_ratio))
 
-#now we need to only work with ID_reps that are in exp_var final and comm_means_final
+#now we need to only work with ID_reps that are in exp_var inter and comm_means_inter
 only_in_exp_var <- anti_join(exp_var_inter, comm_means_inter, by = "ID_rep")
 only_in_comm_means <- anti_join(comm_means_inter,exp_var_inter, by = "ID_rep")
 
