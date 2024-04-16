@@ -6,6 +6,7 @@ library(vegan)
 library(DescTools)
 library(glmmTMB)
 library(car)
+library(ggplot2)
 
 #import nint results
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
@@ -97,10 +98,39 @@ modeldat_final <- modeldat |>
        NIntc_cover_binom = (NIntc_cover + 1)/2, 
        NInta_richness_binom = (NInta_richness - (-1)) / (2 - (-1)), 
        NInta_cover_binom = (NInta_cover - (-1)) / (2 - (-1)), 
-       nurse_mean_C_N_ratio = nurse_mean_percentC/nurse_mean_percentN)
+       nurse_mean_C_N_ratio = nurse_mean_percentC/nurse_mean_percentN) |> 
+  filter(!is.na(NIntc_richness_binom))
+
+modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 
 
 ##Now we can run the model
 nintc_richness_model <- 
-  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + nurse_sp + (1|site_ID), 
-          family = binomial, data = NIntc_richness_binom)
+  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + (1|nurse_sp), 
+          family = binomial, data = modeldat_final)
+
+summary(nintc_richness_model)
+Anova(nintc_richness_model)
+
+ggplot(modeldat_final, aes(x = nurse_meanLA, y = NIntc_richness)) +
+  geom_point() +
+  theme_classic()
+
+ggplot(modeldat_final, aes(x = nurse_mean_LS, y = NIntc_richness)) +
+  geom_point() +
+  theme_classic()
+
+ggplot(modeldat_final, aes(x = nurse_mean_H, y = NIntc_richness)) +
+  geom_point() +
+  theme_classic()
+
+ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
+  geom_point() +
+  theme_classic()
+
+
+##All variables are very left skewed except for CN ratio which is very right skewed.
+hist(modeldat_final$nurse_mean_H)
+hist(modeldat_final$nurse_meanLA)
+hist(modeldat_final$nurse_mean_LS)
+hist(modeldat_final$nurse_mean_C_N_ratio)
