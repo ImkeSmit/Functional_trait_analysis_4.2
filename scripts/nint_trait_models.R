@@ -7,6 +7,7 @@ library(DescTools)
 library(glmmTMB)
 library(car)
 library(ggplot2)
+library(DHARMa)
 
 #import nint results
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
@@ -134,3 +135,5 @@ hist(modeldat_final$nurse_mean_H)
 hist(modeldat_final$nurse_meanLA)
 hist(modeldat_final$nurse_mean_LS)
 hist(modeldat_final$nurse_mean_C_N_ratio)
+
+plotResiduals(nintc_richness_model)
