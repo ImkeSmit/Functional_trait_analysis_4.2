@@ -192,7 +192,7 @@ formulas <- AllSubsets(ResponseVariableColumn = which(colnames(modeldat_final) =
                                                             "nurse_meanSLA", "nurse_mean_H", "nurse_mean_LS", "nurse_mean_C_N_ratio"))), 
                        data.source = modeldat_final, 
                        Add.PolynomialTerms = TRUE,
-                       Polynom.exclude = c(which(colnames(nintc_rich_sum) %in% c("graz", "nurse_meanLA", 
+                       Polynom.exclude = c(which(colnames(modeldat_final) %in% c("graz", "nurse_meanLA", 
                                                   "nurse_meanSLA", "nurse_mean_H", "nurse_mean_LS", "nurse_mean_C_N_ratio"))), 
                        Polynom.order = 2, 
                        Do.PredictorInteractions = FALSE, 
@@ -205,4 +205,4 @@ for(f in 1:length(formulas)) {
   one_formula <- formulas[[f]]
   formula_table[f, 1] <- one_formula
 }
-write.csv(formula_table, "Functional trait data\\Results\\model_formulas_with_aridsq.csv")
+write.csv(formula_table, "Functional trait data\\Results\\nint_nurse_trait_formulas.csv")
