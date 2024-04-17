@@ -8,19 +8,20 @@ library(glmmTMB)
 library(car)
 library(ggplot2)
 library(DHARMa)
+library(corrplot)
 
 #import nint results
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
 
 ##import trait data
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv",
-               row.names = 1) |> 
+               row.names = 1) #|> 
   #standardise trait values
-  group_by(trait) |> 
-  mutate(sd_value = sd(value), 
-         mean_value = mean(value)) |> 
-  ungroup() |> 
-  mutate(value_std = (value - mean_value)/sd_value)
+  #group_by(trait) |> 
+  #mutate(sd_value = sd(value), 
+  #       mean_value = mean(value)) |> 
+  #ungroup() |> 
+  #mutate(value_std = (value - mean_value)/sd_value)
 
 ##For each replicate, we need to get the NIntc value and the traits of the nurse
 #names of the traits collectd
@@ -57,15 +58,15 @@ for (i in 1:length(IDlist)) {
       val <- FT_plot |> 
         filter(taxon == nurse_sp, 
                trait == traits_collected[t]) |> 
-        select(value_std)
+        select(value)
       
       #if there are no values for this trait, put NA in the matrix
       if(nrow(val) == 0) {modeldat[l, which(colnames(modeldat) == trait_mean_names[t])] <- NA} 
       #if there are 2 or more trait measurements, get the mean and put that in the matrix
-      else if (nrow(val) > 1) {mean_val <- mean(val$value_std)
+      else if (nrow(val) > 1) {mean_val <- mean(val$value)
       modeldat[l, which(colnames(modeldat) == trait_mean_names[t])] <- mean_val} 
       #if there is only on trait value, put that in the matrix
-      else {modeldat[l, which(colnames(modeldat) == trait_mean_names[t])] <- val$value_std}
+      else {modeldat[l, which(colnames(modeldat) == trait_mean_names[t])] <- val$value}
     }#loop through traits end
     
     #fill the rest of the table
@@ -101,6 +102,7 @@ modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
+cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")])
 
 ##Now we can run the model
 nint_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
