@@ -12,14 +12,6 @@ library(DHARMa)
 #import nint results
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
 
-#|> 
-  #transform the nint variables to range between 0 and 1
-  #mutate(NIntc_richness_binom = (NIntc_richness + 1)/2, 
-        # NIntc_cover_binom = (NIntc_cover + 1)/2, 
-        # NInta_richness_binom = (NInta_richness - (-1)) / (2 - (-1)), 
-        # NInta_cover_binom = (NInta_cover - (-1)) / (2 - (-1)))
-  
-
 ##import trait data
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv",
                row.names = 1) |> 
@@ -100,18 +92,26 @@ modeldat_final <- modeldat |>
        NInta_richness_binom = (NInta_richness - (-1)) / (2 - (-1)), 
        NInta_cover_binom = (NInta_cover - (-1)) / (2 - (-1)), 
        nurse_mean_C_N_ratio = nurse_mean_percentC/nurse_mean_percentN) |> 
-  filter(!is.na(NIntc_richness_binom))
+  filter(!is.na(NIntc_richness_binom), 
+         !is.na(nurse_meanLA), 
+         !is.na(nurse_mean_LS), 
+         !is.na(nurse_mean_C_N_ratio))
 
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
+modeldat_final$graz <- as.factor(modeldat_final$graz)
+modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
 
 ##Now we can run the model
+nint_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+
 nintc_richness_model <- 
-  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + (1|nurse_sp), 
+  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + graz + aridity + (1|nurse_sp) +(1|site_ID), 
           family = binomial, data = modeldat_final)
 
 summary(nintc_richness_model)
 Anova(nintc_richness_model)
+anova(nint_richness_null, nintc_richness_model)
 
 ggplot(modeldat_final, aes(x = nurse_meanLA, y = NIntc_richness)) +
   geom_point() +
