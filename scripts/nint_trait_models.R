@@ -141,6 +141,7 @@ ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
 ##All variables are very left skewed except for CN ratio which is very right skewed.
 hist(modeldat_final$nurse_mean_H)
 hist(modeldat_final$nurse_meanLA)
+hist(modeldat_final$nurse_meanSLA)
 hist(modeldat_final$nurse_mean_LS)
 hist(modeldat_final$nurse_mean_C_N_ratio)
 
