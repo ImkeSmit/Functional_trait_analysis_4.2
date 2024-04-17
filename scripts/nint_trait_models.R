@@ -103,6 +103,8 @@ modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
 cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")])
+corrplot(cormat, method = "number")
+#nothing is gighly correlated except for N and CN ratio
 
 ##Now we can run the model
 nint_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
