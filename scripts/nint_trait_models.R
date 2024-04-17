@@ -96,7 +96,11 @@ modeldat_final <- modeldat |>
   filter(!is.na(NIntc_richness_binom), 
          !is.na(nurse_meanLA), 
          !is.na(nurse_mean_LS), 
-         !is.na(nurse_mean_C_N_ratio))
+         !is.na(nurse_mean_C_N_ratio), 
+         !is.na(nurse_meanSLA), 
+         !is.na(nurse_mean_H))
+
+write.csv(modeldat_final, "Functional trait data//nint_nurse_traits.csv")
 
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
