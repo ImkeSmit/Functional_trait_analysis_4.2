@@ -110,7 +110,7 @@ corrplot(cormat, method = "number")
 nint_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
 
 nintc_richness_model <- 
-  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + graz + aridity + (1|nurse_sp) +(1|site_ID), 
+  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + nurse_meanSLA + graz + aridity + (1|nurse_sp) +(1|site_ID), 
           family = binomial, data = modeldat_final)
 
 summary(nintc_richness_model)
@@ -118,6 +118,10 @@ Anova(nintc_richness_model)
 anova(nint_richness_null, nintc_richness_model)
 
 ggplot(modeldat_final, aes(x = nurse_meanLA, y = NIntc_richness)) +
+  geom_point() +
+  theme_classic()
+
+ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
   geom_point() +
   theme_classic()
 
