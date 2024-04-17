@@ -110,10 +110,6 @@ AllSubsets <- function(ResponseVariableColumn, PredictorsColumns, data.source = 
   for (counter in c(1 : NumberExplanatoryVariables)) {
     
     temp.combn <- t(combn(AllPredictorsNames, counter))
-    #remove unessecary combos
-    #Interactions where functional div indices interact, and where the interaction has an NA in it
-    #temp.combn <- t(t(temp.combn[-which(temp.combn[ , c(1:ncol(temp.combn))] %in% c("FRic:FEve", "FEve:FRic", "FRic:FDiv", "FDiv:FRic", "FEve:FDiv", "FDiv:FEve")) , ]))
-    #temp.combn <- t(t(temp.combn[-which(temp.combn[ , c(1:ncol(temp.combn))] %like% "%:NA%") , ]))
     
     for (counter2 in 1 : length(temp.combn[,1])) {
       PredictorCombinations[[length(PredictorCombinations) + 1]] <- temp.combn[counter2, ]
@@ -184,60 +180,24 @@ AllSubsets <- function(ResponseVariableColumn, PredictorsColumns, data.source = 
 
 
 ####RUN AllSubsets####
-#import FD results
-FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1) 
+#the nint trait results
+modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) 
 
-FD_results$FRic <- as.numeric(FD_results$FRic)
-FD_results$qual.FRic <- as.numeric(FD_results$qual.FRic)
-FD_results$FEve <- as.numeric(FD_results$FEve)
-FD_results$FDiv <- as.numeric(FD_results$FDiv)
-FD_results$RaoQ <- as.numeric(FD_results$RaoQ) 
-FD_results$ID <- as.factor(FD_results$ID)
+modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
+modeldat_final$graz <- as.factor(modeldat_final$graz)
+modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
-#import NIntc results
-nint_result <- 
-  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1)
-
-#NIntc is bounded beween -1 and 1, so binomial family is appropriate
-#However the function requires that the response be bounded between 0 and 1, so rescale NIntc
-#x-min/max- min (here the formula is just already simplified)
-nint_result$NIntc_richness_binom <- (nint_result$NIntc_richness + 1)/2
-nint_result$NIntc_cover_binom <- (nint_result$NIntc_cover + 1)/2
-nint_result$NIntc_shannon_binom <- (nint_result$NIntc_shannon + 1)/2
-
-#x-min/max- min
-nint_result$NInta_richness_binom <- (nint_result$NInta_richness - (-1)) / (2 - (-1))
-nint_result$NInta_cover_binom <- (nint_result$NInta_cover - (-1)) / (2 - (-1))
-nint_result$NInta_shannon_binom <- (nint_result$NInta_shannon - (-1)) / (2 - (-1))
-
-nint_result$site_ID <- as.factor(nint_result$site_ID)
-nint_result$graz <- as.factor(nint_result$graz)
-nint_result$ID <- as.factor(nint_result$ID)
-
-#summarise the average NIntc richness by plot
-nintc_rich_sum <- nint_result |> 
-  select(country, site_ID, ID, graz, aridity, NIntc_richness_binom) |> 
-  filter(!is.na(NIntc_richness_binom)) |> #remove NA's
-  group_by(ID) |> #calculate mean and sd of NIntc richness binom in each plot
-  mutate(mean_NIntc_rich_binom = mean(NIntc_richness_binom), 
-         sd_NIntc_rich_binom = sd(NIntc_richness_binom), 
-         n_obs = n()) |> 
-  ungroup() |> 
-  select(!NIntc_richness_binom) |> 
-  distinct() |> #remove duplicate rows, only need one eman per plot
-  left_join(FD_results, by = "ID") |>  #join to the FD_results
-  filter(!is.na(FEve))
-
-formulas <- AllSubsets(ResponseVariableColumn = which(colnames(nintc_rich_sum) == "mean_NIntc_rich_binom"), 
-                       PredictorsColumns = c(which(colnames(nintc_rich_sum) %in% c("FRic", "FEve", "FDiv", "graz", "aridity"))), 
-                       data.source = nintc_rich_sum, 
+formulas <- AllSubsets(ResponseVariableColumn = which(colnames(modeldat_final) == "NIntc_richness_binom"), 
+                       PredictorsColumns = c(which(colnames(modeldat_final) %in% c("aridity", "graz", "nurse_meanLA", 
+                                                            "nurse_meanSLA", "nurse_mean_H", "nurse_mean_LS", "nurse_mean_C_N_ratio"))), 
+                       data.source = modeldat_final, 
                        Add.PolynomialTerms = TRUE,
-                       Polynom.exclude = c(which(colnames(nintc_rich_sum) %in% c("FRic", "FEve", "FDiv", "graz"))), 
+                       Polynom.exclude = c(which(colnames(nintc_rich_sum) %in% c("graz", "nurse_meanLA", 
+                                                  "nurse_meanSLA", "nurse_mean_H", "nurse_mean_LS", "nurse_mean_C_N_ratio"))), 
                        Polynom.order = 2, 
-                       Do.PredictorInteractions = TRUE, 
-                       Interaction.Level = 2, #interaction level = 3 takes wayyy too long
+                       Do.PredictorInteractions = FALSE, 
                        Do.Random.effect = TRUE, 
-                       random.effect = "(1|site_ID)") 
+                       random.effect = "(1|nurse_sp) + (1|site_ID)") 
 #Save the formulas output because it takes so long to run
 
 formula_table <- data.frame(formula  = character(length = length(formulas)))
