@@ -118,8 +118,10 @@ formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_form
   select(predictors) |> 
   distinct(predictors) |> 
   add_row(predictors = "1+(1|nurse_sp)+(1|site_ID)")
+
 #import the data
-modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv")
+modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv") |> 
+  mutate(aridity2 = aridity^2)
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Create a table for results
@@ -133,7 +135,7 @@ warning_msg <- ""
 ##Also loop through response variables
 #loop through Nintc first
 response_list <- c("NIntc_richness_binom", "NIntc_cover_binom", "NInta_richness_binom", "NInta_cover_binom")
-datalist = c("modeldat_final")
+datalist = c("modeldat_final", "modeldat_final", "modeldat_final", "modeldat_final")
 
 ##LOOP THROUGH MODELS STARTS HERE##
 #Loop through response variables
