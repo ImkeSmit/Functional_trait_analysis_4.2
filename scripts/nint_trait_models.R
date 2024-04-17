@@ -100,7 +100,7 @@ modeldat_final <- modeldat |>
          !is.na(nurse_meanSLA), 
          !is.na(nurse_mean_H))
 
-write.csv(modeldat_final, "Functional trait data//nint_nurse_traits.csv")
+write.csv(modeldat_final, "Functional trait data//Clean data//nint_nurse_traits.csv")
 
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
@@ -109,6 +109,14 @@ modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")])
 corrplot(cormat, method = "number")
 #nothing is gighly correlated except for N and CN ratio
+
+
+##Now we can do the model building
+#import the model formulas
+#run the loop through the formulas
+
+
+
 
 ##Now we can run the model
 nint_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
