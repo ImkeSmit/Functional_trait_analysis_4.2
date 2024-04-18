@@ -108,10 +108,17 @@ modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
 cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")])
 corrplot(cormat, method = "number")
-#nothing is gighly correlated except for N and CN ratio
+#nothing is highly correlated except for N and CN ratio
+
+##All variables are very left skewed except for CN ratio which is very right skewed.
+hist(modeldat_final$nurse_mean_H)
+hist(modeldat_final$nurse_meanLA)
+hist(modeldat_final$nurse_meanSLA)
+hist(modeldat_final$nurse_mean_LS)
+hist(modeldat_final$nurse_mean_C_N_ratio)
 
 
-##Now we can do the model building
+###Now we can run the allsubsets models####
 #import the model formulas
 formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_formulas.csv") |> 
   separate_wider_delim(formula, delim = "~", names = c("response", "predictors")) |> 
@@ -213,6 +220,43 @@ results_table
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
 write.csv(results_table, "Functional trait data\\results\\nint_nurse_traits_model_results_17Apr2024.csv")
+
+
+###select the model with the lowest AIC####
+results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_model_results_17Apr2024.csv", row.names = 1)
+
+best_subset_models <- results_table |> 
+  filter(!is.na(AIC)) |> 
+  group_by(Response) |> 
+  filter(AIC == min(AIC))
+#the models selcted for nintc and ninta cover contain aridity2 but not aridity, so I guess we select the next lowest model
+
+
+##Get the info of the best subset models##
+#nintc richness null model:
+nintc_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+
+#NIntc richness best model
+nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~ nurse_meanSLA+nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+                                 family = binomial, data = modeldat_final)
+
+summary(nintc_richness_bestmod)
+anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
+Anova(nintc_richness_bestmod)
+
+###
+
+#nintc cover null model:
+nintc_cover_null <- glmmTMB(NIntc_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+
+#NIntc cover best model
+nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA+nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+                                  family = binomial, data = modeldat_final)
+
+summary(nintc_richness_bestmod)
+anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
+Anova(nintc_richness_bestmod)
+
 
 
 
