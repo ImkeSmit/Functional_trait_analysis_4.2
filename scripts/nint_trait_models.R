@@ -258,15 +258,6 @@ summary(nintc_cover_bestmod)
 anova(nintc_cover_null, nintc_cover_bestmod) #p = 0.003207
 Anova(nintc_cover_bestmod)
 
-#aridity, SLA and CN ratio are significant predictors. so lets get the model predictions for each of these variables
-pred_data <- data.frame(aridity = c(modeldat_final$aridity), nurse_meanSLA = c(modeldat_final$nurse_meanSLA), 
-                                    nurse_meanLA = c(modeldat_final$nurse_meanLA), 
-                        nurse_mean_C_N_ratio = c(modeldat_final$nurse_mean_C_N_ratio), nurse_sp = c(modeldat_final$nurse_sp),
-                        site_ID = c(modeldat_final$site_ID))
-nintc_covermod_predictions <- predict(nintc_cover_bestmod, pred_data)
-
-
-
 ###
 
 #nintc richness null model:
@@ -315,18 +306,34 @@ nintc_richness_var <- ggarrange(nintc_richness_SLA, nintc_richness_CN, labels = 
 
 
 ###Nintc cover ~ SLA
+#first get the model predictions of nintc cover ~ SLA
+nintc_cover_SLA_mod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
+pred_data <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
+pred_data$binom_prediction <- predict(nintc_cover_SLA_mod, pred_data)
+pred_data$true_prediction <- 2*pred_data$binom_prediction -1
+
 nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
   geom_jitter(width = 2, height = 0.1, alpha = 0.6, size = 2, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[C]~cover)) +
-  xlab("mean SLA of dominant plant")
+  xlab("mean SLA of dominant plant") +
+  geom_line(data = pred_data, aes(x = nurse_meanSLA, y = true_prediction), color = "turquoise", lwd = 1.5)
+
 
 ###NIntc cover ~ C:N ratio
+#first get the model predictions of nintc cover ~ C:N
+nintc_cover_CN_mod <- glmmTMB(NIntc_cover_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
+pred_data <- data.frame(nurse_mean_C_N_ratio = c(unique(modeldat_final$nurse_mean_C_N_ratio)))
+pred_data$binom_prediction <- predict(nintc_cover_CN_mod, pred_data)
+pred_data$true_prediction <- 2*pred_data$binom_prediction -1
+
 nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
   geom_jitter(width = 5, height = 0.1, alpha = 0.6, size = 2, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[C]~cover)) +
-  xlab("mean C:N ratio of dominant plant")
+  xlab("mean C:N ratio of dominant plant") +
+  geom_line(data = pred_data, aes(x = nurse_mean_C_N_ratio, y = true_prediction), color = "turquoise", lwd = 1.5)
+
 
 
 
