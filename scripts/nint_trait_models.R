@@ -9,6 +9,7 @@ library(car)
 library(ggplot2)
 library(DHARMa)
 library(corrplot)
+library(ggpubr)
 
 #import nint results
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
@@ -228,7 +229,7 @@ results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_mod
 best_subset_models <- results_table |> 
   filter(!is.na(AIC)) |> 
   group_by(Response) |> 
-  top_n(-3, AIC)
+  top_n(-3, AIC) # get the 3 lowest AIC values
 #the models selcted for nintc and ninta cover contain aridity2 but not aridity, so I guess we select the next lowest model
 
 
@@ -257,6 +258,15 @@ summary(nintc_cover_bestmod)
 anova(nintc_cover_null, nintc_cover_bestmod) #p = 0.003207
 Anova(nintc_cover_bestmod)
 
+#aridity, SLA and CN ratio are significant predictors. so lets get the model predictions for each of these variables
+pred_data <- data.frame(aridity = c(modeldat_final$aridity), nurse_meanSLA = c(modeldat_final$nurse_meanSLA), 
+                                    nurse_meanLA = c(modeldat_final$nurse_meanLA), 
+                        nurse_mean_C_N_ratio = c(modeldat_final$nurse_mean_C_N_ratio), nurse_sp = c(modeldat_final$nurse_sp),
+                        site_ID = c(modeldat_final$site_ID))
+nintc_covermod_predictions <- predict(nintc_cover_bestmod, pred_data)
+
+
+
 ###
 
 #nintc richness null model:
@@ -283,6 +293,40 @@ summary(ninta_cover_bestmod)
 anova(ninta_cover_null, ninta_cover_bestmod) #p = 0.004049
 Anova(ninta_cover_bestmod)
 
+
+####Let's make some figures####
+
+###Nintc richness ~ SLA
+nintc_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
+  geom_jitter(width = 2, height = 0.1, alpha = 0.6, size = 2, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~richness)) +
+  xlab("mean SLA of dominant plant")
+
+###NIntc_richness ~ C:N ratio
+nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
+  geom_jitter(width = 2, height = 0.1, alpha = 0.6, size = 2, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~richness)) +
+  xlab("mean C:N ratio of dominant plant")
+
+###Combine above figures
+nintc_richness_var <- ggarrange(nintc_richness_SLA, nintc_richness_CN, labels = c("a", "b"))
+
+
+###Nintc cover ~ SLA
+nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
+  geom_jitter(width = 2, height = 0.1, alpha = 0.6, size = 2, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~cover)) +
+  xlab("mean SLA of dominant plant")
+
+###NIntc cover ~ C:N ratio
+nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
+  geom_jitter(width = 5, height = 0.1, alpha = 0.6, size = 2, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~cover)) +
+  xlab("mean C:N ratio of dominant plant")
 
 
 
