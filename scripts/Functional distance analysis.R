@@ -60,9 +60,6 @@ for(t in 1:length(traitlist)) {
 }
 
 
-#Get the euclidean distance between each pair of species
-distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
-
 ##Get the species that are nurses, growing with nurses, or in the bare microsite in each country####
 #We require raw country data
 data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3")
@@ -167,11 +164,12 @@ write.csv(sp_positions, "Functional trait data\\results\\sp_positions.csv")
 
 
 
-
-
-###Another way: retreive distances between the nurse and each species also growing in the rep####
+###Retreive distances between the nurse and each species also growing in the rep####
 #then classify that distance as D_bare_only, D_nurse_only or D_both
-#This distance is only between 2 sp, not between the nurse and many sp as in pair_dist
+#This distance is only between 2 sp
+
+#Get the euclidean distance between each pair of species
+distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
 
 #import sp_positions
 sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
@@ -279,6 +277,11 @@ twosp_dist$GRAZ <- as.factor(twosp_dist$GRAZ)
 twosp_dist$SITE_ID <- as.factor(twosp_dist$SITE_ID)
 twosp_dist$grouping <- as.factor(twosp_dist$grouping)
 twosp_dist$arid_sq <- (twosp_dist$ARIDITY.v3)^2
+
+
+###Lets join the results of the CHi2 tests to twosp-dist###
+ass <- read.csv()
+
 
 
 ggplot(twosp_dist, aes(x = euclidean_dist)) +
