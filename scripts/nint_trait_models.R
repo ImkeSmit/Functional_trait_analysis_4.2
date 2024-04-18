@@ -228,7 +228,7 @@ results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_mod
 best_subset_models <- results_table |> 
   filter(!is.na(AIC)) |> 
   group_by(Response) |> 
-  filter(AIC == min(AIC))
+  top_n(-3, AIC)
 #the models selcted for nintc and ninta cover contain aridity2 but not aridity, so I guess we select the next lowest model
 
 
@@ -250,53 +250,39 @@ Anova(nintc_richness_bestmod)
 nintc_cover_null <- glmmTMB(NIntc_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
 
 #NIntc cover best model
-nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA+nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ aridity+ nurse_meanSLA+ nurse_meanLA+ nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
                                   family = binomial, data = modeldat_final)
 
-summary(nintc_richness_bestmod)
-anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
-Anova(nintc_richness_bestmod)
+summary(nintc_cover_bestmod)
+anova(nintc_cover_null, nintc_cover_bestmod) #p = 0.003207
+Anova(nintc_cover_bestmod)
+
+###
+
+#nintc richness null model:
+ninta_richness_null <- glmmTMB(NInta_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+
+#NIntc richness best model
+ninta_richness_bestmod <- glmmTMB(NInta_richness_binom ~ nurse_meanSLA+ nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+                                  family = binomial, data = modeldat_final)
+
+summary(ninta_richness_bestmod)
+anova(ninta_richness_null, ninta_richness_bestmod) #p = 0.04243
+Anova(ninta_richness_bestmod)
+
+###
+
+#ninta cover null model:
+ninta_cover_null <- glmmTMB(NInta_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+
+#NInta cover best model
+ninta_cover_bestmod <- glmmTMB(NInta_cover_binom ~  aridity+ nurse_meanSLA+ nurse_mean_C_N_ratio+ aridity2 + (1|nurse_sp) +(1|site_ID), 
+                               family = binomial, data = modeldat_final)
+
+summary(ninta_cover_bestmod)
+anova(ninta_cover_null, ninta_cover_bestmod) #p = 0.004049
+Anova(ninta_cover_bestmod)
 
 
 
 
-##Now we can run the model
-nint_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
-
-nintc_richness_model <- 
-  glmmTMB(NIntc_richness_binom ~ nurse_meanLA + nurse_mean_LS + nurse_mean_H + nurse_mean_C_N_ratio + nurse_meanSLA + graz + aridity + (1|nurse_sp) +(1|site_ID), 
-          family = binomial, data = modeldat_final)
-
-summary(nintc_richness_model)
-Anova(nintc_richness_model)
-anova(nint_richness_null, nintc_richness_model)
-
-ggplot(modeldat_final, aes(x = nurse_meanLA, y = NIntc_richness)) +
-  geom_point() +
-  theme_classic()
-
-ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
-  geom_point() +
-  theme_classic()
-
-ggplot(modeldat_final, aes(x = nurse_mean_LS, y = NIntc_richness)) +
-  geom_point() +
-  theme_classic()
-
-ggplot(modeldat_final, aes(x = nurse_mean_H, y = NIntc_richness)) +
-  geom_point() +
-  theme_classic()
-
-ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
-  geom_point() +
-  theme_classic()
-
-
-##All variables are very left skewed except for CN ratio which is very right skewed.
-hist(modeldat_final$nurse_mean_H)
-hist(modeldat_final$nurse_meanLA)
-hist(modeldat_final$nurse_meanSLA)
-hist(modeldat_final$nurse_mean_LS)
-hist(modeldat_final$nurse_mean_C_N_ratio)
-
-plotResiduals(nintc_richness_model)
