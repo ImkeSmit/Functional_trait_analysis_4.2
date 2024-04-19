@@ -7,6 +7,8 @@ library(car)
 library(emmeans)
 library(DHARMa)
 library(MuMIn)
+library(multcomp)
+library(multcompView)
 
 #From the filled trait data for plotspecific species
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1)
@@ -286,12 +288,40 @@ twosp_dist$arid_sq <- (twosp_dist$ARIDITY.v3)^2
 
 
 ###Lets join the results of the CHi2 tests to twosp-dist###
-ass <- read.csv()
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(target = species)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
+
+dist_ass_join <- twosp_dist |> 
+  left_join(ass, by = c("target", "ID"))
+dist_ass_join$association <- as.factor(dist_ass_join$association)
+dist_ass_join$nurse <- as.factor(dist_ass_join$nurse)
+dist_ass_join$SITE_ID <- as.factor(dist_ass_join$SITE_ID)
+dist_ass_join$euclidean_dist <- as.numeric(dist_ass_join$euclidean_dist)
+
+##does the distance between nurses and bare associated species differ from the distance between nurses and nurse associated species?
+dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
+
+dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
+summary(dist_ass_mod)
+Anova(dist_ass_mod)
+anova(dist_ass_null, dist_ass_mod) #p = 2.031e-09 ***
+
+emmeans(dist_ass_mod, specs = "association")
+cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
+
+ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
+  geom_boxplot() +
+  ylab("Euclidean distance between dominant and target species") +
+  xlab("target species association") +
+  #geom_text(aes(x = association, y = 9), label = c("ab", "b", "a", "b")) +
+  theme_classic()
+
+##Nurse and bare are not significantly different, so the difference in the nurse and target traits do not matter for facilitation
 
 
-
-ggplot(twosp_dist, aes(x = euclidean_dist)) +
-  geom_histogram()
+###Old code and models below####
 
 #model without interactions
 twosp1 <- glmmTMB(euclidean_dist ~ grouping +GRAZ + ARIDITY.v3 + arid_sq 
