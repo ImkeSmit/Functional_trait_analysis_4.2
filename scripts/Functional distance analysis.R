@@ -62,7 +62,7 @@ for(t in 1:length(traitlist)) {
 
 ##Get the species that are nurses, growing with nurses, or in the bare microsite in each country####
 #We require raw country data
-data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3")
+data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3")
 countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
                   "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
 for(i in 1:length(data_files)) {                              
@@ -177,7 +177,7 @@ sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row
 IDlist <- unique(sp_positions$ID)
 
 twosp_dist <- cbind("ID" = NA, "replicate" = NA, 
-                    "euclidean_dist" = NA, "grouping" = NA)
+                    "euclidean_dist" = NA, "grouping" = NA, "nurse" = NA, "target" = NA)
 
 for(i in 1:length(IDlist)) {
   plot <- sp_positions |> 
@@ -214,10 +214,12 @@ for(i in 1:length(IDlist)) {
       
       if(b == 1){
         twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                 "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only")
+                                 "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
+                                 "nurse" = NURSE, "target" = bare_only[b])
       } else {
         temp_twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                      "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only")
+                                      "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
+                                      "nurse" = NURSE, "target" = bare_only[b])
         twosp_bare_only <- rbind(twosp_bare_only, temp_twosp_bare_only)
       }}
       
@@ -228,10 +230,12 @@ for(i in 1:length(IDlist)) {
       
       if(n == 1){
         twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                 "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only")
+                                 "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
+                                 "nurse" = NURSE, "target" = nurse_only[n])
       } else {
         temp_twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                      "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only")
+                                      "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
+                                      "nurse" = NURSE, "target" = nurse_only[n])
         twosp_nurse_only <- rbind(twosp_nurse_only, temp_twosp_nurse_only)
       }}
       
@@ -242,10 +246,12 @@ for(i in 1:length(IDlist)) {
       
       if(z == 1){
         twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                  "euclidean_dist" = D_both, "grouping" = "nurse_both")
+                                  "euclidean_dist" = D_both, "grouping" = "nurse_both", 
+                            "nurse" = NURSE, "target" = both[z])
       } else {
         temp_twosp_both <- twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                                     "euclidean_dist" = D_both, "grouping" = "nurse_both")
+                                                     "euclidean_dist" = D_both, "grouping" = "nurse_both", 
+                                               "nurse" = NURSE, "target" = both[z])
         twosp_both <- rbind(twosp_both, temp_twosp_both)
       }}
       
