@@ -143,8 +143,8 @@ warning_msg <- ""
 
 ##Also loop through response variables
 #loop through Nintc first
-response_list <- c("mean_NIntc_rich_binom", "mean_NIntc_cov_binom")
-datalist = c("nintc_rich_sum", "nintc_cov_sum")
+response_list <- c("mean_NIntc_rich_binom", "mean_NIntc_cov_binom", "mean_NInta_rich_binom", "mean_NInta_cov_binom")
+datalist = c("nintc_rich_sum", "nintc_cov_sum", "ninta_rich_sum", "ninta_cov_sum")
 
 ##LOOP THROUGH MODELS STARTS HERE##
 #Loop through response variables
@@ -225,96 +225,7 @@ write.csv(results_table, "Functional trait data\\results\\FD_model_results_13Mar
 
 
 
-###Loop through the formulas for NInta####
-#Create a table for results
-results_table <- data.frame(Response = character(), Model = character(), Chisq = numeric(), 
-                            Df = integer(), Pr_value = numeric(), AIC = numeric(), 
-                            Warnings = character(), row.names = NULL)
 
-# Initialize warning_msg outside the loop
-warning_msg <- ""
-
-##Also loop through response variables
-#loop through Nintc first
-response_list <- c("mean_NInta_rich_binom", "mean_NInta_cov_binom")
-datalist = c("ninta_rich_sum", "ninta_cov_sum")
-
-##LOOP THROUGH MODELS STARTS HERE##
-#Loop through response variables
-for(r in 1:length(response_list)) {
-  
-  response_var <- response_list[r]  
-  data = get(datalist[r])
-  
-  #Loop through response variables
-  for (f in 1:nrow(formula_table)) {
-    
-    predictors <- as.character(formula_table[f, ])
-    formula <- as.formula(paste(response_var, "~",  predictors))
-    
-    # Clear existing warning messages
-    warnings()
-    
-    # Initialize anova_result and AIC_model outside the tryCatch block
-    anova_result <- NULL
-    AIC_model <- NULL
-    
-    tryCatch( #tryCatch looks for errors and warinngs in the expression
-      expr = {
-        model <- glmmTMB(formula, family = binomial, data = data)
-        
-        # Perform Anova 
-        anova_result <- Anova(model)
-        # Get AIC
-        AIC_model <- AIC(model)
-        
-        warning_messages <- warnings()
-        
-        ##Do nothing if the warinng is about non integer successes
-        # Check for the non-integer #successes warning
-        if ("non-integer #successes" %in% warning_messages) {
-          # Handle non-integer #successes warning (e.g., print a message)
-          message("Ignoring non-integer #successes warning")
-        }
-        
-        #Print the warning message if it is about model fit
-        # Check for other warnings, excluding the non-integer #successes warning
-        other_warnings <- setdiff(warning_messages, "non-integer #successes")
-        if (length(other_warnings) > 0) {
-          warning_msg <- paste("warning :", as.character(other_warnings), collapse = "; ")
-          message(paste("WARNING_", "r =" , response_var, "f =", f, warning_msg))
-        }
-      }, 
-      
-      #Also show me errors
-      error = function(e) {
-        message(paste("ERROR_", "r =" , response_var, "f =", f, conditionMessage(e)))
-        print(e)
-      }
-    )
-    
-    # Extract relevant information
-    result_row <- data.frame(Response = response_var,
-                             Model = paste(response_var, "~",  predictors), 
-                             Chisq = ifelse(!is.null(anova_result), anova_result$Chisq[1], NA), 
-                             Df = ifelse(!is.null(anova_result), anova_result$"Df"[1], NA), 
-                             Pr_value = ifelse(!is.null(anova_result), anova_result$"Pr(>Chisq)"[1], NA), 
-                             AIC = ifelse(!is.null(AIC_model), AIC_model, NA),
-                             Warnings = warning_msg)
-    
-    
-    results_table <- rbind(results_table, result_row)
-  }
-}
-
-results_table
-##LOOK AT WARNINGS
-##The warnings are sort of cumulative. Once the is one warning of fitTMB, all warning_msg will contain it.
-##I don't know how to fix this yet
-##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
-##!!MOdels with NA in the CHisq have convergence problems. 
-
-write.csv(results_table, "Functional trait data\\results\\FD_model_results_13Mar2024_ninta.csv")
 
 
 
