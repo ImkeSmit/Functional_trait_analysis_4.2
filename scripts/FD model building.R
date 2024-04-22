@@ -4,6 +4,7 @@ library(tidylog)
 library(glmmTMB)
 library(ggplot2)
 library(car)
+library(corrplot)
 
 FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1) 
 
@@ -40,7 +41,7 @@ ggplot(FD_results, aes(x = RaoQ)) +
 
 
 ##Correlations
-cormat <- cor(FD_results[which(!is.na(FD_results$FEve)) , which(colnames(FD_results) %in% c("FRic", "FEve", "FDiv"))],  method = "spearman")
+cormat <- cor(FD_results[which(!is.na(FD_results$FEve)) , which(colnames(FD_results) %in% c("FRic", "FEve", "FDiv", "RaoQ"))],  method = "spearman")
 corrplot(cormat, method = "number") ##correlations are all very low
 
 
