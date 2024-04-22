@@ -307,7 +307,7 @@ nintc_richness_var <- ggarrange(nintc_richness_SLA, nintc_richness_CN, labels = 
 #first get the model predictions of nintc cover ~ SLA
 nintc_cover_SLA_mod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
 pred_data <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
-pred_data$binom_prediction <- predict(nintc_cover_SLA_mod, pred_data)
+pred_data$binom_prediction <- predict(nintc_cover_SLA_mod, pred_data, type = "response")
 pred_data$true_prediction <- 2*pred_data$binom_prediction -1
 
 nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
@@ -322,7 +322,7 @@ nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover
 #first get the model predictions of nintc cover ~ C:N
 nintc_cover_CN_mod <- glmmTMB(NIntc_cover_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
 pred_data <- data.frame(nurse_mean_C_N_ratio = c(unique(modeldat_final$nurse_mean_C_N_ratio)))
-pred_data$binom_prediction <- predict(nintc_cover_CN_mod, pred_data)
+pred_data$binom_prediction <- predict(nintc_cover_CN_mod, pred_data, type = "response")
 pred_data$true_prediction <- 2*pred_data$binom_prediction -1
 
 nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
