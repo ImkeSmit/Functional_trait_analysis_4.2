@@ -346,47 +346,14 @@ log_results_table |>
 ###Results are the same!###
 
 
+####Some graphs####
+ggplot(nintc_rich_sum, aes(x = RaoQ, y = mean_NIntc_rich_binom)) +
+  geom_point()+
+  theme_classic()
 
 
-
-###DESCRIPTIVE SATISTICS###
-##First add siteinfo of each ID
-siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
-  select(c(ID, GRAZ, ARIDITY.v3))
-siteinfo$ID <-as.factor(siteinfo$ID)
-
-FD_results <- FD_results |> 
-  inner_join(siteinfo, by = "ID")
-FD_results$GRAZ <- as.factor(FD_results$GRAZ)
-
-ggplot(FD_results, aes(x = ARIDITY.v3, y = FEve)) +
-  geom_point()
-
-ggplot(FD_results, aes(x = GRAZ, y = FEve)) +
-  geom_boxplot()
-
-ggplot(FD_results, aes(x = ARIDITY.v3, y = FDiv)) +
-  geom_point()
-
-ggplot(FD_results, aes(x = ARIDITY.v3, y = FRic)) +
-  geom_point()
+ggplot(nintc_cov_sum, aes(x = RaoQ, y = mean_NIntc_cov_binom)) +
+  geom_point()+
+  theme_classic()
 
 
-##DESCRIPTIVE STATISTICS####
-#Are the functional diversity metrics influenced by grazing or aridity?
-FD_results$log_FRic <- log(FD_results$FRic)
-FD_results$neginv_FRic <- -1/(1+(FD_results$FRic))
-
-hist(FD_results$FRic)
-hist(FD_results$log_FRic)
-hist(FD_results$neginv_FRic)
-fric_mod <- lm(neginv_FRic ~ ARIDITY.v3 + GRAZ, data = FD_results)
-Anova(fric_mod)
-summary(fric_mod)
-plot(fric_mod)
-
-feve_mod <- glm(FEve ~ ARIDITY.v3 + GRAZ, data = FD_results, family = "binomial")
-Anova(feve_mod)
-
-fdiv_mod <- glm(FDiv ~ ARIDITY.v3 + GRAZ, data = FD_results, family = "binomial")
-Anova(fdiv_mod)
