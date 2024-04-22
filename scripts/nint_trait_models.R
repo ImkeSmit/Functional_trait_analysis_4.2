@@ -16,13 +16,7 @@ nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation a
 
 ##import trait data
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv",
-               row.names = 1) #|> 
-  #standardise trait values
-  #group_by(trait) |> 
-  #mutate(sd_value = sd(value), 
-  #       mean_value = mean(value)) |> 
-  #ungroup() |> 
-  #mutate(value_std = (value - mean_value)/sd_value)
+               row.names = 1) 
 
 ##For each replicate, we need to get the NIntc value and the traits of the nurse
 #names of the traits collectd
