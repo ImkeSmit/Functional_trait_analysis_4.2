@@ -132,7 +132,7 @@ formula_table <- read.csv("Functional trait data\\Results\\model_formulas_with_R
 
 
 
-###Loop through the formulas for NIntc####
+###Loop through the formulas####
 #Create a table for results
 results_table <- data.frame(Response = character(), Model = character(), Chisq = numeric(), 
                             Df = integer(), Pr_value = numeric(), AIC = numeric(), 
@@ -221,22 +221,11 @@ results_table
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-write.csv(results_table, "Functional trait data\\results\\FD_model_results_13Mar2024_nintc.csv")
-
-
-
-
-
-
+write.csv(results_table, "Functional trait data\\results\\nint_raoq_model_results_22Apr2024.csv")
 
 
 ###Interpret model results####
-mod_results_nintc <- read.csv("Functional trait data\\results\\FD_model_results_13Mar2024_nintc.csv", row.names = 1)
-mod_results_ninta <- read.csv("Functional trait data\\results\\FD_model_results_13Mar2024_ninta.csv", row.names = 1)
-
-mod_results <- mod_results_nintc |> 
-  bind_rows(mod_results_ninta)
-
+mod_results <- read.csv("Functional trait data\\results\\nint_raoq_model_results_22Apr2024.csv", row.names = 1)
 
 ##Which model had the lowest AIC?
 mod_results |> 
@@ -252,6 +241,24 @@ low_10_AIC <- mod_results |>
   arrange(AIC, .by_group = TRUE)
 
 ##There are models with similar AIC vals
+
+
+###Are results different if we run it with log(RaoQ)####
+log_nintc_rich_sum <- nintc_rich_sum |> 
+  mutate(RaoQ = log(RaoQ))
+
+log_nintc_cov_sum <- nintc_cov_sum |> 
+  mutate(RaoQ = log(RaoQ))
+
+log_ninta_rich_sum <- ninta_rich_sum |> 
+  mutate(RaoQ = log(RaoQ))
+
+log_ninta_cov_sum <- ninta_cov_sum |> 
+  mutate(RaoQ = log(RaoQ))
+
+
+  
+
 
 
 ###DESCRIPTIVE SATISTICS###
