@@ -1,4 +1,4 @@
-###MAKE MODELS WITH NINT ~ FDIV####
+###MAKE MODELS WITH NINT ~ RaoQ + graz + aridity####
 library(tidyverse)
 library(tidylog)
 library(glmmTMB)
@@ -24,19 +24,13 @@ nint_result <-
 ggplot(nint_result, aes(x = NIntc_richness)) +
   geom_histogram()
 
-ggplot(FD_results, aes(x = FRic)) +
+ggplot(FD_results, aes(x = RaoQ)) + ##very very left skewed
   geom_histogram()
 
-ggplot(FD_results, aes(x = nsp, y = FRic)) +
-  geom_point()
-
-ggplot(FD_results, aes(x = FEve)) +
+ggplot(FD_results, aes(x = log(RaoQ))) + ##log is better
   geom_histogram()
 
-ggplot(FD_results, aes(x = FDiv)) +
-  geom_histogram()
-
-ggplot(FD_results, aes(x = RaoQ)) +
+ggplot(FD_results, aes(x = sqrt(RaoQ))) + ##sqrt is slightly better
   geom_histogram()
 
 
@@ -75,7 +69,7 @@ nintc_rich_sum <- nint_result |>
   distinct() |> #remove duplicate rows, only need one eman per plot
   left_join(FD_results, by = "ID") |>  #join to the FD_results
   mutate(aridity2 = aridity^2) |> 
-  filter(!is.na(FEve))
+  filter(!is.na(RaoQ))
 
 ##summarise the ninta richness by plot
 ninta_rich_sum <- nint_result |> 
@@ -90,7 +84,7 @@ ninta_rich_sum <- nint_result |>
   distinct() |> #remove duplicate rows, only need one eman per plot
   left_join(FD_results, by = "ID") |>  #join to the FD_results
   mutate(aridity2 = aridity^2) |> 
-  filter(!is.na(FEve))
+  filter(!is.na(RaoQ))
 
 
 ##summarise nintc cover by plot
@@ -106,7 +100,7 @@ nintc_cov_sum <- nint_result |>
   distinct() |> #remove duplicate rows, only need one eman per plot
   left_join(FD_results, by = "ID") |>  #join to the FD_results
   mutate(aridity2 = aridity^2) |> 
-  filter(!is.na(FEve))
+  filter(!is.na(RaoQ))
 
 ##summarise ninta cover by plot
 ninta_cov_sum <- nint_result |> 
@@ -121,12 +115,12 @@ ninta_cov_sum <- nint_result |>
   distinct() |> #remove duplicate rows, only need one eman per plot
   left_join(FD_results, by = "ID") |>  #join to the FD_results
   mutate(aridity2 = aridity^2) |> 
-  filter(!is.na(FEve))
+  filter(!is.na(RaoQ))
 
 
 ##Import formulas and get them ready to run models with
 #lets isolate the response combinations
-formula_table <- read.csv("Functional trait data\\Results\\model_formulas_with_aridsq.csv", row.names = 1) |> 
+formula_table <- read.csv("Functional trait data\\Results\\model_formulas_with_RaoQ.csv", row.names = 1) |> 
   separate_wider_delim(formula, delim = "~", names = c("response", "predictors")) |> 
   select(predictors) |> 
   distinct(predictors) |> 
