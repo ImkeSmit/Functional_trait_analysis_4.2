@@ -315,7 +315,8 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
   geom_boxplot() +
   ylab("Euclidean distance between dominant and target species") +
   xlab("target species association") +
-  #geom_text(aes(x = association, y = 9), label = c("ab", "b", "a", "b")) +
+  annotate(geom = "text", x = unique(dist_ass_join$association), y = c(12,12,12,12) , 
+           label = c("b", "b", "a", "ab")) + #put letters in order of dist$association
   theme_classic()
 
 ##Nurse and bare are not significantly different, so the difference in the nurse and target traits do not matter for facilitation
