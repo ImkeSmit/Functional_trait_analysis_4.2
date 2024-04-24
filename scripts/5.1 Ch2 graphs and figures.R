@@ -45,7 +45,7 @@ Raoq_graz <- long_FD_results |>
   theme(legend.position = "none")
   
 Raoq_graz_arid <- ggarrange(Raoq_aridity, Raoq_graz, ncol = 2, nrow= 1, labels = c("a", "b"))
-ggsave("Raoq_aridity_grazing.png", Raoq_graz_arid, height = 900, width = 1300, units = "px",
+ggsave("Raoq_aridity_grazing.png", Raoq_graz_arid, height = 800, width = 1500, units = "px",
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
@@ -119,7 +119,7 @@ cov_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NIntc_cov)) +
   theme_classic()
 
 nintc_Raoq <- ggarrange(rich_raoq, cov_raoq, ncol = 2, nrow = 1, labels = c("a", "b"))
-ggsave("NIntc_RaoQ_scatterplots.png", nintc_Raoq, height = 900, width = 1300, units = "px", 
+ggsave("NIntc_RaoQ_scatterplots.png", nintc_Raoq, height = 800, width = 1500, units = "px", 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
