@@ -9,7 +9,7 @@ library(car)
 library(tidyverse)
 library(tidylog)
 
-##FD metrics accross aridity and grazing####
+####FD metrics accross aridity and grazing####
 #import FD results
 FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1)
 FD_results$ID <- as.factor(FD_results$ID)
@@ -20,11 +20,36 @@ siteinfo$ID <-as.factor(siteinfo$ID)
 #do the join
 long_FD_results <- FD_results |> 
   inner_join(siteinfo, by = "ID") |> 
-  select(!c(qual.FRic, RaoQ, nsp)) |> 
-  pivot_longer(cols = c(FRic, FEve, FDiv), names_to = "FD_metrics", values_to = "value" )
+  select(!c(qual.FRic, nsp)) |> 
+  pivot_longer(cols = c(FRic, FEve, FDiv, RaoQ), names_to = "FD_metrics", values_to = "value" )
 long_FD_results$GRAZ <- as.factor(long_FD_results$GRAZ)
 
+###RAOQ###
+Raoq_aridity <- long_FD_results |> 
+  filter(FD_metrics == "RaoQ") |> 
+  ggplot(aes(y = log(value), x = ARIDITY.v3)) +
+  geom_point()+
+  theme_classic() +
+  xlab("Aridity") +
+  ylab("ln(RaoQ)")
 
+Raoq_graz <- long_FD_results |> 
+  filter(FD_metrics == "RaoQ") |> 
+  ggplot(aes(y = log(value), x = GRAZ, fill = GRAZ)) +
+  geom_boxplot(alpha = 0.6)+
+  scale_fill_manual(values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4")) +
+  theme_classic() +
+  ylab("") +
+  xlab("Grazing pressure") +
+  scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
+  theme(legend.position = "none")
+  
+Raoq_graz_arid <- ggarrange(Raoq_aridity, Raoq_graz, ncol = 2, nrow= 1, labels = c("a", "b"))
+ggsave("Raoq_aridity_grazing.png", Raoq_graz_arid, height = 900, width = 1300, units = "px",
+       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
+
+
+###FDiv, FEve, FRic###
 FD_arid_grad <- ggplot(long_FD_results, aes(y = value, x = ARIDITY.v3)) +
   geom_point() +
   theme_classic() +
