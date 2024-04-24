@@ -103,31 +103,24 @@ nint_sum <- nint_result |>
   filter(!is.na(FEve))
 
 
-##NIntc richness against the FD metrics##
-rich_fdiv <- ggplot(nint_sum, aes(x = FDiv, y = mean_NIntc_rich)) +
+##NIntc against the RaoQ metrics##
+rich_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NIntc_rich)) +
   geom_point() +
-  ylab("") +
+  ylab(expression(NInt[C]~richness))+
+  xlab("ln(RaoQ)") +
   geom_errorbar(aes(ymin = mean_NIntc_rich - se_NIntc_rich, ymax =  mean_NIntc_rich + se_NIntc_rich), width = 0.01) +
   theme_classic()
 
-rich_frich <- ggplot(nint_sum, aes(x = log(FRic, base = 10), y = mean_NIntc_rich)) +
+cov_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NIntc_cov)) +
   geom_point() +
-  ylab("mean NIntc richness") +
-  xlab(expression(log[10]~(FRic))) +
-  geom_errorbar(aes(ymin = mean_NIntc_rich - se_NIntc_rich, ymax =  mean_NIntc_rich + se_NIntc_rich), 
-  width = 0.01) +
+  ylab(expression(NInt[C]~cover))+
+  xlab("ln(RaoQ)") +
+  geom_errorbar(aes(ymin = mean_NIntc_cov - se_NIntc_cov, ymax =  mean_NIntc_cov + se_NIntc_cov), width = 0.01) +
   theme_classic()
 
-rich_feve <- ggplot(nint_sum, aes(x = FEve, y = mean_NIntc_rich)) +
-  geom_point() +
-  ylab("") +
-  geom_errorbar(aes(ymin = mean_NIntc_rich - se_NIntc_rich, ymax =  mean_NIntc_rich + se_NIntc_rich), 
-                width = 0.01) +
-  theme_classic()
-
-nintc_rich_FD <- ggarrange(rich_frich, rich_feve, rich_fdiv, ncol = 3, nrow = 1, labels = c("a", "b", "c"))
-ggsave("NIntc_FD_scatterplots.png", nintc_rich_FD, height = 800, width = 1700, units = "px", 
-       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis\\Figures")
+nintc_Raoq <- ggarrange(rich_raoq, cov_raoq, ncol = 2, nrow = 1, labels = c("a", "b"))
+ggsave("NIntc_RaoQ_scatterplots.png", nintc_Raoq, height = 900, width = 1300, units = "px", 
+       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
 ###Functional distance ~ GRAZ, ARIDITY, microsite affinty####
