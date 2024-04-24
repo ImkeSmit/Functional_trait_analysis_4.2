@@ -123,6 +123,76 @@ ggsave("NIntc_RaoQ_scatterplots.png", nintc_Raoq, height = 800, width = 1500, un
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
+####NInt ~ trait graphs####
+modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
+  mutate(aridity2 = aridity^2)
+modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
+modeldat_final$graz <- as.factor(modeldat_final$graz)
+modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+##we will make scatterplots with model predictions overlaid
+
+#choose a colour for the line;
+chosen_col <- brewer.pal(6, "Dark2")[6]
+
+###NIntc richness ~ SLA
+nintc_rich_SLA_mod <- glmmTMB(NIntc_richness_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
+pred_data1 <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
+pred_data1$nintc_richness_binom_prediction <- predict(nintc_rich_SLA_mod, pred_data1, type = "response")
+pred_data1$nintc_richness_true_prediction <- 2*pred_data1$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+nintc_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
+  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~richness)) +
+  xlab("") +
+  geom_line(data = pred_data1, aes(x = nurse_meanSLA, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1.5)
+
+###NIntc cover ~ SLA
+nintc_cover_SLA_mod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
+pred_data1$nintc_cover_binom_prediction <- predict(nintc_cover_SLA_mod, pred_data1, type = "response")
+pred_data1$nintc_cover_true_prediction <- 2*pred_data1$nintc_cover_binom_prediction -1 #backtransform from binomial
+
+nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
+  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~cover)) +
+  xlab("mean SLA of dominant plant") +
+  geom_line(data = pred_data1, aes(x = nurse_meanSLA, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1.5)
+
+
+###NIntc richness ~ C:N
+nintc_rich_CN_mod <- glmmTMB(NIntc_richness_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
+pred_data2 <- data.frame(nurse_mean_C_N_ratio = c(unique(modeldat_final$nurse_mean_C_N_ratio)))
+pred_data2$nintc_richness_binom_prediction <- predict(nintc_rich_CN_mod, pred_data2, type = "response")
+pred_data2$nintc_richness_true_prediction <- 2*pred_data2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
+  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  theme_classic() +
+  ylab("") +
+  xlab("") +
+  geom_line(data = pred_data2, aes(x = nurse_mean_C_N_ratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1.5)
+
+###NIntc cover ~ C:N
+nintc_cover_CN_mod <- glmmTMB(NIntc_cover_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
+pred_data2$nintc_cover_binom_prediction <- predict(nintc_cover_CN_mod, pred_data2, type = "response")
+pred_data2$nintc_cover_true_prediction <- 2*pred_data2$nintc_cover_binom_prediction -1 #backtransform from binomial
+
+nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
+  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  theme_classic() +
+  ylab("") +
+  xlab("mean C:N of dominant plant") +
+  geom_line(data = pred_data2, aes(x = nurse_mean_C_N_ratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1.5)
+
+#arrange the above four figures on the same plot
+nint_nurse_traits <- ggarrange(nintc_richness_SLA,nintc_richness_CN, nintc_cover_SLA, nintc_cover_CN,  nrow = 2, ncol = 2, labels = c("a", "b", "c", "d"))
+ggsave("nint_trait_scatterplots.png", nint_nurse_traits, height = 1200, width = 1500, units = "px", 
+       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
+
+
+
+
 ###Functional distance ~ GRAZ, ARIDITY, microsite affinty####
 #import data
 twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1)
