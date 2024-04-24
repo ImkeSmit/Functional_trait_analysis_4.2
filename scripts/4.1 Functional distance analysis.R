@@ -279,7 +279,7 @@ twosp_dist <- twosp_dist |>
 write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
 
 
-###Make some models
+####Models of dist ~ association####
 twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1)
 twosp_dist$GRAZ <- as.factor(twosp_dist$GRAZ)
 twosp_dist$SITE_ID <- as.factor(twosp_dist$SITE_ID)
@@ -294,7 +294,8 @@ ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis 
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 
 dist_ass_join <- twosp_dist |> 
-  left_join(ass, by = c("target", "ID"))
+  left_join(ass, by = c("target", "ID")) |> 
+  filter(association %in% c("nurse", "bare")) #only work with these associations
 dist_ass_join$association <- as.factor(dist_ass_join$association)
 dist_ass_join$nurse <- as.factor(dist_ass_join$nurse)
 dist_ass_join$SITE_ID <- as.factor(dist_ass_join$SITE_ID)
@@ -306,7 +307,7 @@ dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = di
 dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
-anova(dist_ass_null, dist_ass_mod) #p = 2.031e-09 ***
+anova(dist_ass_null, dist_ass_mod) #p = 0.1645 
 
 emmeans(dist_ass_mod, specs = "association")
 cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
