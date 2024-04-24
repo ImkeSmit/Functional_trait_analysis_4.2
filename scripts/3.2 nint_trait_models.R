@@ -243,6 +243,7 @@ summary(nintc_richness_bestmod)
 anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
 Anova(nintc_richness_bestmod)
 plotResiduals(nintc_richness_bestmod)
+r.squaredGLMM(nintc_richness_bestmod)
 
 ###
 
@@ -257,13 +258,14 @@ summary(nintc_cover_bestmod)
 anova(nintc_cover_null, nintc_cover_bestmod) #p = 0.003207
 Anova(nintc_cover_bestmod)
 plotResiduals(nintc_cover_bestmod)
+r.squaredGLMM(nintc_cover_bestmod)
 
 ###
 
-#nintc richness null model:
+#ninta richness null model:
 ninta_richness_null <- glmmTMB(NInta_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
 
-#NIntc richness best model
+#NInta richness best model
 ninta_richness_bestmod <- glmmTMB(NInta_richness_binom ~ nurse_meanSLA+ nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
                                   family = binomial, data = modeldat_final)
 
@@ -271,6 +273,7 @@ summary(ninta_richness_bestmod)
 anova(ninta_richness_null, ninta_richness_bestmod) #p = 0.04243
 Anova(ninta_richness_bestmod)
 plotResiduals(ninta_richness_bestmod)
+r.squaredGLMM(ninta_richness_bestmod)
 
 ###
 
@@ -285,7 +288,7 @@ summary(ninta_cover_bestmod)
 anova(ninta_cover_null, ninta_cover_bestmod) #p = 0.004049
 Anova(ninta_cover_bestmod)
 plotResiduals(ninta_cover_bestmod)
-
+r.squaredGLMM(ninta_cover_bestmod)
 
 ####Let's make some figures####
 
