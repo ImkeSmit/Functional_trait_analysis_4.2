@@ -124,6 +124,10 @@ formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_form
 #import the data
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv") |> 
   mutate(aridity2 = aridity^2)
+modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
+modeldat_final$graz <- as.factor(modeldat_final$graz)
+modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Create a table for results
