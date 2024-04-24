@@ -357,6 +357,26 @@ ggplot(nintc_cov_sum, aes(x = RaoQ, y = mean_NIntc_cov_binom)) +
 
 ####Descriptive statistics####
 ##Is RaoQ influenced by grazing and aridity? 
+#Add graz and aridity to FD results
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  select(ID,SITE_ID, GRAZ, ARIDITY.v3) |> 
+  distinct() |> 
+  filter(!is.na(ID))
+siteinfo$ID <- as.factor(siteinfo$ID)
+
+FD_results <- FD_results |> 
+  left_join(siteinfo, by = "ID")
+FD_results$GRAZ <- as.factor(FD_results$GRAZ)
+FD_results$SITE_ID <- as.factor(FD_results$SITE_ID)
+FD_results$log_RaoQ <- log(FD_results$RaoQ)
+
+hist(FD_results$RaoQ) #very very left skewed
+hist(log(FD_results$RaoQ)) #log is better
+hist(sqrt(FD_results$RaoQ)) #sqrt is not good
 
 
-
+raoqmod <- glmmTMB(log_RaoQ ~ GRAZ + ARIDITY.v3 + (1|SITE_ID), data= FD_results)
+summary(raoqmod)
+Anova(raoqmod) #no significant effects
+null_raoqmod <- glmmTMB(log_RaoQ ~ 1 + (1|SITE_ID), data= FD_results)
+anova(null_raoqmod, raoqmod) #p = 0.2091
