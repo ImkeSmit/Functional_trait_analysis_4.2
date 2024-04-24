@@ -191,6 +191,32 @@ ggsave("nint_trait_scatterplots.png", nint_nurse_traits, height = 1200, width = 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
+###Fdist ~ association####
+#import functional distances
+twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1)
+
+###Lets join the results of the CHi2 tests to twosp-dist###
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(target = species)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
+
+dist_ass_join <- twosp_dist |> 
+  left_join(ass, by = c("target", "ID")) |> 
+  filter(association %in% c("nurse", "bare")) #only work with these associations
+dist_ass_join$association <- as.factor(dist_ass_join$association)
+
+dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
+            geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
+            ylab("Euclidean distance between dominant and target species") +
+            xlab("target species association") +
+            scale_x_discrete(labels = c("bare", "dominant")) +
+            theme_classic()
+ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, units = "px", 
+       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
+
+
+
 
 
 ###Functional distance ~ GRAZ, ARIDITY, microsite affinty####
