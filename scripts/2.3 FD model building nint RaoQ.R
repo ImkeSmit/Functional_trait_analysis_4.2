@@ -351,9 +351,12 @@ ggplot(nintc_rich_sum, aes(x = RaoQ, y = mean_NIntc_rich_binom)) +
   geom_point()+
   theme_classic()
 
-
 ggplot(nintc_cov_sum, aes(x = RaoQ, y = mean_NIntc_cov_binom)) +
   geom_point()+
   theme_classic()
+
+####Descriptive statistics####
+##Is RaoQ influenced by grazing and aridity? 
+
 
 
