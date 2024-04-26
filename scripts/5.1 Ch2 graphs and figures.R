@@ -286,7 +286,7 @@ dist_ass_join$association <- as.factor(dist_ass_join$association)
 
 dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
             geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
-            ylab("Euclidean distance between dominant and target species") +
+            ylab("Euclidean distance between \n dominant and target species") +
             xlab("target species association") +
             scale_x_discrete(labels = c("bare", "dominant")) +
             theme_classic()
