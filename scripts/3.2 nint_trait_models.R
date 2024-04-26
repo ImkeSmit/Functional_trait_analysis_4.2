@@ -122,11 +122,18 @@ formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_form
   add_row(predictors = "1+(1|nurse_sp)+(1|site_ID)")
 
 #import the data
-modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv") |> 
+modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
   mutate(aridity2 = aridity^2)
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+
+####descriptive stats####
+#number of dominant species
+length(unique(modeldat_final$nurse_sp)) #69
+
+#number of replicates
+nrow(modeldat_final) #3055
 
 
 ###Loop through the formulas for NIntc ~ nurse traits####
