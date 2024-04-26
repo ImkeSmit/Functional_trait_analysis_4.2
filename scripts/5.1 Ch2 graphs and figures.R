@@ -9,7 +9,7 @@ library(car)
 library(tidyverse)
 library(tidylog)
 
-####FD metrics accross aridity and grazing####
+####RaoQ accross aridity and grazing####
 #import FD results
 FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1)
 FD_results$ID <- as.factor(FD_results$ID)
@@ -28,7 +28,7 @@ long_FD_results$GRAZ <- as.factor(long_FD_results$GRAZ)
 Raoq_aridity <- long_FD_results |> 
   filter(FD_metrics == "RaoQ") |> 
   ggplot(aes(y = log(value), x = ARIDITY.v3)) +
-  geom_point()+
+  geom_point(alpha = 0.6, colour = "darkslategrey")+
   theme_classic() +
   xlab("Aridity") +
   ylab("ln(RaoQ)")
@@ -49,29 +49,7 @@ ggsave("Raoq_aridity_grazing.png", Raoq_graz_arid, height = 800, width = 1500, u
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
-###FDiv, FEve, FRic###
-FD_arid_grad <- ggplot(long_FD_results, aes(y = value, x = ARIDITY.v3)) +
-  geom_point() +
-  theme_classic() +
-  xlab("Aridity") +
-  facet_wrap(~ factor(FD_metrics, levels = c("FRic", "FEve", "FDiv")), scales = "free_y")
-
-FD_graz_grad <- ggplot(long_FD_results, aes(y = value, x = GRAZ, fill = GRAZ)) +
-  geom_boxplot(alpha = 0.6) +
-  theme_classic() +
-  scale_fill_manual(values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" )) +
-  xlab("") +
-  scale_x_discrete(labels = c("Ungrazed", "Low grazing", "Medium grazing", "High grazing")) +
-  facet_wrap(~ factor(FD_metrics, levels = c("FRic", "FEve", "FDiv")), scales = "free_y") +
-  theme(axis.text.x = element_text(angle = 90), legend.title = element_blank(), legend.position = "none")
-
-FD_grad_plots <- ggarrange(FD_arid_grad, FD_graz_grad, ncol = 1, nrow= 2, labels = c("a", "b"))
-ggsave("FD_grad_plots.png", FD_grad_plots, height = 1600, width = 1300, units = "px",
-       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis\\Figures")
-
-
-
-##Nint ~ FD metrics####
+##Nint ~ RaoQ####
 #import nint results
 #Add the NIntc
 nint_result <- 
@@ -105,21 +83,45 @@ nint_sum <- nint_result |>
 
 ##NIntc against the RaoQ metrics##
 rich_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NIntc_rich)) +
-  geom_point() +
+  geom_point(alpha = 0.6, colour = "darkslategrey") +
   ylab(expression(NInt[C]~richness))+
   xlab("ln(RaoQ)") +
-  geom_errorbar(aes(ymin = mean_NIntc_rich - se_NIntc_rich, ymax =  mean_NIntc_rich + se_NIntc_rich), width = 0.01) +
+  geom_errorbar(aes(ymin = mean_NIntc_rich - se_NIntc_rich, ymax =  mean_NIntc_rich + se_NIntc_rich), 
+                width = 0.01, color = "darkslategrey") +
   theme_classic()
 
 cov_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NIntc_cov)) +
-  geom_point() +
+  geom_point(alpha = 0.6, colour = "darkslategrey") +
   ylab(expression(NInt[C]~cover))+
   xlab("ln(RaoQ)") +
-  geom_errorbar(aes(ymin = mean_NIntc_cov - se_NIntc_cov, ymax =  mean_NIntc_cov + se_NIntc_cov), width = 0.01) +
+  geom_errorbar(aes(ymin = mean_NIntc_cov - se_NIntc_cov, ymax =  mean_NIntc_cov + se_NIntc_cov), 
+                width = 0.01, color = "darkslategrey") +
   theme_classic()
 
 nintc_Raoq <- ggarrange(rich_raoq, cov_raoq, ncol = 2, nrow = 1, labels = c("a", "b"))
 ggsave("NIntc_RaoQ_scatterplots.png", nintc_Raoq, height = 800, width = 1500, units = "px", 
+       path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
+
+
+##NInta against the RaoQ metrics##
+ninta_rich_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NInta_rich)) +
+  geom_point(alpha = 0.6, colour = "darkslategrey") +
+  ylab(expression(NInt[A]~richness))+
+  xlab("ln(RaoQ)") +
+  geom_errorbar(aes(ymin = mean_NInta_rich - se_NInta_rich, ymax =  mean_NInta_rich + se_NInta_rich), 
+                width = 0.01, color = "darkslategrey") +
+  theme_classic()
+
+ninta_cov_raoq <- ggplot(nint_sum, aes(x = log(RaoQ), y = mean_NInta_cov)) +
+  geom_point(alpha = 0.6, colour = "darkslategrey") +
+  ylab(expression(NInt[A]~cover))+
+  xlab("ln(RaoQ)") +
+  geom_errorbar(aes(ymin = mean_NInta_cov - se_NInta_cov, ymax =  mean_NInta_cov + se_NInta_cov), 
+                width = 0.01, color = "darkslategrey") +
+  theme_classic()
+
+ninta_Raoq <- ggarrange(ninta_rich_raoq, ninta_cov_raoq, ncol = 2, nrow = 1, labels = c("a", "b"))
+ggsave("NInta_RaoQ_scatterplots.png", ninta_Raoq, height = 800, width = 1500, units = "px", 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
