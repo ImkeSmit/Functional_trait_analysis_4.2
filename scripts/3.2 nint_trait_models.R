@@ -123,7 +123,11 @@ formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_form
 
 #import the data
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
-  mutate(aridity2 = aridity^2)
+  mutate(aridity2 = aridity^2) |> 
+  filter(!is.na(NIntc_richness_binom)) |> 
+  filter(!is.na(NIntc_cover_binom)) |> 
+  filter(!is.na(NInta_richness_binom)) |> 
+  filter(!is.na(NInta_cover_binom))
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
@@ -133,7 +137,7 @@ modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 length(unique(modeldat_final$nurse_sp)) #69
 
 #number of replicates
-nrow(modeldat_final) #3055
+nrow(modeldat_final) #3043
 
 
 ###Loop through the formulas for NIntc ~ nurse traits####
