@@ -191,9 +191,10 @@ nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc
             aes(x = nurse_mean_C_N_ratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
 
 #arrange the above four figures on the same plot
-nint_nurse_traits <- ggarrange(nintc_richness_SLA,nintc_richness_CN, nintc_cover_SLA, nintc_cover_CN,  nrow = 2, ncol = 2, labels = c("a", "b", "c", "d"))
-ggsave("nint_trait_scatterplots.png", nint_nurse_traits, height = 1200, width = 1500, units = "px", 
+nintc_nurse_traits <- ggarrange(nintc_richness_SLA,nintc_richness_CN, nintc_cover_SLA, nintc_cover_CN,  nrow = 2, ncol = 2, labels = c("a", "b", "c", "d"))
+ggsave("nintc_trait_scatterplots.png", nint_nurse_traits, height = 1200, width = 1500, units = "px", 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
+
 
 
 ####NInta ~ trait graphs####
