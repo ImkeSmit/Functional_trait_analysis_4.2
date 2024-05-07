@@ -312,6 +312,11 @@ anova(dist_ass_null, dist_ass_mod) #p = 0.1645
 emmeans(dist_ass_mod, specs = "association")
 cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
 
+#model diagnostics
+simres <- simulateResiduals(dist_ass_mod)
+plot(simres)
+
+
 ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
   geom_boxplot() +
   ylab("Euclidean distance between dominant and target species") +
