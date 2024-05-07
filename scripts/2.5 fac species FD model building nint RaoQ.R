@@ -1,4 +1,5 @@
 ###MAKE MODELS WITH NINT ~ RaoQ + graz + aridity####
+###Only for the plotspecific facilitation species###
 library(tidyverse)
 library(tidylog)
 library(glmmTMB)
@@ -6,7 +7,8 @@ library(ggplot2)
 library(car)
 library(corrplot)
 
-FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1) 
+FD_results <- read.csv("Functional trait data\\results\\FD_results_11Mar2024_for_facilitation_species.csv", row.names = 1) |> 
+  filter(!nsp == "only one sp") #remove plots that had only one sp
 
 FD_results$FRic <- as.numeric(FD_results$FRic)
 FD_results$qual.FRic <- as.numeric(FD_results$qual.FRic)
@@ -221,11 +223,11 @@ results_table
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-write.csv(results_table, "Functional trait data\\results\\nint_raoq_model_results_22Apr2024.csv")
+write.csv(results_table, "Functional trait data\\results\\fac_species_nint_raoq_model_results_26Apr2024.csv")
 
 
 ###Interpret model results####
-mod_results <- read.csv("Functional trait data\\results\\nint_raoq_model_results_22Apr2024.csv", row.names = 1)
+mod_results <- read.csv("Functional trait data\\results\\fac_species_nint_raoq_model_results_26Apr2024.csv", row.names = 1)
 
 ##Which model had the lowest AIC?
 mod_results |> 
