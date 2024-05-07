@@ -253,8 +253,13 @@ nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~ nurse_meanSLA + nurse_m
 summary(nintc_richness_bestmod)
 anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
 Anova(nintc_richness_bestmod)
-plotResiduals(nintc_richness_bestmod)
 r.squaredGLMM(nintc_richness_bestmod)
+#model diagnostics
+nintc_richness_bestmod_simres <- simulateResiduals(nintc_richness_bestmod)
+plot(nintc_richness_bestmod_simres)#HOV looks ok
+#residuals not normally distributed
+testDispersion(nintc_richness_bestmod_simres)
+
 
 ###
 
@@ -268,8 +273,12 @@ nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ aridity+ nurse_meanSLA+ nurse
 summary(nintc_cover_bestmod)
 anova(nintc_cover_null, nintc_cover_bestmod) #p = 0.003207
 Anova(nintc_cover_bestmod)
-plotResiduals(nintc_cover_bestmod)
 r.squaredGLMM(nintc_cover_bestmod)
+#model diagnostics
+nintc_cover_bestmod_simres <- simulateResiduals(nintc_cover_bestmod)
+plot(nintc_cover_bestmod_simres)#HOV looks ok
+#residuals not normally distributed
+testDispersion(nintc_cover_bestmod_simres)
 
 ###
 
@@ -285,6 +294,11 @@ anova(ninta_richness_null, ninta_richness_bestmod) #p = 0.04243
 Anova(ninta_richness_bestmod)
 plotResiduals(ninta_richness_bestmod)
 r.squaredGLMM(ninta_richness_bestmod)
+#model diagnostics
+ninta_richness_bestmod_simres <- simulateResiduals(ninta_richness_bestmod)
+plot(ninta_richness_bestmod_simres)#HOV looks ok
+#residuals not normally distributed
+testDispersion(ninta_richness_bestmod_simres)
 
 ###
 
@@ -298,8 +312,13 @@ ninta_cover_bestmod <- glmmTMB(NInta_cover_binom ~  aridity+ nurse_meanSLA+ nurs
 summary(ninta_cover_bestmod)
 anova(ninta_cover_null, ninta_cover_bestmod) #p = 0.004049
 Anova(ninta_cover_bestmod)
-plotResiduals(ninta_cover_bestmod)
 r.squaredGLMM(ninta_cover_bestmod)
+#model diagnostics
+ninta_cover_bestmod_simres <- simulateResiduals(ninta_cover_bestmod)
+plot(ninta_cover_bestmod_simres)#HOV looks ok
+#residuals not normally distributed
+testDispersion(ninta_cover_bestmod_simres)
+
 
 ####Let's make some figures####
 
