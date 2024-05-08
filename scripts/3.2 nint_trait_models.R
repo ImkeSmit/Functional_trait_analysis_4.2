@@ -257,8 +257,9 @@ r.squaredGLMM(nintc_richness_bestmod)
 #model diagnostics
 nintc_richness_bestmod_simres <- simulateResiduals(nintc_richness_bestmod)
 plot(nintc_richness_bestmod_simres)#HOV looks ok
-#residuals not normally distributed
-testDispersion(nintc_richness_bestmod_simres)
+#residuals underdispersed
+testDispersion(simulateResiduals(nintc_richness_bestmod, re.form = NULL)) #dispersion test significant
+testZeroInflation(nintc_richness_bestmod_simres) #less zeroes than expected
 
 
 ###
@@ -277,8 +278,9 @@ r.squaredGLMM(nintc_cover_bestmod)
 #model diagnostics
 nintc_cover_bestmod_simres <- simulateResiduals(nintc_cover_bestmod)
 plot(nintc_cover_bestmod_simres)#HOV looks ok
-#residuals not normally distributed
-testDispersion(nintc_cover_bestmod_simres)
+#residuals underdiespersed
+testDispersion(nintc_cover_bestmod_simres) #dispersion test significant
+testZeroInflation(nintc_cover_bestmod_simres) #less zeroes than expected
 
 ###
 
@@ -297,8 +299,9 @@ r.squaredGLMM(ninta_richness_bestmod)
 #model diagnostics
 ninta_richness_bestmod_simres <- simulateResiduals(ninta_richness_bestmod)
 plot(ninta_richness_bestmod_simres)#HOV looks ok
-#residuals not normally distributed
-testDispersion(ninta_richness_bestmod_simres)
+#residuals underdispersed
+testDispersion(ninta_richness_bestmod_simres) #jup underdispersion
+testZeroInflation(ninta_richness_bestmod_simres) #less zeroes than expected
 
 ###
 
@@ -316,8 +319,9 @@ r.squaredGLMM(ninta_cover_bestmod)
 #model diagnostics
 ninta_cover_bestmod_simres <- simulateResiduals(ninta_cover_bestmod)
 plot(ninta_cover_bestmod_simres)#HOV looks ok
-#residuals not normally distributed
-testDispersion(ninta_cover_bestmod_simres)
+#residuals underdispersed
+testDispersion(ninta_cover_bestmod_simres) #jup underdispersed
+testZeroInflation(ninta_cover_bestmod_simres) #less zeroes than expected
 
 
 ####Let's make some figures####
