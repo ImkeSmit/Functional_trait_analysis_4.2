@@ -190,6 +190,28 @@ write.csv(FT_sub, "Functional trait data\\Clean data\\FT_filled_match_facilitati
 write.csv2(sp_matches, "Functional trait data\\Clean data\\filled_sp_matches.csv")
 
 
+####Descriptive statistics####
+#How many species were sampled in the facilitation survey but not in the trait survey?
+#import spnames in the facilitation data
+fac_species <- read.csv("Functional trait data\\Clean data\\facilitation_species_and_positions.csv", row.names = 1) |>
+  rename(taxon = spname) |> 
+  select(taxon) |> 
+  distinct(taxon)
+
+#import unfilled trait data
+FT_species <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots.csv", row.names = 1) |> 
+  select(taxon) |> 
+  distinct(taxon)
+
+only_in_fac <- fac_species |> #species only sampled in the facilitation survey
+  anti_join(FT_species, by = "taxon")
+
+only_in_FT <- FT_species |> #species only sampled in the trait survey
+  anti_join(fac_species, by = "taxon")
+
+
+
+
 ###Assess change in trait coverage###
 #import unfilled trait data
 FT_unfilled <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots.csv", row.names = 1) |> 
