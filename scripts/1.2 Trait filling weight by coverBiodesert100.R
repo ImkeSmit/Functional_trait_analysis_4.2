@@ -210,8 +210,6 @@ only_in_FT <- FT_species |> #species only sampled in the trait survey
   anti_join(fac_species, by = "taxon")
 
 
-
-
 ###Assess change in trait coverage###
 #import unfilled trait data
 FT_unfilled <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots.csv", row.names = 1) |> 
