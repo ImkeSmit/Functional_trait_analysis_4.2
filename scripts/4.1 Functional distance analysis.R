@@ -315,6 +315,8 @@ cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
 #model diagnostics
 simres <- simulateResiduals(dist_ass_mod)
 plot(simres)
+#a little underdispersed
+#HOV violated
 
 
 ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
