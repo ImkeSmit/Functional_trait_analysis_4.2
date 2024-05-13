@@ -174,8 +174,8 @@ pairwise_fdist <- function(distmat, sp_positions) {
   
   IDlist <- unique(sp_positions$ID)
   
-  twosp_dist <- cbind("ID" = NA, "replicate" = NA, 
-                      "euclidean_dist" = NA, "grouping" = NA, "nurse" = NA, "target" = NA)
+  twosp_dist <- cbind("ID" = numeric(), "replicate" = numeric(), 
+                      "euclidean_dist" = numeric(), "grouping" = character(), "nurse" = character(), "target" = character())
   
   for(i in 1:length(IDlist)) {
     plot <- sp_positions |> 
@@ -270,100 +270,6 @@ distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
 sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
 
 twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = sp_positions)
-
-
-
-#Get the euclidean distance between each pair of species
-distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
-
-#import sp_positions
-sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
-
-IDlist <- unique(sp_positions$ID)
-
-twosp_dist <- cbind("ID" = NA, "replicate" = NA, 
-                    "euclidean_dist" = NA, "grouping" = NA, "nurse" = NA, "target" = NA)
-
-for(i in 1:length(IDlist)) {
-  plot <- sp_positions |> 
-    filter(ID == IDlist[i])
-  
-  replist <- unique(plot$replicate) 
-  
-  for(r in 1:length(replist)) {
-    #Get the names of nurse, bare only, nurse only and both species
-    NURSE <- sp_positions |> 
-      filter(ID == IDlist[i], replicate == replist[r], position == "nurse_species") |> 
-      select(taxon)
-    NURSE <- NURSE$taxon
-    
-    bare_only <- sp_positions |> 
-      filter(ID == IDlist[i], replicate == replist[r], position == "bare_only") |> 
-      select(taxon)
-    bare_only <- c(bare_only$taxon)
-    
-    nurse_only <- sp_positions |> 
-      filter(ID == IDlist[i], replicate == replist[r], position == "nurse_only") |> 
-      select(taxon)
-    nurse_only <- c(nurse_only$taxon)
-    
-    both <- sp_positions |> 
-      filter(ID == IDlist[i], replicate == replist[r], position == "both") |> 
-      select(taxon)
-    both <- c(both$taxon)
-    
-    ###
-    for(b in 1:length(bare_only)) {
-      D_bare_only <- 
-      mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == bare_only[b])])
-      
-      if(b == 1){
-        twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                 "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
-                                 "nurse" = NURSE, "target" = bare_only[b])
-      } else {
-        temp_twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                      "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
-                                      "nurse" = NURSE, "target" = bare_only[b])
-        twosp_bare_only <- rbind(twosp_bare_only, temp_twosp_bare_only)
-      }}
-      
-    ###
-    for(n in 1:length(nurse_only)) {
-      D_nurse_only <- 
-        mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == nurse_only[n])])
-      
-      if(n == 1){
-        twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                 "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
-                                 "nurse" = NURSE, "target" = nurse_only[n])
-      } else {
-        temp_twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                      "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
-                                      "nurse" = NURSE, "target" = nurse_only[n])
-        twosp_nurse_only <- rbind(twosp_nurse_only, temp_twosp_nurse_only)
-      }}
-      
-    ###
-    for(z in 1:length(both)) {
-      D_both <- 
-        mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == both[z])])
-      
-      if(z == 1){
-        twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                  "euclidean_dist" = D_both, "grouping" = "nurse_both", 
-                            "nurse" = NURSE, "target" = both[z])
-      } else {
-        temp_twosp_both <- twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                                     "euclidean_dist" = D_both, "grouping" = "nurse_both", 
-                                               "nurse" = NURSE, "target" = both[z])
-        twosp_both <- rbind(twosp_both, temp_twosp_both)
-      }}
-      
-      twosp_dist <- rbind(twosp_dist, twosp_bare_only,twosp_nurse_only, twosp_both)
-  }
-}
-#The distance is NaN if nurse_only, bare_only or both is NA
 
 #Add ardidty and graz
 twosp_dist <- as.data.frame(twosp_dist)
