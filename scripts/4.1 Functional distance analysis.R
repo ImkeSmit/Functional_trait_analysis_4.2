@@ -345,8 +345,6 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 #get the functional distance between species in terms of one trait
 
 traitlist <- c(colnames(std_FT_wide))
-distance_list <- vector(mode = 'list', length = length(traitlist))
-names(distance_list) <- traitlist
 
 for(t in 1:length(traitlist)) {
   
@@ -355,10 +353,22 @@ for(t in 1:length(traitlist)) {
   
   trait_distmat <- as.matrix(dist(one_trait, method = "euclidean")) #get the distance matrix
   
-  trait_fdist <- pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions) #get the distances
+  if(t == 1) {
   
-  distance_list[[t]] <- trait_fdist
+  trait_fdist <- pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions) #get the distances
+  trait_fdist$trait <- traitlist[[t]]
+  
+  } else{
+    temp_trait_fdist <- pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions) #get the distances
+    temp_trait_fdist$trait <- traitlist[[t]]
+  
+    trait_fdist <- rbind(trait_fdist, temp_trait_fdist)
+  }
 }
+
+maxh_dist <- distance_list[[1]]
+maxls_dist <- distance_list[[2]]
+
 
 
 ##SLA
