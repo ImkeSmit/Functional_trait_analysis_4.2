@@ -174,7 +174,7 @@ pairwise_fdist <- function(distmat, sp_positions) {
   
   IDlist <- unique(sp_positions$ID)
   
-  twosp_dist <- cbind("ID" = numeric(), "replicate" = numeric(), 
+  twosp_dist <- cbind("ID" = character(), "replicate" = character(), 
                       "euclidean_dist" = numeric(), "grouping" = character(), "nurse" = character(), "target" = character())
   
   for(i in 1:length(IDlist)) {
