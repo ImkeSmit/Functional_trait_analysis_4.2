@@ -330,6 +330,14 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 ##Nurse and bare are not significantly different, so the difference in the nurse and target traits do not matter for facilitation
 
 
+###One-dimensional (trait) distance between species####
+#get the functional distance between species in terms of one trait
+##SLA
+sla_distmat <- as.matrix(dist(std_FT_wide[, which(colnames(std_FT_wide) == "MeanSLA")], method = "euclidean"))
+
+
+
+
 ###Old code and models below####
 
 #model without interactions
