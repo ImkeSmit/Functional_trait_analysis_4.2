@@ -345,6 +345,7 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 #get the functional distance between species in terms of one trait
 
 traitlist <- c(colnames(std_FT_wide))
+sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
 
 for(t in 1:length(traitlist)) {
   
@@ -355,33 +356,19 @@ for(t in 1:length(traitlist)) {
   
   if(t == 1) {
   
-  trait_fdist <- pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions) #get the distances
-  trait_fdist$trait <- traitlist[[t]]
+    trait_fdist <- as.data.frame(pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions)) #get the distances
+    trait_fdist$trait <- as.character(traitlist[[t]])
   
-  } else{
-    temp_trait_fdist <- pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions) #get the distances
-    temp_trait_fdist$trait <- traitlist[[t]]
-  
-    trait_fdist <- rbind(trait_fdist, temp_trait_fdist)
+    } else {
+      temp_trait_fdist <- as.data.frame(pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions)) #get the distances
+      temp_trait_fdist$trait <- traitlist[[t]]
+    
+      trait_fdist <- rbind(trait_fdist, temp_trait_fdist)
   }
 }
 
-maxh_dist <- distance_list[[1]]
-maxls_dist <- distance_list[[2]]
-
-
-
-##SLA
-sla_df <- std_FT_wide |> #select the sla column
-  select(MeanSLA)
-
-sla_distmat <- as.matrix(dist(sla_df, method = "euclidean")) #get the distance matrix
-
-sla_fdist <- pairwise_fdist(distmat = sla_distmat, sp_positions = sp_positions) #get the distances
-
 #Add ardidty and graz
-sla_fdist <- as.data.frame(sla_fdist)
-sla_fdist$ID <- as.numeric(sla_fdist$ID)
+trait_fdist$ID <- as.numeric(trait_fdist$ID)
 #import siteinfo
 siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
   select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
@@ -389,13 +376,14 @@ siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation anal
   filter(!is.na(ID))
 
 #do the join
-sla_fdist <- sla_fdist |> 
+trait_fdist <- trait_fdist |> 
   filter(!is.na(euclidean_dist), !euclidean_dist == "NaN") |> 
   inner_join(siteinfo, by = "ID") 
 
-write.csv(sla_fdist, "Functional trait data\\results\\Funtional_distances_between_2sp_SLA.csv")
+write.csv(trait_fdist, "Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv")
 
 ###models of fdist~association###
+#change this to the univariate distances
 sla_fdist <- read.csv("Functional trait data\\results\\Funtional_distances_between_2sp_SLA.csv", row.names = 1)
 sla_fdist$GRAZ <- as.factor(sla_fdist$GRAZ)
 sla_fdist$SITE_ID <- as.factor(sla_fdist$SITE_ID)
