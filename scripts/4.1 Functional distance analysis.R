@@ -343,6 +343,24 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 
 ###One-dimensional (trait) distance between species####
 #get the functional distance between species in terms of one trait
+
+traitlist <- c(colnames(std_FT_wide))
+distance_list <- vector(mode = 'list', length = length(traitlist))
+names(distance_list) <- traitlist
+
+for(t in 1:length(traitlist)) {
+  
+  one_trait <- std_FT_wide |> #select one column
+    select(traitlist[t])
+  
+  trait_distmat <- as.matrix(dist(one_trait, method = "euclidean")) #get the distance matrix
+  
+  trait_fdist <- pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions) #get the distances
+  
+  distance_list[[t]] <- trait_fdist
+}
+
+
 ##SLA
 sla_df <- std_FT_wide |> #select the sla column
   select(MeanSLA)
