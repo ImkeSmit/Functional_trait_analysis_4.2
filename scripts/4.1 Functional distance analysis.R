@@ -170,7 +170,9 @@ write.csv(sp_positions, "Functional trait data\\results\\sp_positions.csv")
 #then classify that distance as D_bare_only, D_nurse_only or D_both
 #This distance is only between 2 sp
 #write the pairwise_fdist function to do this
-pairwise_fdist <- function(distmat, sp_positions) {
+pairwise_fdist <- function(distmat, #euclidean distances between species pairs based on functional traits
+                           sp_positions) #whther species are nurses, or grow only in a specific microsite
+  { #function returns a dataframe with euclidean distance between nurse and target species and the microsite affinity of the target.
   
   IDlist <- unique(sp_positions$ID)
   
@@ -342,82 +344,57 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 ###One-dimensional (trait) distance between species####
 #get the functional distance between species in terms of one trait
 ##SLA
-sla_distmat <- as.matrix(dist(std_FT_wide[, which(colnames(std_FT_wide) == "MeanSLA")], method = "euclidean"))
+sla_df <- std_FT_wide |> #select the sla column
+  select(MeanSLA)
 
+sla_distmat <- as.matrix(dist(sla_df, method = "euclidean")) #get the distance matrix
 
+sla_fdist <- pairwise_fdist(distmat = sla_distmat, sp_positions = sp_positions) #get the distances
 
+#Add ardidty and graz
+sla_fdist <- as.data.frame(sla_fdist)
+sla_fdist$ID <- as.numeric(sla_fdist$ID)
+#import siteinfo
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
+  distinct() |> 
+  filter(!is.na(ID))
 
-###Old code and models below####
+#do the join
+sla_fdist <- sla_fdist |> 
+  filter(!is.na(euclidean_dist), !euclidean_dist == "NaN") |> 
+  inner_join(siteinfo, by = "ID") 
 
-#model without interactions
-twosp1 <- glmmTMB(euclidean_dist ~ grouping +GRAZ + ARIDITY.v3 + arid_sq 
-                     + (1|SITE_ID), data = twosp_dist)
-summary(twosp1)
-Anova(twosp1) #only grazing is significant
-AIC(twosp1) #36140.13
+write.csv(sla_fdist, "Functional trait data\\results\\Funtional_distances_between_2sp_SLA.csv")
 
+###models of fdist~association###
+sla_fdist <- read.csv("Functional trait data\\results\\Funtional_distances_between_2sp_SLA.csv", row.names = 1)
+sla_fdist$GRAZ <- as.factor(sla_fdist$GRAZ)
+sla_fdist$SITE_ID <- as.factor(sla_fdist$SITE_ID)
+sla_fdist$grouping <- as.factor(sla_fdist$grouping)
+sla_fdist$arid_sq <- (sla_fdist$ARIDITY.v3)^2
+##Lets join the results of the CHi2 tests to sla_fdist###
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(target = species)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 
+sla_ass_join <- sla_fdist |> 
+  left_join(ass, by = c("target", "ID")) |> 
+  filter(association %in% c("nurse", "bare")) #only work with these associations
+sla_ass_join$association <- as.factor(sla_ass_join$association)
+sla_ass_join$nurse <- as.factor(sla_ass_join$nurse)
+sla_ass_join$SITE_ID <- as.factor(sla_ass_join$SITE_ID)
+sla_ass_join$euclidean_dist <- as.numeric(sla_ass_join$euclidean_dist)
 
-#model with interactions 
-twosp2 <- glmmTMB(euclidean_dist ~ grouping*GRAZ +grouping*ARIDITY.v3 + 
-                    ARIDITY.v3*GRAZ + grouping*arid_sq + arid_sq*GRAZ + (1|SITE_ID), data = twosp_dist)
-Anova(twosp2)
-summary(twosp2)
-AIC(twosp2) #35883.66
-emmeans(twosp2, specs = "grouping")
-emmeans(twosp2, specs = "GRAZ")
+##does the distance between nurses and bare associated species differ from the distance between nurses and nurse associated species?
+sla_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = sla_ass_join)
 
-twosp2_simres <- simulateResiduals(twosp2)
-plot(twosp2_simres)
+sla_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = sla_ass_join)
+summary(sla_ass_mod)
+Anova(sla_ass_mod)
+anova(sla_ass_null, sla_ass_mod) #p = 0.2543 
 
-twosp_null <- glmmTMB(euclidean_dist ~ 1 + (1|SITE_ID), data = twosp_dist)
-anova(twosp_null, twosp2) #whole model p = < 2.2e-16
-
-#get R squared
-r.squaredGLMM(twosp2) #take the theoretical
-
-
-##Let's run the model only for replicates with Nintc_richness > 0
-nint_result <- 
-  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
-  filter(ID %in% c(twosp_dist$ID)) |>
-  filter(!is.na(NIntc_richness)) |> 
-  select(!c(NIntc_cover, NInta_richness, NInta_cover, NIntc_shannon, NInta_shannon)) |> 
-  mutate(ID_rep = str_c(ID, replicate_no, sep = "_")) |> 
-  mutate(interaction = case_when(NIntc_richness > 0 ~ "facilitation", 
-                                 NIntc_richness < 0 ~ "competition", 
-                                 NIntc_richness == 0 ~ "neutral")) |> 
-  select(ID_rep, interaction)
-
-#now isolate facilitative reps in twosp_dist
-twosp_dist_fac <- twosp_dist |> 
-  mutate(ID_rep = str_c(ID, replicate, sep = "_")) |> 
-  left_join(nint_result, by = "ID_rep")  |> 
-  filter(interaction == "facilitation")
-
-#model for only facilitative interactions
-twosp_fac <- glmmTMB(euclidean_dist ~ grouping*GRAZ +grouping*ARIDITY.v3 + 
-                       ARIDITY.v3*GRAZ + grouping*arid_sq + arid_sq*GRAZ + (1|SITE_ID), data = twosp_dist)
-
-Anova(twosp_fac)
-summary(twosp_fac)
-  
-
-
-#PLOTS#
-#dist ~ graz
-ggplot(twosp_dist, aes(x = GRAZ, y = euclidean_dist)) +
-  geom_boxplot()
-
-#dist~graz, colour by grouping
-ggplot(twosp_dist, aes(x = GRAZ, y = euclidean_dist, fill = grouping)) +
-  geom_boxplot()
-
-#dist~grouping, colour by graz
-ggplot(twosp_dist, aes(x = grouping, y = euclidean_dist, fill = GRAZ)) +
-  geom_boxplot()
-
-
-#dist~aridity
-ggplot(twosp_dist , aes(x = ARIDITY.v3, y = euclidean_dist, color = grouping)) +
-  geom_jitter(width = 0.1, height = 0.1)
+#model diagnostics
+simres <- simulateResiduals(sla_ass_mod)
+plot(simres)#a little underispersed, HOV violated
