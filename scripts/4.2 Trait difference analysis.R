@@ -180,4 +180,9 @@ cn_simres <- simulateResiduals(cn_mod)
 plot(cn_simres) #residuals normal, HOV good
 
 
+##Lets make some graphs####
+ggplot(FT_ass_join, aes(x = association, y = value)) +
+  geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
+  facet_wrap(~trait, scale = "free_y") +
+  theme_classic()
 
