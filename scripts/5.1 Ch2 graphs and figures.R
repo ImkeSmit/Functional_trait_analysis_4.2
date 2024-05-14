@@ -320,6 +320,7 @@ annotations <- data.frame(trait = c(unique(trait_ass_join$trait)),
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = euclidean_dist)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
+  scale_x_discrete(labels = c("bare", "dominant")) +
   facet_wrap(~trait, scales = "free_y", labeller = labeller(trait = trait_labels)) +
   ylab("Distance") +
   xlab("Target species association") +
