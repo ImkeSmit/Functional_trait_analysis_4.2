@@ -1,6 +1,9 @@
 ###Compare trait values of dominant, bare associated and dominant associated species
 library(tidyverse)
 library(tidylog)
+library(glmmTMB)
+library(car)
+library(DHARMa)
 
 #import data 
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
@@ -44,9 +47,137 @@ for(i in 1:length(IDlist)) {
                 , which(colnames(FT_ass_join) == "association")] <- "nurse_species"
   }
 }
+#final cleaning of FT_ass_join
+FT_ass_join <- FT_ass_join |> 
+  filter(!is.na(value)) 
+FT_ass_join$SITE_ID <- as.factor(FT_ass_join$SITE_ID)  
+FT_ass_join$association <- as.factor(FT_ass_join$association)
+
+###Models of trait values ~ association####
+#MaxH#
+maxh_data <- FT_ass_join |> 
+  filter(trait == "MaxH") |> 
+  mutate(sqrt_value = sqrt(value), 
+         log_value = log(value))
+
+maxh_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = maxh_data)
+
+maxh_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = maxh_data)
+
+summary(maxh_mod)
+Anova(maxh_mod)
+anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
+
+maxh_simres <- simulateResiduals(maxh_mod)
+plot(maxh_simres) #with log, normality of residuals ok, HOv ok
 
 
-#Now we need to get the mean trait values of nurses and bare or nurse associated targets 
-summary <- FT_ass_join |> 
-  group_by(association, trait) |> 
-  summarise(mean_trait_value = mean(value, na.rm = T))
+#MaxLS#
+maxls_data <- FT_ass_join |> 
+  filter(trait == "MaxLS") |> 
+  mutate(sqrt_value = sqrt(value), 
+        log_value = log(value))
+
+maxls_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = maxls_data)
+
+maxls_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = maxls_data)
+
+summary(maxh_mod)
+Anova(maxh_mod)
+anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
+
+maxls_simres <- simulateResiduals(maxls_mod)
+plot(maxls_simres) #with log, normality of residuals ok, HOv ok
+
+
+#MeanLL#
+meanll_data <- FT_ass_join |> 
+  filter(trait == "MeanLL") |> 
+  mutate(sqrt_value = sqrt(value), 
+         log_value = log(value))
+
+meanll_null <- glmmTMB(sqrt_value ~ 1+ (1|SITE_ID), data = meanll_data) #cannot use log transformation because LL has 0 values
+
+meanll_mod <- glmmTMB(sqrt_value ~ association + (1|SITE_ID), data = meanll_data)
+
+summary(meanll_mod)
+Anova(meanll_mod)
+anova(meanll_null, meanll_mod) #p = 0.8483
+
+meanll_simres <- simulateResiduals(meanll_mod)
+plot(meanll_simres) #a little underdispersed, HOV ok
+
+
+#MeanLDMC#
+meanldmc_data <- FT_ass_join |> 
+  filter(trait == "MeanLDMC") |> 
+  mutate(sqrt_value = sqrt(value), 
+         log_value = log(value))
+
+meanldmc_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = meanldmc_data) 
+
+meanldmc_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meanldmc_data)
+
+summary(meanldmc_mod)
+Anova(meanldmc_mod)
+anova(meanll_null, meanldmc_mod) #p =0.005767 **
+
+meanldmc_simres <- simulateResiduals(meanldmc_mod)
+plot(meanldmc_simres) #a little underdispersed, HOV ok
+
+
+#MeanSLA#
+meansla_data <- FT_ass_join |> 
+  filter(trait == "MeanSLA") |> 
+  mutate(sqrt_value = sqrt(value), 
+         log_value = log(value))
+
+meansla_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = meansla_data) 
+
+meansla_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meansla_data)
+
+summary(meansla_mod)
+Anova(meansla_mod)
+anova(meansla_null, meansla_mod) #p = 0.07813 .
+
+meansla_simres <- simulateResiduals(meansla_mod)
+plot(meansla_simres) #residuals normal, HOV good
+
+
+#MeanLA#
+meanla_data <- FT_ass_join |> 
+  filter(trait == "MeanLA") |> 
+  mutate(sqrt_value = sqrt(value), 
+         log_value = log(value))
+
+meanla_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = meanla_data) 
+
+meanla_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meanla_data)
+
+summary(meanla_mod)
+Anova(meanla_mod)
+anova(meanla_null, meanla_mod) #p = 0.4094
+
+meanla_simres <- simulateResiduals(meanla_mod)
+plot(meanla_simres) #residuals normal, HOV good
+
+
+#C:N ratio#
+cn_data <- FT_ass_join |> 
+  filter(trait == "C_N_ratio") |> 
+  mutate(sqrt_value = sqrt(value), 
+         log_value = log(value))
+
+cn_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = cn_data) 
+
+cn_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = cn_data)
+
+summary(cn_mod)
+Anova(cn_mod)
+anova(cn_null, cn_mod) #p = 0.7925
+
+cn_simres <- simulateResiduals(cn_mod)
+plot(cn_simres) #residuals normal, HOV good
+
+
+
