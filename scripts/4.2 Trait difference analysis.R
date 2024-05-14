@@ -3,7 +3,13 @@ library(tidyverse)
 library(tidylog)
 
 #import data 
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1)
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
+  pivot_wider(names_from = trait, values_from = value) |> 
+  #calculate the C:N ratio
+  mutate(C_N_ratio = percentC/percentN) |> 
+  select(!c(percentC, percentN)) |> 
+  pivot_longer(cols = c("MeanLL","MeanSLA","MeanLDMC","MeanLA","MaxH","MaxLS","C_N_ratio"),
+               names_to = "trait", values_to = "value")
 
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
@@ -12,11 +18,11 @@ ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis 
 
 
 FT_ass_join <- FT |> 
-  full_join(ass, by = c("ID", "taxon")) |>  #ass is missing species in FT, because ass is missing the dominant species
+  left_join(ass, by = c("ID", "taxon")) |>  #ass is missing species in FT, because ass is missing the dominant species
   filter(!association %in% c("neutral", "too_rare")) |> 
   mutate(association = case_when(association == "nurse" ~ "nurse_associated", 
             association == "bare" ~ "bare_associated", 
-            .default = association))
+            .default = association)) 
 
 ##Now we need to add values indicitaing which species are the dominant species 
 #import the species position data
@@ -37,9 +43,10 @@ for(i in 1:length(IDlist)) {
     FT_ass_join[which(FT_ass_join$ID == IDlist[i] & FT_ass_join$taxon == nurse_taxa[t]) 
                 , which(colnames(FT_ass_join) == "association")] <- "nurse_species"
   }
-  
 }
 
 
 #Now we need to get the mean trait values of nurses and bare or nurse associated targets 
-
+summary <- FT_ass_join |> 
+  group_by(association, trait) |> 
+  summarise(mean_trait_value = mean(value, na.rm = T))
