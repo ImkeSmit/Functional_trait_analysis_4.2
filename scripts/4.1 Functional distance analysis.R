@@ -457,3 +457,79 @@ anova(meanla_null, meanla_mod) #p = 0.7915
 #model diagnostics
 meanla_simres <- simulateResiduals(meanla_mod)
 plot(meanla_simres)#overdispersed, HOV violated
+
+
+#MeanLDMC#
+meanldmc_data <- trait_ass_join |> 
+  filter(trait == "MeanLDMC") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+
+#null model
+meanldmc_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
+#alternative model
+meanldmc_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
+
+summary(meanldmc_mod)
+Anova(meanldmc_mod) #significant effect
+anova(meanldmc_null, meanldmc_mod) #p = 0.03139 *
+
+#model diagnostics
+meanldmc_simres <- simulateResiduals(meanldmc_mod)
+plot(meanldmc_simres)#a little underdispersed, HOV violated
+
+
+#MeanLL#
+meanll_data <- trait_ass_join |> 
+  filter(trait == "MeanLL") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+
+#null model
+meanll_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meanll_data)
+#alternative model
+meanll_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meanll_data)
+
+summary(meanll_mod)
+Anova(meanll_mod) #significant effect
+anova(meanll_null, meanll_mod) #p = 0.001937 **
+
+#model diagnostics
+meanll_simres <- simulateResiduals(meanll_mod)
+plot(meanll_simres)#a little underdispersed, HOV violated
+
+
+#MeanSLA#
+meansla_data <- trait_ass_join |> 
+  filter(trait == "MeanSLA") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+
+#null model
+meansla_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meansla_data)
+#alternative model
+meansla_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meansla_data)
+
+summary(meansla_mod)
+Anova(meansla_mod) #no effect
+anova(meansla_null, meansla_mod) #p = 0.9172
+
+#model diagnostics
+meansla_simres <- simulateResiduals(meansla_mod)
+plot(meansla_simres)#a little underdispersed, HOV violated
+
+
+#C_N_ratio#
+cn_data <- trait_ass_join |> 
+  filter(trait == "C_N_ratio") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+
+#null model
+cn_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = cn_data)
+#alternative model
+cn_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = cn_data)
+
+summary(cn_mod)
+Anova(cn_mod) #significant effect
+anova(cn_null, cn_mod) #p = 0.03852 *
+
+#model diagnostics
+cn_simres <- simulateResiduals(cn_mod)
+plot(cn_simres)#a little underdispersed, HOV violated
