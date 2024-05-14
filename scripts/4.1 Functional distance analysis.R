@@ -383,34 +383,77 @@ trait_fdist <- trait_fdist |>
 write.csv(trait_fdist, "Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv")
 
 ###models of fdist~association###
-#change this to the univariate distances
-sla_fdist <- read.csv("Functional trait data\\results\\Funtional_distances_between_2sp_SLA.csv", row.names = 1)
-sla_fdist$GRAZ <- as.factor(sla_fdist$GRAZ)
-sla_fdist$SITE_ID <- as.factor(sla_fdist$SITE_ID)
-sla_fdist$grouping <- as.factor(sla_fdist$grouping)
-sla_fdist$arid_sq <- (sla_fdist$ARIDITY.v3)^2
+trait_fdist <- read.csv("Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv", row.names = 1)
+trait_fdist$GRAZ <- as.factor(trait_fdist$GRAZ)
+trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
+trait_fdist$grouping <- as.factor(trait_fdist$grouping)
+trait_fdist$arid_sq <- (trait_fdist$ARIDITY.v3)^2
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
   select(ID, species, association) |> 
   rename(target = species)
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 
-sla_ass_join <- sla_fdist |> 
+trait_ass_join <- trait_fdist |> 
   left_join(ass, by = c("target", "ID")) |> 
   filter(association %in% c("nurse", "bare")) #only work with these associations
-sla_ass_join$association <- as.factor(sla_ass_join$association)
-sla_ass_join$nurse <- as.factor(sla_ass_join$nurse)
-sla_ass_join$SITE_ID <- as.factor(sla_ass_join$SITE_ID)
-sla_ass_join$euclidean_dist <- as.numeric(sla_ass_join$euclidean_dist)
+trait_ass_join$association <- as.factor(trait_ass_join$association)
+trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
+trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
+trait_ass_join$euclidean_dist <- as.numeric(trait_ass_join$euclidean_dist)
 
-##does the distance between nurses and bare associated species differ from the distance between nurses and nurse associated species?
-sla_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = sla_ass_join)
+#MaxH model#
+maxh_data <- trait_ass_join |> 
+  filter(trait == "MaxH") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
 
-sla_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = sla_ass_join)
-summary(sla_ass_mod)
-Anova(sla_ass_mod)
-anova(sla_ass_null, sla_ass_mod) #p = 0.2543 
+#null model
+maxh_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data)
+#alternative model
+maxh_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = maxh_data)
+
+summary(maxh_mod)
+Anova(maxh_mod) #significant effect
+anova(maxh_null, maxh_mod) #p = 1.598e-14 ***
 
 #model diagnostics
-simres <- simulateResiduals(sla_ass_mod)
-plot(simres)#a little underispersed, HOV violated
+simres <- simulateResiduals(maxh_mod)
+plot(simres)#underispersed but better with sqrt variable, HOV violated
+
+
+#MaxLS#
+maxls_data <- trait_ass_join |> 
+  filter(trait == "MaxLS") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+
+#null model
+maxls_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = maxls_data)
+#alternative model
+maxls_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = maxls_data)
+
+summary(maxls_mod)
+Anova(maxls_mod) #significant effect
+anova(maxls_null, maxls_mod) #p = 7.03e-14 ***
+
+#model diagnostics
+maxls_simres <- simulateResiduals(maxls_mod)
+plot(maxls_simres)#underispersed but better with sqrt variable, HOV violated
+
+
+#MeanLA#
+meanla_data <- trait_ass_join |> 
+  filter(trait == "MeanLA") |> 
+  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+
+#null model
+meanla_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meanla_data)
+#alternative model
+meanla_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
+
+summary(meanla_mod)
+Anova(meanla_mod) #no effect
+anova(meanla_null, meanla_mod) #p = 0.7915
+
+#model diagnostics
+meanla_simres <- simulateResiduals(meanla_mod)
+plot(meanla_simres)#overdispersed, HOV violated
