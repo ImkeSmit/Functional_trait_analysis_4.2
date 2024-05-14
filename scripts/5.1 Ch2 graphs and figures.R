@@ -283,6 +283,7 @@ dist_ass_join <- twosp_dist |>
   left_join(ass, by = c("target", "ID")) |> 
   filter(association %in% c("nurse", "bare")) #only work with these associations
 dist_ass_join$association <- as.factor(dist_ass_join$association)
+dist_ass_join$trait <- "all traits"
 
 dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
             geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
@@ -297,37 +298,32 @@ ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, un
 ###one dimensional Fdist~association####
 #import 1D trait difference data
 trait_fdist <- read.csv("Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv", row.names = 1)
-trait_fdist$GRAZ <- as.factor(trait_fdist$GRAZ)
-trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
-trait_fdist$grouping <- as.factor(trait_fdist$grouping)
-trait_fdist$arid_sq <- (trait_fdist$ARIDITY.v3)^2
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
   select(ID, species, association) |> 
   rename(target = species)
-#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 trait_ass_join <- trait_fdist |> 
   left_join(ass, by = c("target", "ID")) |> 
-  filter(association %in% c("nurse", "bare")) #only work with these associations
+  filter(association %in% c("nurse", "bare")) |>  #only work with these associations
+  bind_rows(dist_ass_join) #add the distances calculated wiith all seven traits so that it can go in the same figure
 trait_ass_join$association <- as.factor(trait_ass_join$association)
-trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
-trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$euclidean_dist <- as.numeric(trait_ass_join$euclidean_dist)
 
-trait_labels = c("H", "LS", "LA", "LDMC", "LL", "SLA", "C:N ratio")
+trait_labels = c("H", "LS", "LA", "LDMC", "LL", "SLA", "C:N ratio", "All traits")
 names(trait_labels) = c(unique(trait_ass_join$trait))
 
 annotations <- data.frame(trait = c(unique(trait_ass_join$trait)), 
                           p_value = c("p < 0.001***", "p < 0.001***", "p = 0.791", 
-                                      "p = 0.031*", "p = 0.002**", "p = 0.917", "p = 0.036*"))
+                                      "p = 0.031*", "p = 0.002**", "p = 0.917", "p = 0.036*", "p = 0.165"))
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = euclidean_dist)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
   facet_wrap(~trait, scales = "free_y", labeller = labeller(trait = trait_labels)) +
   ylab("Distance") +
   xlab("Target species association") +
-  geom_text(x = "bare", y = c(6.5, 7, 7.5, 3.2, 5, 2.2, 3.8), aes(label = p_value), data = annotations, color = "brown3")+
+  geom_text(x = "bare", y = c(6.5, 7, 7.5, 3.2, 5, 2.2, 3.8, 10.5), aes(label = p_value), data = annotations, color = "brown3")+
   theme_classic() 
 
 ggsave("one_dimensional_trait_distances.png", trait_distances, path = "Figures", 
