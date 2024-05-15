@@ -667,7 +667,7 @@ annotations$letters <- c("", "", "",  #cn ratio
                          "a", "b", "a", #meanldmc
                          "", "", "", #meanll
                          "", "", "") #meansla
-annotations$ycoord <- c(rep(55,3), rep(620,3), rep(700000,3), rep(75,3), rep(0.9, 3), rep(60,3),rep(300,3))
+annotations$ycoord <- c(rep(55,3), rep(570,3), rep(650000,3), rep(75,3), rep(0.8, 3), rep(60,3),rep(300,3))
 
 trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
