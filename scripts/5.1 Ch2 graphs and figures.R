@@ -676,7 +676,8 @@ trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
   xlab("Target species association") +
   scale_x_discrete(labels = c("bare-associated", "dominant-associated", "dominant species")) +
   geom_text(data = annotations, aes(y = ycoord, label = letters), color = "brown3") +
-  theme_classic() 
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
-ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 1700, width = 2000, units = "px")
+ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 1900, width = 2000, units = "px")
   
