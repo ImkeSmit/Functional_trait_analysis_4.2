@@ -653,9 +653,11 @@ FT_ass_join$SITE_ID <- as.factor(FT_ass_join$SITE_ID)
 FT_ass_join$association <- as.factor(FT_ass_join$association)
 
 ##NOw we can make the figure###
+#labels for facets
 trait_labels = c("C:N ratio", "LL", "SLA", "LDMC","LA","H","LS")
 names(trait_labels) = c(unique(FT_ass_join$trait))
 
+#dataframe containing significance letters
 annotations <- data.frame(trait = c(rep(unique(FT_ass_join$trait), 3)), 
                           association = c(rep("bare_associated", 7), rep("nurse_associated", 7), rep("nurse_species", 7)))
 annotations <- annotations[order(annotations$trait) , ]
@@ -667,7 +669,13 @@ annotations$letters <- c("", "", "",  #cn ratio
                          "", "", "", #meanldmc
                          "", "", "", #meanll
                          "", "", "") #meansla
-annotations$ycoord <- c(rep(55,3), rep(560,3), rep(650000,3), rep(75,3), rep(0.8, 3), rep(60,3),rep(300,3))
+annotations$ycoord <- c(rep(55,3), rep(500,3), rep(600000,3), rep(75,3), rep(0.8, 3), rep(60,3),rep(300,3))
+
+#dataframe containing p values
+p_vals <- data.frame(trait = c(unique(FT_ass_join$trait)), 
+                     p_value = c("p = 0.793", "p = 0.848", "p = 0.078", "p = 0.133", "p = 0.409", "p < 0.001***", "p < 0.001***"), 
+                     ycoord = c(55,65,300,0.8,75,575,670000))
+
 
 trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
@@ -675,9 +683,11 @@ trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
   ylab("Trait value") +
   xlab("") +
   scale_x_discrete(labels = c("bare-associated", "dominant-associated", "dominant species")) +
-  geom_text(data = annotations, aes(y = ycoord, label = letters), color = "brown3") +
+  geom_text(data = annotations, aes(y = ycoord, label = letters), color = "brown3", size = 6) +
+  geom_text(data = p_vals, aes(x = "bare_associated",y = ycoord, label = p_value), color = "brown3", size = 6) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 16), 
+        axis.title.y = element_text(size = 18))
 
-ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 1900, width = 2200, units = "px")
+ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 2200, width = 3600, units = "px")
   
