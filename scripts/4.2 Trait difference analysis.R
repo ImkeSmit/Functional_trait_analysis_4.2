@@ -68,6 +68,9 @@ summary(maxh_mod)
 Anova(maxh_mod)
 anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
 
+#significance letters
+cld(glht(model = maxh_mod, mcp(association = "Tukey")))
+
 maxh_simres <- simulateResiduals(maxh_mod)
 plot(maxh_simres) #with log, normality of residuals ok, HOv ok
 
@@ -85,6 +88,9 @@ maxls_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = maxls_data)
 summary(maxh_mod)
 Anova(maxh_mod)
 anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
+
+#significance letters
+cld(glht(model = maxls_mod, mcp(association = "Tukey")))
 
 maxls_simres <- simulateResiduals(maxls_mod)
 plot(maxls_simres) #with log, normality of residuals ok, HOv ok
@@ -104,6 +110,7 @@ summary(meanll_mod)
 Anova(meanll_mod)
 anova(meanll_null, meanll_mod) #p = 0.8483
 
+
 meanll_simres <- simulateResiduals(meanll_mod)
 plot(meanll_simres) #a little underdispersed, HOV ok
 
@@ -121,6 +128,9 @@ meanldmc_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meanldmc_d
 summary(meanldmc_mod)
 Anova(meanldmc_mod)
 anova(meanll_null, meanldmc_mod) #p =0.005767 **
+
+#significance letters
+cld(glht(model = meanldmc_mod, mcp(association = "Tukey")))
 
 meanldmc_simres <- simulateResiduals(meanldmc_mod)
 plot(meanldmc_simres) #a little underdispersed, HOV ok
