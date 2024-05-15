@@ -457,7 +457,6 @@ ggsave("dist_aridity.png", dist_aridity, height = 1400, width = 900, units = "px
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis\\Figures")
 
 
-
 ###ONLY FOR FACILITATIVE REPS: Functional distance ~ GRAZ, ARIDITY, microsite affinty####
 #import data
 twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1) |> 
@@ -604,3 +603,77 @@ ggsave("pc1_3_biplot.png", pc1_3,height = 1500, width = 2100, units = "px",
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis\\Figures")
 
 
+
+####Trait differences between species associations####
+#import data 
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
+  pivot_wider(names_from = trait, values_from = value) |> 
+  #calculate the C:N ratio
+  mutate(C_N_ratio = percentC/percentN) |> 
+  select(!c(percentC, percentN)) |> 
+  pivot_longer(cols = c("MeanLL","MeanSLA","MeanLDMC","MeanLA","MaxH","MaxLS","C_N_ratio"),
+               names_to = "trait", values_to = "value")
+
+##Lets join the results of the CHi2 tests to sla_fdist###
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(taxon= species)
+
+FT_ass_join <- FT |> 
+  left_join(ass, by = c("ID", "taxon")) |>  #ass is missing species in FT, because ass is missing the dominant species
+  filter(!association %in% c("neutral", "too_rare")) |> 
+  mutate(association = case_when(association == "nurse" ~ "nurse_associated", 
+                                 association == "bare" ~ "bare_associated", 
+                                 .default = association)) 
+
+##Now we need to add values indicitaing which species are the dominant species 
+#import the species position data
+sp_positions <- read.csv("Functional trait data//Clean data//sp_positions.csv", row.names = 1) |> 
+  select(!replicate) |> 
+  distinct(ID, taxon, position) |> 
+  filter(position == "nurse_species")
+
+#overwrite the association column in FT_ass_join with "nurse_species" if it is a nurse in that plot
+IDlist <- c(unique(sp_positions$ID))
+
+for(i in 1:length(IDlist)) {
+  
+  sp_positions_plot <- sp_positions[which(sp_positions$ID == IDlist[i]) , ]
+  nurse_taxa <- c(sp_positions_plot$taxon)
+  
+  for(t in 1:length(nurse_taxa)) {
+    FT_ass_join[which(FT_ass_join$ID == IDlist[i] & FT_ass_join$taxon == nurse_taxa[t]) 
+                , which(colnames(FT_ass_join) == "association")] <- "nurse_species"
+  }
+}
+#final cleaning of FT_ass_join
+FT_ass_join <- FT_ass_join |> 
+  filter(!is.na(value)) 
+FT_ass_join$SITE_ID <- as.factor(FT_ass_join$SITE_ID)  
+FT_ass_join$association <- as.factor(FT_ass_join$association)
+
+##NOw we can make the figure###
+trait_labels = c("C:N ratio", "LL", "SLA", "LDMC","LA","H","LS")
+names(trait_labels) = c(unique(FT_ass_join$trait))
+
+annotations <- data.frame(trait = c(rep(unique(FT_ass_join$trait), 3)), 
+                          association = c(rep("bare_associated", 7), rep("nurse_associated", 7), rep("nurse_species", 7)))
+annotations <- annotations[order(annotations$trait) , ]
+#add significance letters from analysis script
+annotations$letters <- c("", "", "",  #cn ratio
+                         "a", "b", "c", #maxh
+                         "a", "a", "b", #maxls
+                         "", "", "",  #meanla
+                         "a", "b", "a", #meanldmc
+                         "", "", "", #meanll
+                         "", "", "") #meansla
+
+trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
+  geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
+  facet_wrap(~trait, scale = "free_y", labeller = labeller(trait = trait_labels)) +
+  ylab("Trait value") +
+  xlab("Target species association") +
+  scale_x_discrete(labels = c("bare-associated", "dominant-associated", "dominant species")) +
+  geom_text(data = annotations, )
+  theme_classic() 
+  
