@@ -70,6 +70,7 @@ anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
 
 #significance letters
 cld(glht(model = maxh_mod, mcp(association = "Tukey")))
+emmeans(maxh_mod, specs = "association")
 
 maxh_simres <- simulateResiduals(maxh_mod)
 plot(maxh_simres) #with log, normality of residuals ok, HOv ok
@@ -91,6 +92,7 @@ anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
 
 #significance letters
 cld(glht(model = maxls_mod, mcp(association = "Tukey")))
+emmeans(maxls_mod, specs = "association")
 
 maxls_simres <- simulateResiduals(maxls_mod)
 plot(maxls_simres) #with log, normality of residuals ok, HOv ok
@@ -121,19 +123,21 @@ meanldmc_data <- FT_ass_join |>
   mutate(sqrt_value = sqrt(value), 
          log_value = log(value))
 
-meanldmc_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = meanldmc_data) 
+meanldmc_null <- glmmTMB(value ~ 1+ (1|SITE_ID), data = meanldmc_data) 
 
-meanldmc_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meanldmc_data)
+meanldmc_mod <- glmmTMB(value ~ association + (1|SITE_ID), data = meanldmc_data)
 
 summary(meanldmc_mod)
 Anova(meanldmc_mod)
-anova(meanll_null, meanldmc_mod) #p =0.005767 **
+anova(meanldmc_null, meanldmc_mod) #0.1325
 
 #significance letters
 cld(glht(model = meanldmc_mod, mcp(association = "Tukey")))
+emmeans(meanldmc_mod, specs = "association")
+
 
 meanldmc_simres <- simulateResiduals(meanldmc_mod)
-plot(meanldmc_simres) #a little underdispersed, HOV ok
+plot(meanldmc_simres) #everything is good without the transformation
 
 
 #MeanSLA#
