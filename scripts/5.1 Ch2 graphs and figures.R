@@ -664,20 +664,20 @@ annotations$letters <- c("", "", "",  #cn ratio
                          "a", "b", "c", #maxh
                          "a", "a", "b", #maxls
                          "", "", "",  #meanla
-                         "a", "b", "a", #meanldmc
+                         "", "", "", #meanldmc
                          "", "", "", #meanll
                          "", "", "") #meansla
-annotations$ycoord <- c(rep(55,3), rep(570,3), rep(650000,3), rep(75,3), rep(0.8, 3), rep(60,3),rep(300,3))
+annotations$ycoord <- c(rep(55,3), rep(560,3), rep(650000,3), rep(75,3), rep(0.8, 3), rep(60,3),rep(300,3))
 
 trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
   facet_wrap(~trait, scale = "free_y", labeller = labeller(trait = trait_labels)) +
   ylab("Trait value") +
-  xlab("Target species association") +
+  xlab("") +
   scale_x_discrete(labels = c("bare-associated", "dominant-associated", "dominant species")) +
   geom_text(data = annotations, aes(y = ycoord, label = letters), color = "brown3") +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
-ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 1900, width = 2000, units = "px")
+ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 1900, width = 2200, units = "px")
   
