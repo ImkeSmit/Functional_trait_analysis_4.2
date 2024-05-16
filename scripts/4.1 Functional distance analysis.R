@@ -341,31 +341,34 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 ##Nurse and bare are not significantly different, so the difference in the nurse and target traits do not matter for facilitation
 
 
-###One-dimensional (trait) distance between species####
-#get the functional distance between species in terms of one trait
+###One-dimensional (trait) difference between species####
+#get the functional difference between species in terms of one trait
 
-traitlist <- c(colnames(std_FT_wide))
+traitlist <- c(colnames(FT_wide))
 sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
 
 for(t in 1:length(traitlist)) {
+  #isolate one trait
+  one_trait <- FT_wide[, which(colnames(FT_wide) == traitlist[t])]
+  names(one_trait) <- rownames(FT_wide)
   
-  one_trait <- std_FT_wide |> #select one column
-    select(traitlist[t])
-  
-  trait_distmat <- as.matrix(dist(one_trait, method = "euclidean")) #get the distance matrix
+  #get the difference in trait values between every two species
+  trait_diff_matrix <- outer(one_trait, one_trait, FUN = "-")
   
   if(t == 1) {
   
-    trait_fdist <- as.data.frame(pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions)) #get the distances
-    trait_fdist$trait <- as.character(traitlist[[t]])
+    trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
+    trait_diff$trait <- as.character(traitlist[[t]])
   
     } else {
-      temp_trait_fdist <- as.data.frame(pairwise_fdist(distmat = trait_distmat, sp_positions = sp_positions)) #get the distances
-      temp_trait_fdist$trait <- traitlist[[t]]
+      temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
+      temp_trait_diff$trait <- traitlist[[t]]
     
-      trait_fdist <- rbind(trait_fdist, temp_trait_fdist)
+      trait_diff <- rbind(trait_diff, temp_trait_diff)
   }
 }
+
+
 
 #Add ardidty and graz
 trait_fdist$ID <- as.numeric(trait_fdist$ID)
