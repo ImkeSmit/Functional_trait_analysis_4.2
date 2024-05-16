@@ -367,7 +367,7 @@ for(t in 1:length(traitlist)) {
       trait_diff <- rbind(trait_diff, temp_trait_diff)
   }
 }
-
+#!! there are differnces = 0 because sometimes the dominant species also occurs in the bare or nurse microsite. Thus the dominant and target sp can be the same
 
 #Add ardidty and graz
 trait_diff$ID <- as.numeric(trait_diff$ID)
@@ -385,12 +385,10 @@ trait_diff <- trait_diff |>
 
 write.csv(trait_diff, "Functional trait data\\results\\trait_differences_between_2sp.csv")
 
+
 ###models of fdist~association###
-trait_fdist <- read.csv("Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv", row.names = 1)
-trait_fdist$GRAZ <- as.factor(trait_fdist$GRAZ)
+trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp.csv", row.names = 1)
 trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
-trait_fdist$grouping <- as.factor(trait_fdist$grouping)
-trait_fdist$arid_sq <- (trait_fdist$ARIDITY.v3)^2
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
   select(ID, species, association) |> 
@@ -403,31 +401,33 @@ trait_ass_join <- trait_fdist |>
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
-trait_ass_join$euclidean_dist <- as.numeric(trait_ass_join$euclidean_dist)
 
 #MaxH model#
 maxh_data <- trait_ass_join |> 
   filter(trait == "MaxH") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference)) 
 
 #null model
-maxh_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data)
+maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
 #alternative model
-maxh_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = maxh_data)
+maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = maxh_data)
 
 summary(maxh_mod)
 Anova(maxh_mod) #significant effect
-anova(maxh_null, maxh_mod) #p = 1.598e-14 ***
+anova(maxh_null, maxh_mod) #p = < 2.2e-16 ***
 
 #model diagnostics
 simres <- simulateResiduals(maxh_mod)
-plot(simres)#underispersed but better with sqrt variable, HOV violated
+plot(simres)#underispersed, HOV violated
 
 
 #MaxLS#
 maxls_data <- trait_ass_join |> 
   filter(trait == "MaxLS") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference))
+hist(maxls_data$log_trait_difference)
 
 #null model
 maxls_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = maxls_data)
