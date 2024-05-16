@@ -342,13 +342,13 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 
 
 ###One-dimensional (trait) difference between species####
-#get the functional difference between species in terms of one trait
+#This is just the difference in (unstandardised) trait values between species
 
 traitlist <- c(colnames(FT_wide))
 sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
 
 for(t in 1:length(traitlist)) {
-  #isolate one trait
+  #isolate one trait from the sp x trait matrix
   one_trait <- FT_wide[, which(colnames(FT_wide) == traitlist[t])]
   names(one_trait) <- rownames(FT_wide)
   
@@ -369,21 +369,21 @@ for(t in 1:length(traitlist)) {
 }
 
 
-
 #Add ardidty and graz
-trait_fdist$ID <- as.numeric(trait_fdist$ID)
+trait_diff$ID <- as.numeric(trait_diff$ID)
 #import siteinfo
-siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
   select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
   distinct() |> 
   filter(!is.na(ID))
 
 #do the join
-trait_fdist <- trait_fdist |> 
-  filter(!is.na(euclidean_dist), !euclidean_dist == "NaN") |> 
+trait_diff <- trait_diff |> 
+  rename(trait_difference = euclidean_dist) |> 
+  filter(!is.na(trait_difference), !trait_difference == "NaN") |> 
   inner_join(siteinfo, by = "ID") 
 
-write.csv(trait_fdist, "Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv")
+write.csv(trait_diff, "Functional trait data\\results\\trait_differences_between_2sp.csv")
 
 ###models of fdist~association###
 trait_fdist <- read.csv("Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv", row.names = 1)
