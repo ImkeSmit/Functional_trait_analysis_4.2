@@ -297,34 +297,33 @@ ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, un
 
 ###one dimensional Fdist~association####
 #import 1D trait difference data
-trait_fdist <- read.csv("Functional trait data\\results\\one_dimensional_functional_distances_between_2sp.csv", row.names = 1)
+trait_diff <- read.csv("Functional trait data\\results\\trait_differences_between_2sp.csv", row.names = 1)
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
   select(ID, species, association) |> 
   rename(target = species)
 
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
-trait_ass_join <- trait_fdist |> 
+trait_ass_join <- trait_diff |> 
   left_join(ass, by = c("target", "ID")) |> 
-  filter(association %in% c("nurse", "bare")) |>  #only work with these associations
-  bind_rows(dist_ass_join) #add the distances calculated wiith all seven traits so that it can go in the same figure
+  filter(association %in% c("nurse", "bare"))  #only work with these associations
 trait_ass_join$association <- as.factor(trait_ass_join$association)
-trait_ass_join$euclidean_dist <- as.numeric(trait_ass_join$euclidean_dist)
+trait_ass_join$trait_difference <- as.numeric(trait_ass_join$trait_difference)
 
-trait_labels = c("H", "LS", "LA", "LDMC", "LL", "SLA", "C:N ratio", "All traits")
+trait_labels = c("H", "LS", "LA", "LDMC", "LL", "SLA", "C:N ratio")
 names(trait_labels) = c(unique(trait_ass_join$trait))
 
 annotations <- data.frame(trait = c(unique(trait_ass_join$trait)), 
-                          p_value = c("p < 0.001***", "p < 0.001***", "p = 0.791", 
-                                      "p = 0.031*", "p = 0.002**", "p = 0.917", "p = 0.036*", "p = 0.165"))
+                          p_value = c("     ***", "       ***", "        **", "      ***", "", "", ""), 
+                          ycoord = c(600, 420000, 21, 0.38,0,0,0))
 
-trait_distances <- ggplot(trait_ass_join, aes(x = association, y = euclidean_dist)) +
+trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
   scale_x_discrete(labels = c("bare", "dominant")) +
   facet_wrap(~trait, scales = "free_y", labeller = labeller(trait = trait_labels)) +
-  ylab("Distance") +
+  ylab("Difference") +
   xlab("Target species association") +
-  geom_text(x = "bare", y = c(6.5, 7, 7.5, 3.2, 5, 2.2, 3.8, 10.5), aes(label = p_value), data = annotations, color = "brown3")+
+  geom_text(data = annotations, aes(x = "nurse", y = ycoord,label = p_value),color = "brown3", size = 8)+
   theme_classic() 
 
 ggsave("one_dimensional_trait_distances.png", trait_distances, path = "Figures", 
