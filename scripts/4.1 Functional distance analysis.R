@@ -420,6 +420,7 @@ maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), da
 summary(maxh_mod)
 Anova(maxh_mod) #significant effect
 anova(maxh_null, maxh_mod) #p = < 2.2e-16 ***
+r.squaredGLMM(maxh_mod)
 
 #model diagnostics
 simres <- simulateResiduals(maxh_mod)
@@ -446,6 +447,7 @@ maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_I
 summary(maxls_mod)
 Anova(maxls_mod) #significant effect
 anova(maxls_null, maxls_mod) #p = 2.881e-16 ***
+r.squaredGLMM(maxls_mod)
 
 #model diagnostics
 maxls_simres <- simulateResiduals(maxls_mod)
@@ -469,6 +471,7 @@ meanla_mod <- glmmTMB(neginv_trait_difference ~ association + (1|nurse) + (1|SIT
 summary(meanla_mod)
 Anova(meanla_mod) #significant effect
 anova(meanla_null, meanla_mod) #p = 0.008328 *
+r.squaredGLMM(meanla_mod)
 
 #model diagnostics
 meanla_simres <- simulateResiduals(meanla_mod)
@@ -491,6 +494,7 @@ meanldmc_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID)
 summary(meanldmc_mod)
 Anova(meanldmc_mod) #significant effect
 anova(meanldmc_null, meanldmc_mod) #p < 2.2e-16 ***
+r.squaredGLMM(meanldmc_mod)
 
 #model diagnostics
 meanldmc_simres <- simulateResiduals(meanldmc_mod)
@@ -514,6 +518,7 @@ meanll_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), 
 summary(meanll_mod)
 Anova(meanll_mod) #no significant effect
 anova(meanll_null, meanll_mod) #p = 0.379
+r.squaredGLMM(meanll_mod)
 
 #model diagnostics
 meanll_simres <- simulateResiduals(meanll_mod)
@@ -536,6 +541,7 @@ meansla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID),
 summary(meansla_mod)
 Anova(meansla_mod) #no effect
 anova(meansla_null, meansla_mod) #p = 0.4862
+r.squaredGLMM(meansla_null)
 
 #model diagnostics
 meansla_simres <- simulateResiduals(meansla_mod)
@@ -558,6 +564,7 @@ cn_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data
 summary(cn_mod)
 Anova(cn_mod) #no effect
 anova(cn_null, cn_mod) #p = 0.4859
+r.squaredGLMM(cn_mod)
 
 #model diagnostics
 cn_simres <- simulateResiduals(cn_mod)
