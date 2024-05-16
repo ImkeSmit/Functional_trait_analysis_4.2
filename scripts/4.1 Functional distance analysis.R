@@ -406,7 +406,11 @@ trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 maxh_data <- trait_ass_join |> 
   filter(trait == "MaxH") |> 
   mutate(sqrt_trait_difference = sqrt(trait_difference), 
-         log_trait_difference = log(trait_difference)) 
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(maxh_data$neginv_trait_difference)
+hist(maxh_data$trait_difference)
+
 
 #null model
 maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
@@ -426,93 +430,112 @@ plot(simres)#underispersed, HOV violated
 maxls_data <- trait_ass_join |> 
   filter(trait == "MaxLS") |> 
   mutate(sqrt_trait_difference = sqrt(trait_difference), 
-         log_trait_difference = log(trait_difference))
-hist(maxls_data$log_trait_difference)
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(maxls_data$trait_difference)
+hist(maxls_data$neginv_trait_difference)
+hist(maxls_data$sqrt_trait_difference)
+
 
 #null model
-maxls_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = maxls_data)
+maxls_null <- glmmTMB(sqrt_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxls_data) #cannot use transformations because of 0 and - values
 #alternative model
-maxls_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = maxls_data)
+maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = maxls_data)
+#models do not converge for untransformed response, forced to use sqrt despite NA values
 
 summary(maxls_mod)
 Anova(maxls_mod) #significant effect
-anova(maxls_null, maxls_mod) #p = 7.03e-14 ***
+anova(maxls_null, maxls_mod) #p = 2.881e-16 ***
 
 #model diagnostics
 maxls_simres <- simulateResiduals(maxls_mod)
-plot(maxls_simres)#underispersed but better with sqrt variable, HOV violated
+plot(maxls_simres)#unerdispersed
 
 
 #MeanLA#
 meanla_data <- trait_ass_join |> 
   filter(trait == "MeanLA") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference),
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(meanla_data$trait_difference)
+hist(meanla_data$neginv_trait_difference)
 
 #null model
-meanla_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meanla_data)
+meanla_null <- glmmTMB(neginv_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanla_data) #cannot use transformed respinse because of 0 and - values
 #alternative model
-meanla_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
+meanla_mod <- glmmTMB(neginv_trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
 
 summary(meanla_mod)
-Anova(meanla_mod) #no effect
-anova(meanla_null, meanla_mod) #p = 0.7915
+Anova(meanla_mod) #significant effect
+anova(meanla_null, meanla_mod) #p = 0.008328 *
 
 #model diagnostics
 meanla_simres <- simulateResiduals(meanla_mod)
-plot(meanla_simres)#overdispersed, HOV violated
+plot(meanla_simres)#a little underdispersed, HOV violated
 
 
 #MeanLDMC#
 meanldmc_data <- trait_ass_join |> 
   filter(trait == "MeanLDMC") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(meanldmc_data$trait_difference)
 
 #null model
-meanldmc_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
+meanldmc_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
 #alternative model
-meanldmc_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
+meanldmc_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
 
 summary(meanldmc_mod)
 Anova(meanldmc_mod) #significant effect
-anova(meanldmc_null, meanldmc_mod) #p = 0.03139 *
+anova(meanldmc_null, meanldmc_mod) #p < 2.2e-16 ***
 
 #model diagnostics
 meanldmc_simres <- simulateResiduals(meanldmc_mod)
-plot(meanldmc_simres)#a little underdispersed, HOV violated
+plot(meanldmc_simres)#residuals normal, HOV violated
 
 
 #MeanLL#
 meanll_data <- trait_ass_join |> 
   filter(trait == "MeanLL") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(meanll_data$trait_difference)
+hist(meanll_data$neginv_trait_difference)
 
 #null model
-meanll_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meanll_data)
+meanll_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanll_data) #cannot use transfromations because of 0 and - values
 #alternative model
-meanll_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meanll_data)
+meanll_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanll_data)
 
 summary(meanll_mod)
-Anova(meanll_mod) #significant effect
-anova(meanll_null, meanll_mod) #p = 0.001937 **
+Anova(meanll_mod) #no significant effect
+anova(meanll_null, meanll_mod) #p = 0.379
 
 #model diagnostics
 meanll_simres <- simulateResiduals(meanll_mod)
-plot(meanll_simres)#a little underdispersed, HOV violated
+plot(meanll_simres)#a little overdispersed, HOV violated
 
 
 #MeanSLA#
 meansla_data <- trait_ass_join |> 
   filter(trait == "MeanSLA") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(meansla_data$trait_difference)
 
 #null model
-meansla_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = meansla_data)
+meansla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meansla_data)
 #alternative model
-meansla_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = meansla_data)
+meansla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meansla_data)
 
 summary(meansla_mod)
 Anova(meansla_mod) #no effect
-anova(meansla_null, meansla_mod) #p = 0.9172
+anova(meansla_null, meansla_mod) #p = 0.4862
 
 #model diagnostics
 meansla_simres <- simulateResiduals(meansla_mod)
@@ -522,17 +545,20 @@ plot(meansla_simres)#a little underdispersed, HOV violated
 #C_N_ratio#
 cn_data <- trait_ass_join |> 
   filter(trait == "C_N_ratio") |> 
-  mutate(sqrt_euclidean_dist = sqrt(euclidean_dist)) 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(cn_data$trait_difference)
 
 #null model
-cn_null <- glmmTMB(sqrt_euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = cn_data)
+cn_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = cn_data)
 #alternative model
-cn_mod <- glmmTMB(sqrt_euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = cn_data)
+cn_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = cn_data)
 
 summary(cn_mod)
-Anova(cn_mod) #significant effect
-anova(cn_null, cn_mod) #p = 0.03852 *
+Anova(cn_mod) #no effect
+anova(cn_null, cn_mod) #p = 0.4859
 
 #model diagnostics
 cn_simres <- simulateResiduals(cn_mod)
-plot(cn_simres)#a little underdispersed, HOV violated
+plot(cn_simres)#resiuals normal enough, HOV violated
