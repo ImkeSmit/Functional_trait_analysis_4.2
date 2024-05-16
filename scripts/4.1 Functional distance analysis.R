@@ -420,6 +420,7 @@ maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), da
 summary(maxh_mod)
 Anova(maxh_mod) #significant effect
 anova(maxh_null, maxh_mod) #p = < 2.2e-16 ***
+emmeans(maxh_mod, specs = "association")
 r.squaredGLMM(maxh_mod)
 
 #model diagnostics
@@ -447,6 +448,7 @@ maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_I
 summary(maxls_mod)
 Anova(maxls_mod) #significant effect
 anova(maxls_null, maxls_mod) #p = 2.881e-16 ***
+emmeans(maxls_mod, specs = "association")
 r.squaredGLMM(maxls_mod)
 
 #model diagnostics
@@ -470,7 +472,8 @@ meanla_mod <- glmmTMB(neginv_trait_difference ~ association + (1|nurse) + (1|SIT
 
 summary(meanla_mod)
 Anova(meanla_mod) #significant effect
-anova(meanla_null, meanla_mod) #p = 0.008328 *
+anova(meanla_null, meanla_mod) #p = 0.008328 **
+emmeans(meanla_mod, specs = "association")
 r.squaredGLMM(meanla_mod)
 
 #model diagnostics
@@ -494,6 +497,7 @@ meanldmc_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID)
 summary(meanldmc_mod)
 Anova(meanldmc_mod) #significant effect
 anova(meanldmc_null, meanldmc_mod) #p < 2.2e-16 ***
+emmeans(meanldmc_mod, specs = "association")
 r.squaredGLMM(meanldmc_mod)
 
 #model diagnostics
@@ -518,6 +522,7 @@ meanll_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), 
 summary(meanll_mod)
 Anova(meanll_mod) #no significant effect
 anova(meanll_null, meanll_mod) #p = 0.379
+emmeans(meanll_mod, specs = "association")
 r.squaredGLMM(meanll_mod)
 
 #model diagnostics
@@ -541,6 +546,7 @@ meansla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID),
 summary(meansla_mod)
 Anova(meansla_mod) #no effect
 anova(meansla_null, meansla_mod) #p = 0.4862
+emmeans(meansla_mod, specs = "association")
 r.squaredGLMM(meansla_null)
 
 #model diagnostics
@@ -564,6 +570,7 @@ cn_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data
 summary(cn_mod)
 Anova(cn_mod) #no effect
 anova(cn_null, cn_mod) #p = 0.4859
+emmeans(cn_mod, specs = "association")
 r.squaredGLMM(cn_mod)
 
 #model diagnostics
