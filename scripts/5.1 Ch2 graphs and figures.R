@@ -672,21 +672,23 @@ annotations$ycoord <- c(rep(55,3), rep(500,3), rep(600000,3), rep(75,3), rep(0.8
 
 #dataframe containing p values
 p_vals <- data.frame(trait = c(unique(FT_ass_join$trait)), 
-                     p_value = c("p = 0.793", "p = 0.848", "p = 0.078", "p = 0.133", "p = 0.409", "p < 0.001***", "p < 0.001***"), 
+                     p_value = c("", "", "", "", "", "      ***", "      ***"), 
                      ycoord = c(55,65,300,0.8,75,575,670000))
 
 
 trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
-  facet_wrap(~trait, scale = "free_y", labeller = labeller(trait = trait_labels)) +
+  facet_wrap(~trait, scale = "free_y", labeller = labeller(trait = trait_labels), ncol = 2) +
   ylab("Trait value") +
   xlab("") +
   scale_x_discrete(labels = c("bare-associated", "dominant-associated", "dominant species")) +
-  geom_text(data = annotations, aes(y = ycoord, label = letters), color = "brown3", size = 6) +
-  geom_text(data = p_vals, aes(x = "bare_associated",y = ycoord, label = p_value), color = "brown3", size = 6) +
+  geom_text(data = annotations, aes(y = ycoord, label = letters), color = "brown3", size = 8) +
+  geom_text(data = p_vals, aes(x = "nurse_species",y = ycoord, label = p_value), color = "brown3", size = 8) +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 16), 
-        axis.title.y = element_text(size = 18))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 16),
+        axis.text.y = element_text(size = 16),
+        axis.title.y = element_text(size = 18), 
+        strip.text = element_text(size = 16))
 
-ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 2200, width = 3600, units = "px")
+ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 3500, width = 3400, units = "px")
   
