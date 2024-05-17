@@ -106,6 +106,7 @@ Anova(ls_mod)
 ##GRAZING MATTERS##
 
 ###Filling starts here####
+#look at CWM_working script to see how to fill while taking GRAZ into account
 
 #Change FT to long format
 FT_long <- FT |> 
