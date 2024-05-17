@@ -4,6 +4,7 @@ library(tidylog)
 library(glmmTMB)
 library(car)
 library(DHARMa)
+library(emmeans)
 
 #import data 
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
@@ -67,6 +68,7 @@ maxh_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = maxh_data)
 summary(maxh_mod)
 Anova(maxh_mod)
 anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
+r.squaredGLMM(maxh_mod)
 
 #significance letters
 cld(glht(model = maxh_mod, mcp(association = "Tukey")))
@@ -86,9 +88,10 @@ maxls_null <- glmmTMB(log_value ~ 1+ (1|SITE_ID), data = maxls_data)
 
 maxls_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = maxls_data)
 
-summary(maxh_mod)
-Anova(maxh_mod)
-anova(maxh_null, maxh_mod) #p = 8.176e-12 ***
+summary(maxls_mod)
+Anova(maxls_mod)
+anova(maxls_null, maxls_mod) #p = 2.422e-14 ***
+r.squaredGLMM(maxls_mod)
 
 #significance letters
 cld(glht(model = maxls_mod, mcp(association = "Tukey")))
@@ -111,7 +114,8 @@ meanll_mod <- glmmTMB(sqrt_value ~ association + (1|SITE_ID), data = meanll_data
 summary(meanll_mod)
 Anova(meanll_mod)
 anova(meanll_null, meanll_mod) #p = 0.8483
-
+r.squaredGLMM(meanll_mod)
+emmeans(meanll_mod, specs = "association")
 
 meanll_simres <- simulateResiduals(meanll_mod)
 plot(meanll_simres) #a little underdispersed, HOV ok
@@ -130,11 +134,11 @@ meanldmc_mod <- glmmTMB(value ~ association + (1|SITE_ID), data = meanldmc_data)
 summary(meanldmc_mod)
 Anova(meanldmc_mod)
 anova(meanldmc_null, meanldmc_mod) #0.1325
+r.squaredGLMM(meanldmc_mod)
 
 #significance letters
 cld(glht(model = meanldmc_mod, mcp(association = "Tukey")))
 emmeans(meanldmc_mod, specs = "association")
-
 
 meanldmc_simres <- simulateResiduals(meanldmc_mod)
 plot(meanldmc_simres) #everything is good without the transformation
@@ -153,6 +157,8 @@ meansla_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meansla_dat
 summary(meansla_mod)
 Anova(meansla_mod)
 anova(meansla_null, meansla_mod) #p = 0.07813 .
+r.squaredGLMM(meansla_mod)
+emmeans(meansla_mod, specs = "association")
 
 meansla_simres <- simulateResiduals(meansla_mod)
 plot(meansla_simres) #residuals normal, HOV good
@@ -171,6 +177,8 @@ meanla_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = meanla_data)
 summary(meanla_mod)
 Anova(meanla_mod)
 anova(meanla_null, meanla_mod) #p = 0.4094
+r.squaredGLMM(meanla_mod)
+emmeans(meanla_mod, specs = "association")
 
 meanla_simres <- simulateResiduals(meanla_mod)
 plot(meanla_simres) #residuals normal, HOV good
@@ -189,6 +197,8 @@ cn_mod <- glmmTMB(log_value ~ association + (1|SITE_ID), data = cn_data)
 summary(cn_mod)
 Anova(cn_mod)
 anova(cn_null, cn_mod) #p = 0.7925
+r.squaredGLMM(cn_mod)
+emmeans(cn_mod, specs = "association")
 
 cn_simres <- simulateResiduals(cn_mod)
 plot(cn_simres) #residuals normal, HOV good
