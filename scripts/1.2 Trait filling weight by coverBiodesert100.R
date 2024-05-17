@@ -4,12 +4,14 @@
 library(tidyverse)
 library(tidylog)
 library(traitstrap)
+library(glmmTMB)
+library(car)
 
 #we will import FT data for all sites that have FT data. 
 #Then do trait filling
 #Then subset for facilitation plots to have most complete trait data. 
 
-#trait data 
+#import trait data 
 FT <- read.csv("Functional trait data\\Clean data\\FT_all_sites.csv", row.names = 1) |> 
   #some values of CoverBiodesert 100 exceed 100, therefore I assume it is the sum of the cover of a species over all 100 quadrats
   #therefore divide by 100
@@ -17,8 +19,93 @@ FT <- read.csv("Functional trait data\\Clean data\\FT_all_sites.csv", row.names 
          #make sure that there are no 0 cover values.
          #values must be >0 or NA
          coverBiodesert100 = case_when(coverBiodesert100 == 0 ~ NA, .default = as.numeric(coverBiodesert100)))
+FT$GRAZ <- as.factor(FT$GRAZ)
+FT$SITE_ID <- as.factor(FT$SITE_ID)
 
 
+###But first: see if traits are influenced by GRAZ####
+#to determine wehther we need to take GRAZ into account when filling
+
+#meanLL~graz#
+ll_dat <- FT |> 
+  filter(!is.na(MeanLL)) |> 
+  mutate(log_MeanLL = log(MeanLL), 
+         sqrt_MeanLL = sqrt(MeanLL))
+
+ll_null <- glmmTMB(sqrt_MeanLL ~ 1 + (1|SITE_ID), data = ll_dat)
+
+ll_mod <- glmmTMB(sqrt_MeanLL ~ GRAZ + (1|SITE_ID), data = ll_dat)
+anova(ll_null, ll_mod) #p =  0.02515 *
+Anova(ll_mod)
+
+
+#meanSLA~graz#
+sla_dat <- FT |> 
+  filter(!is.na(MeanSLA)) |> 
+  mutate(log_MeanSLA = log(MeanSLA), 
+         sqrt_MeanSLA = sqrt(MeanSLA)) 
+
+sla_null <- glmmTMB(sqrt_MeanSLA ~ 1 + (1|SITE_ID), data = sla_dat)
+
+sla_mod <- glmmTMB(sqrt_MeanSLA ~ GRAZ + (1|SITE_ID), data = sla_dat)
+anova(sla_null, sla_mod)#p = 0.02515 *
+Anova(sla_mod)
+
+
+#meanLDMC~graz#
+ldmc_dat <- FT |> 
+  filter(!is.na(MeanLDMC)) |> 
+  mutate(log_MeanLDMC = log(MeanLDMC), 
+         sqrt_MeanLDMC = sqrt(MeanLDMC)) 
+
+ldmc_null <- glmmTMB(sqrt_MeanLDMC ~ 1 + (1|SITE_ID), data = ldmc_dat)
+
+ldmc_mod <- glmmTMB(sqrt_MeanLDMC ~ GRAZ + (1|SITE_ID), data = ldmc_dat)
+anova(ldmc_null, ldmc_mod) #p = 0.02264 *
+Anova(ldmc_mod)
+
+
+#meanLA~graz#
+la_dat <- FT |> 
+  filter(!is.na(MeanLA)) |> 
+  mutate(log_MeanLA = log(MeanLA), 
+         sqrt_MeanLA = sqrt(MeanLA)) 
+
+la_null <- glmmTMB(log_MeanLA ~ 1 + (1|SITE_ID), data = la_dat)
+
+la_mod <- glmmTMB(log_MeanLA ~ GRAZ + (1|SITE_ID), data = la_dat)
+anova(la_null, la_mod) #p = 0.4067
+Anova(la_mod)
+
+
+#maxH~graz#
+h_dat <- FT |> 
+  filter(!is.na(MaxH)) |> 
+  mutate(log_MaxH = log(MaxH), 
+         sqrt_MaxH = sqrt(MaxH)) 
+
+h_null <- glmmTMB(log_MaxH ~ 1 + (1|SITE_ID), data = h_dat)
+
+h_mod <- glmmTMB(log_MaxH ~ GRAZ + (1|SITE_ID), data = h_dat)
+anova(h_null, h_mod) #p = 7.452e-05 ***
+Anova(h_mod)
+
+
+#maxLS~graz#
+ls_dat <- FT |> 
+  filter(!is.na(MaxLS)) |> 
+  mutate(log_MaxLS = log(MaxLS), 
+         sqrt_MaxLS = sqrt(MaxLS)) 
+
+ls_null <- glmmTMB(log_MaxLS ~ 1 + (1|SITE_ID), data = ls_dat)
+
+ls_mod <- glmmTMB(log_MaxLS ~ GRAZ + (1|SITE_ID), data = ls_dat)
+anova(ls_null, ls_mod) #p = 0.003995 **
+Anova(ls_mod)
+
+##GRAZING MATTERS##
+
+###Filling starts here####
 
 #Change FT to long format
 FT_long <- FT |> 
