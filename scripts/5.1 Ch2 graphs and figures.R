@@ -306,12 +306,16 @@ ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis 
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 trait_ass_join <- trait_diff |> 
   left_join(ass, by = c("target", "ID")) |> 
-  filter(association %in% c("nurse", "bare"))  #only work with these associations
+  filter(association %in% c("nurse", "bare")) |>  #only work with these associations
+  mutate(trait = case_when(trait == "MaxH" ~ "H~(cm)", #rename the traits so that they are labelled nicely in the plot
+                   trait == "MaxLS" ~ "LS~(cm^2)",
+                   trait == "MeanLA" ~ "LA~(cm^2)",
+                   trait == "MeanLDMC" ~ "LDMC~('%')",
+                   trait == "MeanLL" ~ "LL~(cm)",
+                   trait == "MeanSLA" ~ "SLA~(cm^2/g)", 
+                   trait == "C_N_ratio" ~ "C:N"))
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$trait_difference <- as.numeric(trait_ass_join$trait_difference)
-
-trait_labels = c("H", "LS", "LA", "LDMC", "LL", "SLA", "C:N ratio")
-names(trait_labels) = c(unique(trait_ass_join$trait))
 
 annotations <- data.frame(trait = c(unique(trait_ass_join$trait)), 
                           p_value = c("     ***", "       ***", "        **", "      ***", "", "", ""), 
@@ -320,7 +324,7 @@ annotations <- data.frame(trait = c(unique(trait_ass_join$trait)),
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
   scale_x_discrete(labels = c("bare", "dominant")) +
-  facet_wrap(~trait, scales = "free_y", labeller = labeller(trait = trait_labels)) +
+  facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
   ylab("Difference") +
   xlab("Target species association") +
   geom_text(data = annotations, aes(x = "nurse", y = ycoord,label = p_value),color = "brown3", size = 8)+
@@ -634,6 +638,7 @@ sp_positions <- read.csv("Functional trait data//Clean data//sp_positions.csv", 
 
 #overwrite the association column in FT_ass_join with "nurse_species" if it is a nurse in that plot
 IDlist <- c(unique(sp_positions$ID))
+FT_3_ass <- FT_ass_join
 
 for(i in 1:length(IDlist)) {
   
@@ -641,44 +646,49 @@ for(i in 1:length(IDlist)) {
   nurse_taxa <- c(sp_positions_plot$taxon)
   
   for(t in 1:length(nurse_taxa)) {
-    FT_ass_join[which(FT_ass_join$ID == IDlist[i] & FT_ass_join$taxon == nurse_taxa[t]) 
+    FT_3_ass[which(FT_ass_join$ID == IDlist[i] & FT_ass_join$taxon == nurse_taxa[t]) 
                 , which(colnames(FT_ass_join) == "association")] <- "nurse_species"
   }
 }
 #final cleaning of FT_ass_join
-FT_ass_join <- FT_ass_join |> 
-  filter(!is.na(value)) 
-FT_ass_join$SITE_ID <- as.factor(FT_ass_join$SITE_ID)  
-FT_ass_join$association <- as.factor(FT_ass_join$association)
+FT_3_ass <- FT_3_ass |> 
+  filter(!is.na(value)) |> 
+  mutate(trait = case_when(trait == "MaxH" ~ "H~(cm)", #rename the traits so that they are labelled nicely in the plot
+                           trait == "MaxLS" ~ "LS~(cm^2)",
+                           trait == "MeanLA" ~ "LA~(cm^2)",
+                           trait == "MeanLDMC" ~ "LDMC~('%')",
+                           trait == "MeanLL" ~ "LL~(cm)",
+                           trait == "MeanSLA" ~ "SLA~(cm^2/g)", 
+                           trait == "C_N_ratio" ~ "C:N"))
+FT_3_ass$SITE_ID <- as.factor(FT_3_ass$SITE_ID)  
+FT_3_ass$association <- as.factor(FT_3_ass$association)
 
 ##NOw we can make the figure###
-#labels for facets
-trait_labels = c("C:N ratio", "LL", "SLA", "LDMC","LA","H","LS")
-names(trait_labels) = c(unique(FT_ass_join$trait))
 
 #dataframe containing significance letters
-annotations <- data.frame(trait = c(rep(unique(FT_ass_join$trait), 3)), 
+annotations <- data.frame(trait = c(rep(unique(FT_3_ass$trait), 3)), 
                           association = c(rep("bare_associated", 7), rep("nurse_associated", 7), rep("nurse_species", 7)))
 annotations <- annotations[order(annotations$trait) , ]
 #add significance letters from analysis script
 annotations$letters <- c("", "", "",  #cn ratio
                          "a", "b", "c", #maxh
-                         "a", "a", "b", #maxls
-                         "", "", "",  #meanla
-                         "", "", "", #meanldmc
+                         "", "", "", #meanla
+                         "", "", "", #meansldmc
                          "", "", "", #meanll
-                         "", "", "") #meansla
-annotations$ycoord <- c(rep(55,3), rep(500,3), rep(600000,3), rep(75,3), rep(0.8, 3), rep(60,3),rep(300,3))
+                         "a", "a", "b", #maxls
+                         "", "", "" #meansla
+                         )
+annotations$ycoord <- c(rep(0,3), rep(560,3), rep(0,3), rep(0,3), rep(0, 3), rep(600000,3),rep(0,3))
 
 #dataframe containing p values
-p_vals <- data.frame(trait = c(unique(FT_ass_join$trait)), 
-                     p_value = c("", "", "", "", "", "      ***", "      ***"), 
-                     ycoord = c(55,65,300,0.8,75,575,670000))
+p_vals <- data.frame(trait = c(unique(FT_3_ass$trait)), 
+                     p_value = c( "", "", "", "", "","      ***", "      ***"), 
+                     ycoord = c(55,65,300,0.8,75,585,670000))
 
 
-trait_differences <- ggplot(FT_ass_join, aes(x = association, y = value)) +
+trait_differences <- ggplot(FT_3_ass, aes(x = association, y = value)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
-  facet_wrap(~trait, scale = "free_y", labeller = labeller(trait = trait_labels), ncol = 2) +
+  facet_wrap(~trait, scale = "free_y", labeller = "label_parsed", ncol = 2) +
   ylab("Trait value") +
   xlab("") +
   scale_x_discrete(labels = c("bare-associated", "dominant-associated", "dominant species")) +
