@@ -6,7 +6,7 @@ library(ggplot2)
 library(car)
 library(corrplot)
 
-FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1) 
+FD_results <- read.csv("Functional trait data\\results\\FD_results_20May2024.csv", row.names = 1) 
 
 FD_results$FRic <- as.numeric(FD_results$FRic)
 FD_results$qual.FRic <- as.numeric(FD_results$qual.FRic)
@@ -17,7 +17,7 @@ FD_results$ID <- as.factor(FD_results$ID)
 
 ##Import NIntc results
 nint_result <- 
-  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
+  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
   filter(ID %in% c(FD_results$ID))
 
 ##Histograms of predictors and responses
