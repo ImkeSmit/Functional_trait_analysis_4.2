@@ -379,4 +379,4 @@ raoqmod <- glmmTMB(log_RaoQ ~ GRAZ + ARIDITY.v3 + (1|SITE_ID), data= FD_results)
 summary(raoqmod)
 Anova(raoqmod) #no significant effects
 null_raoqmod <- glmmTMB(log_RaoQ ~ 1 + (1|SITE_ID), data= FD_results)
-anova(null_raoqmod, raoqmod) # chisq = 5.8696, df = 4, p = 0.2091
+anova(null_raoqmod, raoqmod) # chisq = 1.9943, df = 4, p = 0.7368
