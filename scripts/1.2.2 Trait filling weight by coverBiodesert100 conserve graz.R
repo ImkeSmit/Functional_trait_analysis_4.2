@@ -116,7 +116,8 @@ FT_long <- FT |>
 
 FT_long$ID <- as.factor(FT_long$ID)
 FT_long$site_ID <- as.factor(FT_long$SITE_ID)
-FT_long$GRAZ <- factor(FT_long$GRAZ, levels = c(0,1,2,3))
+#traitstrap assumes the first level is the control, since we do not have a control, we make an empty first level
+FT_long$GRAZ <- factor(FT_long$GRAZ, levels = c(100, 0,1,2,3))
 
 #Create the comm table containing the cover values for each species
 #Use CoverBiodesert100
@@ -126,7 +127,8 @@ CovBio100 <- FT |>
   filter(!is.na(coverBiodesert100)) #remove rows with NA cover values
 CovBio100$ID <- as.factor(CovBio100$ID)
 CovBio100$site_ID <- as.factor(CovBio100$SITE_ID)
-CovBio100$GRAZ <- factor(CovBio100$GRAZ, levels = c(0,1,2,3)) 
+#traitstrap assumes the first level is the control, since we do not have a control, we make an empty first level
+CovBio100$GRAZ <- factor(CovBio100$GRAZ, levels = c(100, 0,1,2,3)) 
 
 
 FT_filled <- trait_fill(
@@ -143,8 +145,9 @@ FT_filled <- trait_fill(
   
   # specifies sampling hierarchy
   scale_hierarchy = c("COU", "SITE_ID", "ID"),
-  
-  other_col = "GRAZ",
+  #only fill with trait values from the same graz level
+  treatment_col = "GRAZ",
+  treatment_level = "COU", #hierarchy level at which you will find the same graz treatment level
   
   # min number of samples
   min_n_in_sample = 1 #if there is one trait value in the sample, do not search for values higher up in the hierarchy
