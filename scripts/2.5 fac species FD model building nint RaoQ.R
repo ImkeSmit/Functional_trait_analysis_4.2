@@ -7,7 +7,7 @@ library(ggplot2)
 library(car)
 library(corrplot)
 
-FD_results <- read.csv("Functional trait data\\results\\FD_results_11Mar2024_for_facilitation_species.csv", row.names = 1) |> 
+FD_results <- read.csv("Functional trait data\\results\\FD_results_20May2024_for_facilitation_species.csv", row.names = 1) |> 
   filter(!nsp == "only one sp") #remove plots that had only one sp
 
 FD_results$FRic <- as.numeric(FD_results$FRic)
@@ -19,7 +19,7 @@ FD_results$ID <- as.factor(FD_results$ID)
 
 ##Import NIntc results
 nint_result <- 
-  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
+  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
   filter(ID %in% c(FD_results$ID))
 
 ##Histograms of predictors and responses
@@ -223,11 +223,11 @@ results_table
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-write.csv(results_table, "Functional trait data\\results\\fac_species_nint_raoq_model_results_26Apr2024.csv")
+write.csv(results_table, "Functional trait data\\results\\fac_species_nint_raoq_model_results_20May2024.csv")
 
 
 ###Interpret model results####
-mod_results <- read.csv("Functional trait data\\results\\fac_species_nint_raoq_model_results_26Apr2024.csv", row.names = 1)
+mod_results <- read.csv("Functional trait data\\results\\fac_species_nint_raoq_model_results_20May2024.csv", row.names = 1)
 
 ##Which model had the lowest AIC?
 mod_results |> 
