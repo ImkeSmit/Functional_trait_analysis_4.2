@@ -6,12 +6,12 @@ library(DescTools)
 library(readxl)
 
 #Import the country_v3 data
-data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3")
+data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3")
 countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
                   "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
 for(i in 1:length(data_files)) {                              
   assign(paste0(countrynames[i]),                                   
-         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3\\",
+         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3\\",
                           data_files[i])))
 }
 
