@@ -121,7 +121,7 @@ FT_long$COU <- as.factor(FT_long$COU)
 FT_long$GRAZ <- factor(FT_long$GRAZ, levels = c(100, 0,1,2,3))
 
 #Create the comm table containing the cover values for each species
-#Use CoverBiodesert100
+#Use CoverBiodesert100 because we cannot get cover values for the nurse species from the facilitation data
 CovBio100 <- FT |> 
   select(c(ID, COU, SITE, SITE_ID, PLOT, taxon, coverBiodesert100, GRAZ, ARIDITY.v3)) |> 
   distinct() |> 
@@ -158,6 +158,9 @@ FT_filled <- trait_fill(
   min_n_in_sample = 1 #if there is one trait value in the sample, do not search for values higher up in the hierarchy
 )
 FT_filled_sorted <- arrange(FT_filled, ID)
+#make sure GRAZ_comm and GRAZ_trait are always the same
+nrow(FT_filled[which(FT_filled$GRAZ_comm != FT_filled$GRAZ_comm) ,]) #GRAZ_comm is always equal to GRAZ_trait
+
 write.csv(FT_filled, "Functional trait data\\Clean data\\FT_filled_all_sites_graz_conserved.csv")
 #coverBiodesert100 is the cover value of that species in that ID
 #coverBiodesert100_FT is the cover value of the "filler", i.e. it is the cover of the species entry that came from elsewhere to fill this gap
@@ -175,15 +178,15 @@ missing_traits <- trait_missing(
 
 
 ###Subset FT_filled for the facilitation plots####
-FT_filled <- read.csv("Functional trait data\\Clean data\\FT_filled_all_sites.csv", row.names = 1)
+FT_filled <- read.csv("Functional trait data\\Clean data\\FT_filled_all_sites_graz_conserved.csv", row.names = 1)
 
 #Import the country_v3 data
-data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3")
+data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3")
 countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
                   "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
 for(i in 1:length(data_files)) {                              
   assign(paste0(countrynames[i]),                                   
-         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3\\",
+         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3\\",
                           data_files[i])))
 }
 
@@ -213,19 +216,19 @@ FT_filled_facplots <- FT_filled |>
 length(unique(FT_filled_facplots$ID))
 
 #export
-write.csv(FT_filled_facplots, "Functional trait data\\Clean data\\FT_filled_match_facilitation_plots.csv")
+write.csv(FT_filled_facplots, "Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv")
 
 
 
 ###SUBSET THE FT_filled_facplots FOR THE SPECIES IN THAT PLOT IN THE FACILITATION DATA####
-FT_filled_facplots <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots.csv", row.names = 1)
+FT_filled_facplots <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv", row.names = 1)
 
 ###ALSO FIND OUT WHICH SPECIES ARE IN BOTH DATASETS OR ONLY ON ONE?
 #import spnames in the facilitation data
 fac_species <- read.csv("Functional trait data\\Clean data\\facilitation_species_and_positions.csv", row.names = 1)
 
 #which sp are only in the facilitation data, but not in the trait data, this table is sp_matches
-sp_matches <- data.frame(matrix(nrow = 11, ncol = 3))
+sp_matches <- data.frame(matrix(nrow = 10, ncol = 3))
 colnames(sp_matches) <- c("ID", "spname", "position")
 #Position = fac_only, if the sp is only in the facilitation data, FT_only if it is only in the FT data, match if the sp is present in both datasets
 
@@ -280,7 +283,7 @@ for(i in 1:length(fac_IDs)) {
 }###end of loop
 ##FT sub did not try to fill any traits for species that are only in the fac data
 
-write.csv(FT_sub, "Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv") #these species occur in that plot in the facilitation data
+write.csv(FT_sub, "Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv") #these species occur in that plot in the facilitation data
 
 write.csv2(sp_matches, "Functional trait data\\Clean data\\filled_sp_matches.csv")
 
