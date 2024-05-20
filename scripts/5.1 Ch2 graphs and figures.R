@@ -11,10 +11,10 @@ library(tidylog)
 
 ####RaoQ accross aridity and grazing####
 #import FD results
-FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1)
+FD_results <- read.csv("Functional trait data\\results\\FD_results_20May2024.csv", row.names = 1)
 FD_results$ID <- as.factor(FD_results$ID)
 #add grazing and aridity
-siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
   select(c(ID, GRAZ, ARIDITY.v3))
 siteinfo$ID <-as.factor(siteinfo$ID)
 #do the join
@@ -53,7 +53,7 @@ ggsave("Raoq_aridity_grazing.png", Raoq_graz_arid, height = 800, width = 1500, u
 #import nint results
 #Add the NIntc
 nint_result <- 
-  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
+  read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1) |> 
   filter(ID %in% c(FD_results$ID))
 nint_result$ID <- as.factor(nint_result$ID)
 
