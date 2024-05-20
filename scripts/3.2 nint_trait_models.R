@@ -15,7 +15,7 @@ library(ggpubr)
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
 
 ##import trait data
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv",
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv",
                row.names = 1) 
 
 ##For each replicate, we need to get the NIntc value and the traits of the nurse
@@ -115,7 +115,7 @@ hist(modeldat_final$nurse_mean_C_N_ratio)
 
 ###Now we can run the allsubsets models####
 #import the model formulas
-formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_formulas.csv") |> 
+formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_formulas.csv", row.names = 1) |> 
   separate_wider_delim(formula, delim = "~", names = c("response", "predictors")) |> 
   select(predictors) |> 
   distinct(predictors) |> 
@@ -134,10 +134,10 @@ modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
 ####descriptive stats####
 #number of dominant species
-length(unique(modeldat_final$nurse_sp)) #69
+length(unique(modeldat_final$nurse_sp)) #66
 
 #number of replicates
-nrow(modeldat_final) #3043
+nrow(modeldat_final) #2625
 
 
 ###Loop through the formulas for NIntc ~ nurse traits####
