@@ -115,7 +115,8 @@ FT_long <- FT |>
                        names_to = "trait", values_to = "value")
 
 FT_long$ID <- as.factor(FT_long$ID)
-FT_long$site_ID <- as.factor(FT_long$SITE_ID)
+FT_long$SITE_ID <- as.factor(FT_long$SITE_ID)
+FT_long$COU <- as.factor(FT_long$COU)
 #traitstrap assumes the first level is the control, since we do not have a control, we make an empty first level
 FT_long$GRAZ <- factor(FT_long$GRAZ, levels = c(100, 0,1,2,3))
 
@@ -126,7 +127,8 @@ CovBio100 <- FT |>
   distinct() |> 
   filter(!is.na(coverBiodesert100)) #remove rows with NA cover values
 CovBio100$ID <- as.factor(CovBio100$ID)
-CovBio100$site_ID <- as.factor(CovBio100$SITE_ID)
+CovBio100$SITE_ID <- as.factor(CovBio100$SITE_ID)
+CovBio100$COU <- as.factor(CovBio100$COU)
 #traitstrap assumes the first level is the control, since we do not have a control, we make an empty first level
 CovBio100$GRAZ <- factor(CovBio100$GRAZ, levels = c(100, 0,1,2,3)) 
 
@@ -144,16 +146,19 @@ FT_filled <- trait_fill(
   keep_all = FALSE, #do not keep trait data at all availible levels, only on the finest scale availible
   
   # specifies sampling hierarchy
-  scale_hierarchy = c("COU", "SITE_ID", "ID"),
+  scale_hierarchy = c("COU", "ID"), #in order to retrieve traits from only the same graz level, traits can only be filled from country.
+                                    #you cannot find the same grazlevel from SITE_ID.
   #only fill with trait values from the same graz level
   treatment_col = "GRAZ",
   treatment_level = "COU", #hierarchy level at which you will find the same graz treatment level
+  
+  other_col = c("SITE_ID"),
   
   # min number of samples
   min_n_in_sample = 1 #if there is one trait value in the sample, do not search for values higher up in the hierarchy
 )
 FT_filled_sorted <- arrange(FT_filled, ID)
-write.csv(FT_filled, "Functional trait data\\Clean data\\FT_filled_all_sites.csv")
+write.csv(FT_filled, "Functional trait data\\Clean data\\FT_filled_all_sites_graz_conserved.csv")
 #coverBiodesert100 is the cover value of that species in that ID
 #coverBiodesert100_FT is the cover value of the "filler", i.e. it is the cover of the species entry that came from elsewhere to fill this gap
 
