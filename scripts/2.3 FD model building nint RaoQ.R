@@ -221,11 +221,11 @@ results_table
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-write.csv(results_table, "Functional trait data\\results\\nint_raoq_model_results_22Apr2024.csv")
+write.csv(results_table, "Functional trait data\\results\\nint_raoq_model_results_20May2024.csv")
 
 
 ###Interpret model results####
-mod_results <- read.csv("Functional trait data\\results\\nint_raoq_model_results_22Apr2024.csv", row.names = 1)
+mod_results <- read.csv("Functional trait data\\results\\nint_raoq_model_results_20May2024.csv", row.names = 1)
 
 ##Which model had the lowest AIC?
 mod_results |> 
