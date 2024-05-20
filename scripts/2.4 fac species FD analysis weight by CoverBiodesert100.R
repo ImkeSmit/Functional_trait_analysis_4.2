@@ -12,7 +12,7 @@ library(DescTools)
 library(corrplot)
 
 ##Import filled FT data for the facilitation plots
-FT_raw <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1)
+FT_raw <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
 
 FT <- FT_raw|> 
@@ -150,7 +150,7 @@ plots_for_FD <- nsp_dat |>
   distinct(ID) #resulting in 75 plots
 
 ##However to make this comparable with the full version of this analysis (with FT-match facilitation plots), we need to run it for exactly the same plots
-full_FD_IDlist <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv") |> 
+full_FD_IDlist <- read.csv("Functional trait data\\results\\FD_results_20May2024.csv") |> 
   distinct(ID)
 #subset for the plots in full_FD_IDlist
 xlist_red <- xlist[which(names(xlist) %in% c(as.character(full_FD_IDlist$ID)))]
@@ -208,4 +208,4 @@ for (k in 1:length(xlist_red)) {
 }
 
 
-write.csv(FD_results, "Functional trait data\\results\\FD_results_11Mar2024_for_facilitation_species.csv")
+write.csv(FD_results, "Functional trait data\\results\\FD_results_20May2024_for_facilitation_species.csv")
