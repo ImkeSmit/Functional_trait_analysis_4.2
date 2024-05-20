@@ -144,15 +144,13 @@ FT_filled <- trait_fill(
   # specifies sampling hierarchy
   scale_hierarchy = c("COU", "SITE_ID", "ID"),
   
-  #only fill from the same graz level
-  treatment_col = "GRAZ",
-  treatment_level = "COU", #hierarchy level at which you will find the same graz treatment level
+  other_col = "GRAZ",
   
   # min number of samples
   min_n_in_sample = 1 #if there is one trait value in the sample, do not search for values higher up in the hierarchy
 )
 FT_filled_sorted <- arrange(FT_filled, ID)
-write.csv(FT_filled, "Functional trait data\\Clean data\\FT_filled_all_sites_graz_conserved.csv")
+write.csv(FT_filled, "Functional trait data\\Clean data\\FT_filled_all_sites.csv")
 #coverBiodesert100 is the cover value of that species in that ID
 #coverBiodesert100_FT is the cover value of the "filler", i.e. it is the cover of the species entry that came from elsewhere to fill this gap
 
