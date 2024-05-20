@@ -48,7 +48,7 @@ graz_allsp <- FT_long |>
 
 #Get the nurses at each graz level
 #import the nint results
-nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1)   
+nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names =1)   
 graz_nurses <- nint_result |> 
   group_by(graz) |> 
   distinct(nurse) |> 
