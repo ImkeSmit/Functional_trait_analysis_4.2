@@ -1,7 +1,7 @@
 ###FUNCTIONAL DIVERSITY ANALYSIS###
 #Get the functional richness of each plot with FD
 #Use FT match facilitation plots
-#ie there may be species present atht are not in the facilitation data
+#ie there may be species present that are not in the facilitation data
 
 library(tidyverse)
 library(tidylog)
@@ -13,7 +13,7 @@ library(DescTools)
 library(corrplot)
 
 ##Import filled FT data for the facilitation plots
-FT_raw <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots.csv", row.names = 1)
+FT_raw <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv", row.names = 1)
 
 
 FT <- FT_raw|> 
@@ -95,7 +95,7 @@ for(i in 1:length(IDlist)) {
 
 ###Quality assesment - do we have enough species?####
 #compare the species and cover in xlist to the species and cover in the quadrat data
-quad <- read.csv("Functional trait data\\quadrat_survey_all_plots.csv", row.names = 1)
+quad <- read.csv("Functional trait data\\Clean data\\quadrat_survey_all_plots.csv", row.names = 1)
 
 IDlist <- c(row.names(covermat))
 
@@ -148,7 +148,7 @@ nsp_dat <- nsp_dat |>
 #plots where we have data for more than 80% cover
 plots_for_FD <- nsp_dat |> 
   filter(trait_cover_div_quad_cover >= 80) |> 
-  distinct(ID) #resulting in 90 plots
+  distinct(ID) #resulting in 88 plots
 
 ##Remove the plots with less than 80% cover from xlist and alist
 remove_plots <- nsp_dat |> 
@@ -168,6 +168,36 @@ xlist_red[[which(names(xlist_red) == "115")]] <- new_115
 new_cov_115 <- alist_red[[which(names(alist_red) == "115")]] |> 
   select(!Ferula_sinkiangensis)
 alist_red[[which(names(alist_red) == "115")]]  <- new_cov_115
+
+
+##plot 19 breaks because Prosopis_alpataco has too many NA's, lets remove this species
+new_19 <- xlist_red[[which(names(xlist_red) == "19")]] |> 
+  filter(!row.names(xlist_red[[which(names(xlist_red) == "19")]]) == "Prosopis_alpataco")
+xlist_red[[which(names(xlist_red) == "19")]] <- new_19
+
+new_cov_19 <- alist_red[[which(names(alist_red) == "19")]] |> 
+  select(!Prosopis_alpataco)
+alist_red[[which(names(alist_red) == "19")]]  <- new_cov_19
+
+##plot248 breaks because Lycium_schizocalyx has too many NA's, remove this species
+new_248 <- xlist_red[[which(names(xlist_red) == "248")]] |> 
+  filter(!row.names(xlist_red[[which(names(xlist_red) == "248")]]) == "Lycium_schizocalyx")
+xlist_red[[which(names(xlist_red) == "248")]] <- new_248
+
+new_cov_248 <- alist_red[[which(names(alist_red) == "248")]] |> 
+  select(!Lycium_schizocalyx)
+alist_red[[which(names(alist_red) == "248")]]  <- new_cov_248
+
+
+##plot252 breaks because Duvalia_caespitosa has too many NA's, remove this species
+new_252 <- xlist_red[[which(names(xlist_red) == "252")]] |> 
+  filter(!row.names(xlist_red[[which(names(xlist_red) == "252")]]) == "Duvalia_caespitosa")
+xlist_red[[which(names(xlist_red) == "252")]] <- new_252
+
+new_cov_252 <- alist_red[[which(names(alist_red) == "252")]] |> 
+  select(!Duvalia_caespitosa)
+alist_red[[which(names(alist_red) == "252")]]  <- new_cov_252
+
 
 
 ###Now calculate FD for each plot
@@ -210,4 +240,4 @@ for (k in 1:length(xlist_red)) {
 }
 
 
-write.csv(FD_results, "Functional trait data\\results\\FD_results_4Mar2024.csv")
+write.csv(FD_results, "Functional trait data\\results\\FD_results_20May2024.csv")
