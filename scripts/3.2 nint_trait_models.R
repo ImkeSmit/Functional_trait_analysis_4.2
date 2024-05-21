@@ -247,7 +247,7 @@ best_subset_models <- results_table |>
 nintc_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
 
 #NIntc richness best model
-nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~ nurse_meanSLA + nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~ aridity + nurse_meanSLA + nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
                                  family = binomial, data = modeldat_final)
 
 summary(nintc_richness_bestmod)
@@ -294,7 +294,6 @@ ninta_richness_bestmod <- glmmTMB(NInta_richness_binom ~ nurse_meanSLA+ nurse_me
 summary(ninta_richness_bestmod)
 anova(ninta_richness_null, ninta_richness_bestmod) #p = 0.04243
 Anova(ninta_richness_bestmod)
-plotResiduals(ninta_richness_bestmod)
 r.squaredGLMM(ninta_richness_bestmod)
 #model diagnostics
 ninta_richness_bestmod_simres <- simulateResiduals(ninta_richness_bestmod)
