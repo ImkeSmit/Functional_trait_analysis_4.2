@@ -609,7 +609,7 @@ ggsave("pc1_3_biplot.png", pc1_3,height = 1500, width = 2100, units = "px",
 
 ####Trait differences between species associations####
 #import data 
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1) |> 
   pivot_wider(names_from = trait, values_from = value) |> 
   #calculate the C:N ratio
   mutate(C_N_ratio = percentC/percentN) |> 
@@ -676,14 +676,20 @@ annotations$letters <- c("", "", "",  #cn ratio
                          "", "", "", #meansldmc
                          "", "", "", #meanll
                          "a", "a", "b", #maxls
-                         "", "", "" #meansla
+                         "a", "ab", "b" #meansla
                          )
-annotations$ycoord <- c(rep(0,3), rep(560,3), rep(0,3), rep(0,3), rep(0, 3), rep(600000,3),rep(0,3))
+annotations$ycoord <- c(rep(0,3), rep(560,3), rep(0,3), rep(0,3), rep(0, 3), rep(600000,3),rep(280,3))
 
 #dataframe containing p values
 p_vals <- data.frame(trait = c(unique(FT_3_ass$trait)), 
-                     p_value = c( "", "", "", "", "","      ***", "      ***"), 
-                     ycoord = c(55,65,300,0.8,75,585,670000))
+                     p_value = c( "", #LL
+                                  "               *", #SLA
+                                  "", #LDMC
+                                  "", #LA
+                                  "            ***", #H
+                                  "            ***", #LS
+                                  ""),         #C:N
+                     ycoord = c(0,300,0,0,585,670000, 0))
 
 
 trait_differences <- ggplot(FT_3_ass, aes(x = association, y = value)) +
