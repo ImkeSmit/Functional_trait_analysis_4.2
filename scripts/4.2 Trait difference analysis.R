@@ -7,7 +7,7 @@ library(DHARMa)
 library(emmeans)
 
 #import data 
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1) |> 
   pivot_wider(names_from = trait, values_from = value) |> 
   #calculate the C:N ratio
   mutate(C_N_ratio = percentC/percentN) |> 
