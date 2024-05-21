@@ -159,6 +159,7 @@ Anova(meansla_mod)
 anova(meansla_null, meansla_mod) #p = 0.07813 .
 r.squaredGLMM(meansla_mod)
 emmeans(meansla_mod, specs = "association")
+cld(glht(model = meansla_mod, mcp(association = "Tukey")))
 
 meansla_simres <- simulateResiduals(meansla_mod)
 plot(meansla_simres) #residuals normal, HOV good
