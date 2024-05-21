@@ -11,7 +11,7 @@ library(multcomp)
 library(multcompView)
 
 #From the filled trait data for plotspecific species
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species.csv", row.names = 1)
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
 ##We need to standardise each trait value to mean 0 and variance of 1 with Z = (x-mean)/sd
 ##We need only one trait value per species
@@ -277,7 +277,7 @@ twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = sp_positions)
 twosp_dist <- as.data.frame(twosp_dist)
 twosp_dist$ID <- as.numeric(twosp_dist$ID)
 #import siteinfo
-siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
   select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
   distinct() |> 
   filter(!is.na(ID))
@@ -318,7 +318,7 @@ dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = di
 dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
-anova(dist_ass_null, dist_ass_mod) #p = 0.1645 
+anova(dist_ass_null, dist_ass_mod) #p = 0.06969 
 
 emmeans(dist_ass_mod, specs = "association")
 cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
