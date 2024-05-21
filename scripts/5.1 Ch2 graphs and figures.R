@@ -318,7 +318,7 @@ trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$trait_difference <- as.numeric(trait_ass_join$trait_difference)
 
 annotations <- data.frame(trait = c(unique(trait_ass_join$trait)), 
-                          p_value = c("     ***", "       ***", "        **", "      ***", "", "", ""), 
+                          p_value = c("     ***", "       ***", "       *", "      ***", "", "", ""), 
                           ycoord = c(600, 420000, 21, 0.38,0,0,0))
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
