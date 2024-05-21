@@ -386,7 +386,7 @@ trait_diff <- trait_diff |>
 write.csv(trait_diff, "Functional trait data\\results\\trait_differences_between_2sp.csv")
 
 
-###models of fdist~association###
+###models of trait difference ~association####
 trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp.csv", row.names = 1)
 trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
 ##Lets join the results of the CHi2 tests to sla_fdist###
@@ -466,9 +466,9 @@ hist(meanla_data$trait_difference)
 hist(meanla_data$neginv_trait_difference)
 
 #null model
-meanla_null <- glmmTMB(neginv_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanla_data) #cannot use transformed respinse because of 0 and - values
+meanla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanla_data) #cannot use transformed respinse because of 0 and - values
 #alternative model
-meanla_mod <- glmmTMB(neginv_trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
+meanla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
 
 summary(meanla_mod)
 Anova(meanla_mod) #significant effect
@@ -478,7 +478,7 @@ r.squaredGLMM(meanla_mod)
 
 #model diagnostics
 meanla_simres <- simulateResiduals(meanla_mod)
-plot(meanla_simres)#a little underdispersed, HOV violated
+plot(meanla_simres)#underdispersed, HOV violated
 
 
 #MeanLDMC#
