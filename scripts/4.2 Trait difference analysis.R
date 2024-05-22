@@ -55,6 +55,7 @@ FT_ass_join$SITE_ID <- as.factor(FT_ass_join$SITE_ID)
 FT_ass_join$association <- as.factor(FT_ass_join$association)
 
 ###Models of trait values ~ association####
+#Cannot add (1|nurse species) as a random effect because the association is measured at the plot level
 #MaxH#
 maxh_data <- FT_ass_join |> 
   filter(trait == "MaxH") |> 
