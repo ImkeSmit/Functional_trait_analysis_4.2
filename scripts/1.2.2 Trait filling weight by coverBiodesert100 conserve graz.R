@@ -310,12 +310,12 @@ only_in_FT <- FT_species |> #species only sampled in the trait survey
 
 ###Assess change in trait coverage###
 #import unfilled trait data
-FT_unfilled <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots.csv", row.names = 1) |> 
+FT_unfilled <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
   pivot_longer(cols = c(MeanLL, MeanSLA, MeanLDMC, MeanLA, MaxH, MaxLS, percentN, percentC), 
                names_to = "trait", values_to = "value")
 
 #import filled trait data
-FT_filled <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots.csv", row.names = 1)
+FT_filled <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
 ###trait coverage in FT_unfilled
 denom <- nrow(FT_unfilled) #this is the number of trait X species x plot combinations
