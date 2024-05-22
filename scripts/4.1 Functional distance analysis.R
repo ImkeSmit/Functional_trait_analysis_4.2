@@ -421,6 +421,7 @@ summary(maxh_mod)
 Anova(maxh_mod) #significant effect
 anova(maxh_null, maxh_mod) #p = < 2.2e-16 ***
 emmeans(maxh_mod, specs = "association")
+emmeans(maxh_mod, ~association, adjust = "nurse")
 r.squaredGLMM(maxh_mod)
 
 #model diagnostics
