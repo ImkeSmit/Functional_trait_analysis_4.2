@@ -323,6 +323,7 @@ annotations <- data.frame(trait = c(unique(trait_ass_join$trait)),
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
+  stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
   scale_x_discrete(labels = c("bare", "dominant")) +
   facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
   ylab("Difference") +
