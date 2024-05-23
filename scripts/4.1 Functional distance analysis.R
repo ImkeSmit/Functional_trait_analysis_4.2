@@ -270,8 +270,53 @@ write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_betw
 
 
 
-####Functional distance in 7 dimensional space
+####Functional distance in 7 dimensional space####
+sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
+#From the filled trait data for plotspecific species
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
+IDlist <- c(unique(sp_positions$ID))[1:2]
+
+for(p in 1:length(IDlist)) {
+  positions_plot <- sp_positions[which(sp_positions$ID == IDlist[p]) , ]
+  FT_plot <- FT[which(FT$ID == IDlist[p]) , ]
+  
+  #now make FT wide and standardise it
+  #Get the mean of each trait for each sp
+  FT_mean <- FT_plot |> 
+    group_by(taxon,trait) |> 
+    summarise(mean_value = mean(value))
+  
+  #Get it into wide format
+  FT_wide <- FT_mean |>
+    pivot_wider(names_from = trait, values_from = mean_value) |> 
+    column_to_rownames(var = "taxon") |> 
+    filter(!is.na(MaxH),
+           !is.na(MaxLS), 
+           !is.na(MeanLA),
+           !is.na(MeanLDMC),
+           !is.na(MeanLL),
+           !is.na(MeanSLA), 
+           !is.na(percentC),
+           !is.na(percentN)) |> 
+    mutate(C_N_ratio = percentC/percentN) |> 
+    select(!c(percentC, percentN))
+  
+  #standardise trait values
+  std_FT_wide <- standard_trait_matrix(trat_matrix = FT_wide, traitlist = c(colnames(FT_wide)))
+  
+  #now get the distance between each pair of species
+  distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
+  
+  if (p == 1) {
+    twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
+    #twosp_dist$ID <- IDlist[p]
+  }else{
+    twosp_dist_temp <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
+    #twosp_dist_temp$ID <- IDlist[p]
+    twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
+  }
+}
 
 
 ####Models of dist ~ association####
