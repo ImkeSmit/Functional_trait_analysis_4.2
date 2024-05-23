@@ -402,6 +402,16 @@ trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 
+trait_ass_join |> 
+  filter(trait == "MeanLA") |> 
+  group_by(association) |> 
+  summarise(sample_size = n())
+  
+  ggplot(aes(x = association, y = trait_difference)) +
+  geom_boxplot() +
+  stat_summary(fun =)
+
+
 #MaxH model#
 maxh_data <- trait_ass_join |> 
   filter(trait == "MaxH") |> 
@@ -410,7 +420,7 @@ maxh_data <- trait_ass_join |>
          neginv_trait_difference = -1/(1+trait_difference))
 hist(maxh_data$neginv_trait_difference)
 hist(maxh_data$trait_difference)
-
+maxh_data$replicate <- as.factor(maxh_data$replicate)
 
 #null model
 maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
@@ -421,7 +431,6 @@ summary(maxh_mod)
 Anova(maxh_mod) #significant effect
 anova(maxh_null, maxh_mod) #p = < 2.2e-16 ***
 emmeans(maxh_mod, specs = "association")
-emmeans(maxh_mod, ~association, adjust = "nurse")
 r.squaredGLMM(maxh_mod)
 
 #model diagnostics
