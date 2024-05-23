@@ -13,52 +13,126 @@ library(multcompView)
 #From the filled trait data for plotspecific species
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
-##We need to standardise each trait value to mean 0 and variance of 1 with Z = (x-mean)/sd
-##We need only one trait value per species
-
-#Get the mean of each trait for each sp
-FT_mean <- FT |> 
-  group_by(taxon,trait) |> 
-  summarise(mean_value = mean(value))
-
-#Get it into wide format
-FT_wide <- FT_mean |>
-  pivot_wider(names_from = trait, values_from = mean_value) |> 
-  column_to_rownames(var = "taxon") |> 
-  filter(!is.na(MaxH),
-         !is.na(MaxLS), 
-         !is.na(MeanLA),
-         !is.na(MeanLDMC),
-         !is.na(MeanLL),
-         !is.na(MeanSLA), 
-         !is.na(percentC),
-         !is.na(percentN)) |> 
-  mutate(C_N_ratio = percentC/percentN) |> 
-  select(!c(percentC, percentN))
-
-
-
-#standardise trait values
-std_FT_wide <- FT_wide
-
-traitlist <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","C_N_ratio")
-
-for(t in 1:length(traitlist)) {
-  
-  #get the grand mean and sd for each trait
-  m <- FT_wide |> 
-    summarise(m = mean(FT_wide[ , which(colnames(FT_wide) == traitlist[t])]))
-  
-  sd <- FT_wide |> 
-    summarise(m = sd(FT_wide[ , which(colnames(FT_wide) == traitlist[t])]))
-  
-  for (i in 1:nrow(FT_wide)) {
+####Create function to standardise sp X trait matrices####
+standard_trait_matrix <- function(trait_matrix, traitlist) {
+  std_trait_matrix <- trait_matrix
+  for(t in 1:length(traitlist)) {
     
-    raw_value <- FT_wide[i , which(colnames(FT_wide) == traitlist[t])]
-    #replace the raw value with the standardised value using m and sd
-    std_FT_wide[i , which(colnames(std_FT_wide) == traitlist[t])] <- (raw_value - m)/sd
+    #get the grand mean and sd for each trait
+    m <- trait_matrix |> 
+      summarise(m = mean(trait_matrix[ , which(colnames(trait_matrix) == traitlist[t])]))
     
+    sd <- trait_matrix |> 
+      summarise(m = sd(trait_matrix[ , which(colnames(trait_matrix) == traitlist[t])]))
+    
+    for (i in 1:nrow(trait_matrix)) {
+      
+      raw_value <- trait_matrix[i , which(colnames(trait_matrix) == traitlist[t])]
+      #replace the raw value with the standardised value using m and sd
+      std_trait_matrix[i , which(colnames(std_trait_matrix) == traitlist[t])] <- (raw_value - m)/sd
+    }
   }
+    return(std_trait_matrix)
+}
+
+
+###Create function to retrieve pairwise distances between nurse and target plants####
+#This function gets the distance between the dominant species and every other species in the replicate. And then classifies that distance as 
+#nurse_bare_only = dist between nurse and a species that occurs only in bare microsite
+#nurse_nurse_only = dist between nurse and a species that occurs only in nurse microsite
+#nurse_both = dist between nurse and a species that occurs in both microsites
+
+pairwise_fdist <- function(distmat, #euclidean distances between species pairs based on functional traits
+                           sp_positions) #whther species are nurses, or grow only in a specific microsite
+{ #function returns a dataframe with euclidean distance between nurse and target species and the microsite affinity of the target.
+  
+  IDlist <- unique(sp_positions$ID)
+  
+  twosp_dist <- cbind("ID" = character(), "replicate" = character(), 
+                      "euclidean_dist" = numeric(), "grouping" = character(), "nurse" = character(), "target" = character())
+  
+  for(i in 1:length(IDlist)) {
+    plot <- sp_positions |> 
+      filter(ID == IDlist[i])
+    
+    replist <- unique(plot$replicate) 
+    
+    for(r in 1:length(replist)) {
+      #Get the names of nurse, bare only, nurse only and both species
+      NURSE <- sp_positions |> 
+        filter(ID == IDlist[i], replicate == replist[r], position == "nurse_species") |> 
+        select(taxon)
+      NURSE <- NURSE$taxon
+      
+      bare_only <- sp_positions |> 
+        filter(ID == IDlist[i], replicate == replist[r], position == "bare_only") |> 
+        select(taxon)
+      bare_only <- c(bare_only$taxon)
+      
+      nurse_only <- sp_positions |> 
+        filter(ID == IDlist[i], replicate == replist[r], position == "nurse_only") |> 
+        select(taxon)
+      nurse_only <- c(nurse_only$taxon)
+      
+      both <- sp_positions |> 
+        filter(ID == IDlist[i], replicate == replist[r], position == "both") |> 
+        select(taxon)
+      both <- c(both$taxon)
+      
+      ###
+      for(b in 1:length(bare_only)) {
+        D_bare_only <- 
+          mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == bare_only[b])])
+        
+        if(b == 1){
+          twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
+                                   "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
+                                   "nurse" = NURSE, "target" = bare_only[b])
+        } else {
+          temp_twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
+                                        "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
+                                        "nurse" = NURSE, "target" = bare_only[b])
+          twosp_bare_only <- rbind(twosp_bare_only, temp_twosp_bare_only)
+        }}
+      
+      ###
+      for(n in 1:length(nurse_only)) {
+        D_nurse_only <- 
+          mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == nurse_only[n])])
+        
+        if(n == 1){
+          twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
+                                    "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
+                                    "nurse" = NURSE, "target" = nurse_only[n])
+        } else {
+          temp_twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
+                                         "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
+                                         "nurse" = NURSE, "target" = nurse_only[n])
+          twosp_nurse_only <- rbind(twosp_nurse_only, temp_twosp_nurse_only)
+        }}
+      
+      ###
+      for(z in 1:length(both)) {
+        D_both <- 
+          mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == both[z])])
+        
+        if(z == 1){
+          twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
+                              "euclidean_dist" = D_both, "grouping" = "nurse_both", 
+                              "nurse" = NURSE, "target" = both[z])
+        } else {
+          temp_twosp_both <- twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
+                                                 "euclidean_dist" = D_both, "grouping" = "nurse_both", 
+                                                 "nurse" = NURSE, "target" = both[z])
+          twosp_both <- rbind(twosp_both, temp_twosp_both)
+        }}
+      
+      twosp_dist <- rbind(twosp_dist, twosp_bare_only,twosp_nurse_only, twosp_both)
+    }
+  }
+  #The distance is NaN if nurse_only, bare_only or both is NA
+  
+  return(twosp_dist)
 }
 
 
@@ -166,102 +240,7 @@ write.csv(sp_positions, "Functional trait data\\results\\sp_positions.csv")
 
 
 
-###Retreive distances between the nurse and each species also growing in the rep####
-#then classify that distance as D_bare_only, D_nurse_only or D_both
-#This distance is only between 2 sp
-#write the pairwise_fdist function to do this
-pairwise_fdist <- function(distmat, #euclidean distances between species pairs based on functional traits
-                           sp_positions) #whther species are nurses, or grow only in a specific microsite
-  { #function returns a dataframe with euclidean distance between nurse and target species and the microsite affinity of the target.
-  
-  IDlist <- unique(sp_positions$ID)
-  
-  twosp_dist <- cbind("ID" = character(), "replicate" = character(), 
-                      "euclidean_dist" = numeric(), "grouping" = character(), "nurse" = character(), "target" = character())
-  
-  for(i in 1:length(IDlist)) {
-    plot <- sp_positions |> 
-      filter(ID == IDlist[i])
-    
-    replist <- unique(plot$replicate) 
-    
-    for(r in 1:length(replist)) {
-      #Get the names of nurse, bare only, nurse only and both species
-      NURSE <- sp_positions |> 
-        filter(ID == IDlist[i], replicate == replist[r], position == "nurse_species") |> 
-        select(taxon)
-      NURSE <- NURSE$taxon
-      
-      bare_only <- sp_positions |> 
-        filter(ID == IDlist[i], replicate == replist[r], position == "bare_only") |> 
-        select(taxon)
-      bare_only <- c(bare_only$taxon)
-      
-      nurse_only <- sp_positions |> 
-        filter(ID == IDlist[i], replicate == replist[r], position == "nurse_only") |> 
-        select(taxon)
-      nurse_only <- c(nurse_only$taxon)
-      
-      both <- sp_positions |> 
-        filter(ID == IDlist[i], replicate == replist[r], position == "both") |> 
-        select(taxon)
-      both <- c(both$taxon)
-      
-      ###
-      for(b in 1:length(bare_only)) {
-        D_bare_only <- 
-          mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == bare_only[b])])
-        
-        if(b == 1){
-          twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                   "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
-                                   "nurse" = NURSE, "target" = bare_only[b])
-        } else {
-          temp_twosp_bare_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                        "euclidean_dist" = D_bare_only, "grouping" = "nurse_bare_only", 
-                                        "nurse" = NURSE, "target" = bare_only[b])
-          twosp_bare_only <- rbind(twosp_bare_only, temp_twosp_bare_only)
-        }}
-      
-      ###
-      for(n in 1:length(nurse_only)) {
-        D_nurse_only <- 
-          mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == nurse_only[n])])
-        
-        if(n == 1){
-          twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                    "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
-                                    "nurse" = NURSE, "target" = nurse_only[n])
-        } else {
-          temp_twosp_nurse_only <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                         "euclidean_dist" = D_nurse_only, "grouping" = "nurse_nurse_only", 
-                                         "nurse" = NURSE, "target" = nurse_only[n])
-          twosp_nurse_only <- rbind(twosp_nurse_only, temp_twosp_nurse_only)
-        }}
-      
-      ###
-      for(z in 1:length(both)) {
-        D_both <- 
-          mean(distmat[which(rownames(distmat) == NURSE), which(colnames(distmat) == both[z])])
-        
-        if(z == 1){
-          twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                              "euclidean_dist" = D_both, "grouping" = "nurse_both", 
-                              "nurse" = NURSE, "target" = both[z])
-        } else {
-          temp_twosp_both <- twosp_both <- cbind("ID" = IDlist[i], "replicate" = replist[r], 
-                                                 "euclidean_dist" = D_both, "grouping" = "nurse_both", 
-                                                 "nurse" = NURSE, "target" = both[z])
-          twosp_both <- rbind(twosp_both, temp_twosp_both)
-        }}
-      
-      twosp_dist <- rbind(twosp_dist, twosp_bare_only,twosp_nurse_only, twosp_both)
-    }
-  }
-  #The distance is NaN if nurse_only, bare_only or both is NA
-  
-  return(twosp_dist)
-}
+
 
 
 ####run the function
@@ -288,6 +267,11 @@ twosp_dist <- twosp_dist |>
   inner_join(siteinfo, by = "ID") 
 
 write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
+
+
+
+####Functional distance in 7 dimensional space
+
 
 
 ####Models of dist ~ association####
