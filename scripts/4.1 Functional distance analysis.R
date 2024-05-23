@@ -241,6 +241,10 @@ sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row
 #From the filled trait data for plotspecific species
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
+complete_FT_mean <- FT |> #get the mean trait value for each sp accross the whole dataset. we will use this to fill missing data values
+  group_by(taxon,trait) |> 
+  summarise(mean_value = mean(value))
+
 IDlist <- c(unique(sp_positions$ID))
 
 for(p in 1:length(IDlist)) {
@@ -253,7 +257,30 @@ for(p in 1:length(IDlist)) {
     group_by(taxon,trait) |> 
     summarise(mean_value = mean(value))
   
-  if(length(unique(FT_mean$trait)) == 8) {#only run it if all 8 traits are present
+  #Find out if traits are missing:
+  splist <- c(unique(FT_mean$taxon)) #species in plot
+  traits_required <- traitlist <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","percentC", "percentN")
+  
+  for (s in 1:length(splist)) {
+  traits_present <- FT_mean[which(FT_mean$taxon == splist[s]) , ]$trait
+  #get missing traits
+  traits_tofill <- c(traits_required[which(is.na(match(traits_required, traits_present)))])
+  }
+  #if there are missing traits:
+  if(length(traits_tofill) > 0) {
+  for(f in 1:length(traits_tofill)) {
+  
+  filler_value <- complete_FT_mean |> 
+    filter(taxon == splist[s], trait == traits_tofill[f])
+  
+  if(nrow(filler_value) >0) {
+  
+  filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = filler_value$mean_value)
+  FT_mean <- rbind(FT_mean, filler_row)
+  }
+  }}
+  
+  if(length(unique(FT_mean$trait)) == 8) {#only run it if we managed to fill all 8 traits
   
   #Get it into wide format
   FT_wide <- FT_mean |>
@@ -287,7 +314,7 @@ for(p in 1:length(IDlist)) {
       twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
     } 
   
-  }else { #if the plot has no species with complete traits, do th efollowing:
+  }else { #if the plot has no species with complete traits, do the following:
         twosp_dist_temp <- cbind(ID = IDlist[p], replicate = "no complete traits in plot", euclidean_dist = NA, grouping = NA, nurse = NA, target = NA)
         twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
   }
@@ -300,10 +327,12 @@ for(p in 1:length(IDlist)) {
 }
 #save the output
 write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
-
+##maybe we can change this to just delete species that dont have complete traits
 
 ####Models of dist ~ association####
-twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1)
+twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1) 
+twosp_dist[which(twosp_dist$replicate %in% c("no complete traits in plot", "not all traits measured in plot")), ]
+
 twosp_dist$GRAZ <- as.factor(twosp_dist$GRAZ)
 twosp_dist$SITE_ID <- as.factor(twosp_dist$SITE_ID)
 twosp_dist$grouping <- as.factor(twosp_dist$grouping)
