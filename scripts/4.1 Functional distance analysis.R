@@ -10,9 +10,6 @@ library(MuMIn)
 library(multcomp)
 library(multcompView)
 
-#From the filled trait data for plotspecific species
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
-
 ####Create function to standardise sp X trait matrices####
 standard_trait_matrix <- function(trait_matrix, traitlist) {
   std_trait_matrix <- trait_matrix
@@ -239,43 +236,12 @@ sp_positions <- as.data.frame(sp_positions)
 write.csv(sp_positions, "Functional trait data\\results\\sp_positions.csv")
 
 
-
-
-
-
-####run the function
-#Get the euclidean distance between each pair of species
-distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
-
-#import sp_positions
-sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
-
-twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = sp_positions)
-
-#Add ardidty and graz
-twosp_dist <- as.data.frame(twosp_dist)
-twosp_dist$ID <- as.numeric(twosp_dist$ID)
-#import siteinfo
-siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
-  select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
-  distinct() |> 
-  filter(!is.na(ID))
-
-#do the join
-twosp_dist <- twosp_dist |> 
-  filter(!is.na(euclidean_dist), !euclidean_dist == "NaN") |> 
-  inner_join(siteinfo, by = "ID") 
-
-write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
-
-
-
 ####Functional distance in 7 dimensional space####
 sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
 #From the filled trait data for plotspecific species
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
 
-IDlist <- c(unique(sp_positions$ID))[1:2]
+IDlist <- c(unique(sp_positions$ID))
 
 for(p in 1:length(IDlist)) {
   positions_plot <- sp_positions[which(sp_positions$ID == IDlist[p]) , ]
@@ -287,11 +253,13 @@ for(p in 1:length(IDlist)) {
     group_by(taxon,trait) |> 
     summarise(mean_value = mean(value))
   
+  if(length(unique(FT_mean$trait)) == 8) {#only run it if all 8 traits are present
+  
   #Get it into wide format
   FT_wide <- FT_mean |>
     pivot_wider(names_from = trait, values_from = mean_value) |> 
     column_to_rownames(var = "taxon") |> 
-    filter(!is.na(MaxH),
+    filter(!is.na(MaxH), #remove species that do not have all seven traits
            !is.na(MaxLS), 
            !is.na(MeanLA),
            !is.na(MeanLDMC),
@@ -302,21 +270,36 @@ for(p in 1:length(IDlist)) {
     mutate(C_N_ratio = percentC/percentN) |> 
     select(!c(percentC, percentN))
   
-  #standardise trait values
-  std_FT_wide <- standard_trait_matrix(trat_matrix = FT_wide, traitlist = c(colnames(FT_wide)))
+  if(nrow(FT_wide >0)) { #only do the following if FT_wide has entries:
   
-  #now get the distance between each pair of species
-  distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
+    #standardise trait values
+    std_FT_wide <- standard_trait_matrix(trait_matrix = FT_wide, traitlist = c(colnames(FT_wide)))
+    
+    #now get the distance between each pair of species
+    distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
+    
+    if (p == 1) {
+      twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
+      #twosp_dist$ID <- IDlist[p]
+    }else{
+      twosp_dist_temp <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
+      #twosp_dist_temp$ID <- IDlist[p]
+      twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
+    } 
   
-  if (p == 1) {
-    twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
-    #twosp_dist$ID <- IDlist[p]
-  }else{
-    twosp_dist_temp <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
-    #twosp_dist_temp$ID <- IDlist[p]
+  }else { #if the plot has no species with complete traits, do th efollowing:
+        twosp_dist_temp <- cbind(ID = IDlist[p], replicate = "no complete traits in plot", euclidean_dist = NA, grouping = NA, nurse = NA, target = NA)
+        twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
+  }
+  
+  }else { #if the plot does not ahve all the traits, do the following:
+    twosp_dist_temp <- cbind(ID = IDlist[p], replicate = "not all traits measured in plot", euclidean_dist = NA, grouping = NA, nurse = NA, target = NA)
     twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
   }
+  
 }
+#save the output
+write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
 
 
 ####Models of dist ~ association####
