@@ -265,7 +265,7 @@ for(p in 1:length(IDlist)) {
   traits_present <- FT_mean[which(FT_mean$taxon == splist[s]) , ]$trait
   #get missing traits
   traits_tofill <- c(traits_required[which(is.na(match(traits_required, traits_present)))])
-  }
+  
   #if there are missing traits:
   if(length(traits_tofill) > 0) {
   for(f in 1:length(traits_tofill)) {
@@ -277,8 +277,11 @@ for(p in 1:length(IDlist)) {
   
   filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = filler_value$mean_value)
   FT_mean <- rbind(FT_mean, filler_row)
+  } else {
+    #if there is no filler value available, remove the species
+    FT_mean <- FT_mean[-which(FT_mean$taxon == splist[s]) , ]
   }
-  }}
+  }}}
   
   if(length(unique(FT_mean$trait)) == 8) {#only run it if we managed to fill all 8 traits
   
@@ -306,10 +309,10 @@ for(p in 1:length(IDlist)) {
     distmat <- as.matrix(dist(std_FT_wide, method = "euclidean"))
     
     if (p == 1) {
-      twosp_dist <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
+      twosp_dist <- as.data.frame(pairwise_fdist(distmat = distmat, sp_positions = positions_plot))
       #twosp_dist$ID <- IDlist[p]
     }else{
-      twosp_dist_temp <- pairwise_fdist(distmat = distmat, sp_positions = positions_plot)
+      twosp_dist_temp <- as.data.frame(pairwise_fdist(distmat = distmat, sp_positions = positions_plot))
       #twosp_dist_temp$ID <- IDlist[p]
       twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
     } 
@@ -325,13 +328,29 @@ for(p in 1:length(IDlist)) {
   }
   
 }
+##How many plots were thrown out?
+nrow(twosp_dist[which(twosp_dist$replicate %in% c("no complete traits in plot", "not all traits measured in plot")), ])
+#14 eish
+
+##add siteinfo
+twosp_dist <- as.data.frame(twosp_dist)
+twosp_dist$ID <- as.numeric(twosp_dist$ID)
+#import siteinfo
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  select(ID,COU,SITE,SITE_ID,PLOT,GRAZ, ARIDITY.v3) |> 
+  distinct() |> 
+  filter(!is.na(ID))
+
+#do the join
+twosp_dist <- twosp_dist |> 
+  filter(!is.na(euclidean_dist), !euclidean_dist == "NaN") |> 
+  inner_join(siteinfo, by = "ID") 
+
 #save the output
 write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
-##maybe we can change this to just delete species that dont have complete traits
 
 ####Models of dist ~ association####
 twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1) 
-twosp_dist[which(twosp_dist$replicate %in% c("no complete traits in plot", "not all traits measured in plot")), ]
 
 twosp_dist$GRAZ <- as.factor(twosp_dist$GRAZ)
 twosp_dist$SITE_ID <- as.factor(twosp_dist$SITE_ID)
@@ -359,7 +378,7 @@ dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = di
 dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
-anova(dist_ass_null, dist_ass_mod) #p = 0.06969 
+anova(dist_ass_null, dist_ass_mod) #p = 0.7132 
 
 emmeans(dist_ass_mod, specs = "association")
 cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
@@ -368,7 +387,7 @@ cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
 simres <- simulateResiduals(dist_ass_mod)
 plot(simres)
 #a little underdispersed
-#HOV violated
+#HOV ok
 
 
 ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
