@@ -21,6 +21,8 @@ FT <- read.csv("Functional trait data\\Clean data\\FT_all_sites.csv", row.names 
          coverBiodesert100 = case_when(coverBiodesert100 == 0 ~ NA, .default = as.numeric(coverBiodesert100)))
 FT$GRAZ <- as.factor(FT$GRAZ)
 FT$SITE_ID <- as.factor(FT$SITE_ID)
+#how many plots in the FT data?
+length(unique(FT$ID)) #325
 
 
 ###But first: see if traits are influenced by GRAZ####
