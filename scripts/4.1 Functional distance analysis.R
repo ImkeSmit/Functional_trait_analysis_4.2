@@ -259,7 +259,7 @@ for(p in 1:length(IDlist)) {
   
   #Find out if traits are missing:
   splist <- c(unique(FT_mean$taxon)) #species in plot
-  traits_required <- traitlist <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","percentC", "percentN")
+  traits_required <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","percentC", "percentN")
   
   for (s in 1:length(splist)) {
   traits_present <- FT_mean[which(FT_mean$taxon == splist[s]) , ]$trait
@@ -272,9 +272,8 @@ for(p in 1:length(IDlist)) {
   
   filler_value <- complete_FT_mean |> 
     filter(taxon == splist[s], trait == traits_tofill[f])
-  
+  #if there is a filler:
   if(nrow(filler_value) >0) {
-  
   filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = filler_value$mean_value)
   FT_mean <- rbind(FT_mean, filler_row)
   } else {
@@ -404,29 +403,84 @@ ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
 ###One-dimensional (trait) difference between species####
 #This is just the difference in (unstandardised) trait values between species
 
-traitlist <- c(colnames(FT_wide))
+traitlist <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","C_N_ratio")
 sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) 
 
-for(t in 1:length(traitlist)) {
-  #isolate one trait from the sp x trait matrix
-  one_trait <- FT_wide[, which(colnames(FT_wide) == traitlist[t])]
-  names(one_trait) <- rownames(FT_wide)
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1)
+
+complete_FT_mean <- FT |> #get the mean trait value for each sp accross the whole dataset. we will use this to fill missing data values
+  group_by(taxon,trait) |> 
+  summarise(mean_value = mean(value))
+
+IDlist <- c(unique(sp_positions$ID))
+
+for(p in 1:length(IDlist)) {
+  #isolate one plot
+  positions_plot <- sp_positions[which(sp_positions$ID == IDlist[p]) , ]
+  FT_plot <- FT[which(FT$ID == IDlist[p]) , ]
   
-  #get the difference in trait values between every two species
-  trait_diff_matrix <- outer(one_trait, one_trait, FUN = "-")
+  #Get the mean of each trait for each sp
+  FT_mean <- FT_plot |> 
+    group_by(taxon,trait) |> 
+    summarise(mean_value = mean(value))
   
-  if(t == 1) {
+  #Find out if traits are missing:
+  splist <- c(unique(FT_mean$taxon)) #species in plot
+  traits_required <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","percentC", "percentN")
   
-    trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
-    trait_diff$trait <- as.character(traitlist[[t]])
-  
-    } else {
-      temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
-      temp_trait_diff$trait <- traitlist[[t]]
+  for (s in 1:length(splist)) {
+    traits_present <- FT_mean[which(FT_mean$taxon == splist[s]) , ]$trait
+    #get missing traits
+    traits_tofill <- c(traits_required[which(is.na(match(traits_required, traits_present)))])
     
-      trait_diff <- rbind(trait_diff, temp_trait_diff)
-  }
-}
+    #if there are missing traits:
+    if(length(traits_tofill) > 0) {
+      for(f in 1:length(traits_tofill)) {
+        #get the filler value from complete_FT_mean
+        filler_value <- complete_FT_mean |> 
+          filter(taxon == splist[s], trait == traits_tofill[f])
+        #if a filler exists, rbind it to FT_mean:
+        if(nrow(filler_value) >0) {
+          filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = filler_value$mean_value)
+          FT_mean <- rbind(FT_mean, filler_row)
+          #if there is no filler availible, add an NA
+        } else { 
+          filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = NA)
+          FT_mean <- rbind(FT_mean, filler_row)
+        }
+      }}} #now FT_mean is a s filled as possible
+    
+    #Get it into wide format
+    FT_wide <- FT_mean |>
+      pivot_wider(names_from = trait, values_from = mean_value) |> 
+      column_to_rownames(var = "taxon") |> 
+      mutate(C_N_ratio = percentC/percentN) |> 
+      select(!c(percentC, percentN))
+    
+    if(nrow(FT_wide >0)) { #only do the following if FT_wide has entries:
+    
+      for(t in 1:length(traitlist)) {
+        #isolate one trait from the sp x trait matrix
+        #remove sp with NA values for the trait
+        one_trait <- FT_wide[, which(colnames(FT_wide) == traitlist[t])]
+        names(one_trait) <- rownames(FT_wide)
+        one_trait <- one_trait[which(!is.na(one_trait))]
+        
+        #get the difference in trait values between every two species
+        trait_diff_matrix <- outer(one_trait, one_trait, FUN = "-")
+        
+        if(t == 1) {
+        
+          trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
+          trait_diff$trait <- as.character(traitlist[[t]])
+        
+          } else {
+            temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
+            temp_trait_diff$trait <- traitlist[[t]]
+          
+            trait_diff <- rbind(trait_diff, temp_trait_diff)
+        }
+      } }}
 #!! there are differnces = 0 because sometimes the dominant species also occurs in the bare or nurse microsite. Thus the dominant and target sp can be the same
 
 #Add ardidty and graz
