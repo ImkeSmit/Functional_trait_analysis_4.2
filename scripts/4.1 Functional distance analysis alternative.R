@@ -484,6 +484,7 @@ for(p in 1:length(IDlist)) {
         }
       }}}
 #!! there are differnces = 0 because sometimes the dominant species also occurs in the bare or nurse microsite. Thus the dominant and target sp can be the same
+###mmm it overwrites plots, but doesnt run as long
 
 #Add ardidty and graz
 trait_diff$ID <- as.numeric(trait_diff$ID)
