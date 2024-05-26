@@ -245,7 +245,7 @@ complete_FT_mean <- FT |> #get the mean trait value for each sp accross the whol
   group_by(taxon,trait) |> 
   summarise(mean_value = mean(value))
 
-IDlist <- c(unique(sp_positions$ID))
+IDlist <- c(unique(sp_positions$ID))[10]
 
 for(p in 1:length(IDlist)) {
   positions_plot <- sp_positions[which(sp_positions$ID == IDlist[p]) , ]
@@ -320,7 +320,7 @@ for(p in 1:length(IDlist)) {
 }
 ##How many plots were thrown out?
 nrow(twosp_dist[which(twosp_dist$replicate %in% c("no complete traits in plot", "not all traits measured in plot")), ])
-#14 eish
+#10 eish
 
 ##add siteinfo
 twosp_dist <- as.data.frame(twosp_dist)
@@ -403,7 +403,7 @@ complete_FT_mean <- FT |> #get the mean trait value for each sp accross the whol
   group_by(taxon,trait) |> 
   summarise(mean_value = mean(value))
 
-IDlist <- c(unique(sp_positions$ID))
+IDlist <- c(unique(sp_positions$ID))[p]
 
 for(p in 1:length(IDlist)) {
   #isolate one plot
@@ -457,6 +457,8 @@ for(p in 1:length(IDlist)) {
         names(one_trait) <- rownames(FT_wide)
         one_trait <- one_trait[which(!is.na(one_trait))]
         
+        if(length(one_trait) >0) { #only get the differences if there are actually trait values
+          
         #get the difference in trait values between every two species
         trait_diff_matrix <- outer(one_trait, one_trait, FUN = "-")
         
@@ -470,8 +472,17 @@ for(p in 1:length(IDlist)) {
             temp_trait_diff$trait <- traitlist[[t]]
           
             trait_diff <- rbind(trait_diff, temp_trait_diff)
+          }
+        
+        #if there are no trait diffrences, just put an NA value in
+        }else {
+          temp_trait_diff <- data.frame(ID = IDlist[p], 
+                                        replicate = "No trait values", 
+                                        euclidean_dist = NA, grouping = NA, 
+                                        nurse = NA, target = NA)
+          trait_diff <- rbind(trait_diff, temp_trait_diff)
         }
-      } }}
+      }}}
 #!! there are differnces = 0 because sometimes the dominant species also occurs in the bare or nurse microsite. Thus the dominant and target sp can be the same
 
 #Add ardidty and graz
