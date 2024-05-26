@@ -403,7 +403,7 @@ complete_FT_mean <- FT |> #get the mean trait value for each sp accross the whol
   group_by(taxon,trait) |> 
   summarise(mean_value = mean(value))
 
-IDlist <- c(unique(sp_positions$ID))[p]
+IDlist <- c(unique(sp_positions$ID))
 
 for(p in 1:length(IDlist)) {
   #isolate one plot
