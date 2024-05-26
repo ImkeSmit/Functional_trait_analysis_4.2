@@ -269,20 +269,19 @@ for(p in 1:length(IDlist)) {
   #if there are missing traits:
   if(length(traits_tofill) > 0) {
   for(f in 1:length(traits_tofill)) {
-  
+  #get the filler value
   filler_value <- complete_FT_mean |> 
     filter(taxon == splist[s], trait == traits_tofill[f])
-  #if there is a filler:
+  #if there is a filler available:
   if(nrow(filler_value) >0) {
   filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = filler_value$mean_value)
   FT_mean <- rbind(FT_mean, filler_row)
   } else {
-    #if there is no filler value available, remove the species
-    FT_mean <- FT_mean[-which(FT_mean$taxon == splist[s]) , ]
+    #if there is no filler, just insert an NA value
+    filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = NA)
+    FT_mean <- rbind(FT_mean, filler_row)
   }
   }}}
-  
-  if(length(unique(FT_mean$trait)) == 8) {#only run it if we managed to fill all 8 traits
   
   #Get it into wide format
   FT_wide <- FT_mean |>
@@ -299,7 +298,7 @@ for(p in 1:length(IDlist)) {
     mutate(C_N_ratio = percentC/percentN) |> 
     select(!c(percentC, percentN))
   
-  if(nrow(FT_wide >0)) { #only do the following if FT_wide has entries:
+  if(nrow(FT_wide >0)){ #only do the following if FT_wide has entries:
   
     #standardise trait values
     std_FT_wide <- standard_trait_matrix(trait_matrix = FT_wide, traitlist = c(colnames(FT_wide)))
@@ -309,10 +308,8 @@ for(p in 1:length(IDlist)) {
     
     if (p == 1) {
       twosp_dist <- as.data.frame(pairwise_fdist(distmat = distmat, sp_positions = positions_plot))
-      #twosp_dist$ID <- IDlist[p]
     }else{
       twosp_dist_temp <- as.data.frame(pairwise_fdist(distmat = distmat, sp_positions = positions_plot))
-      #twosp_dist_temp$ID <- IDlist[p]
       twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
     } 
   
@@ -320,12 +317,6 @@ for(p in 1:length(IDlist)) {
         twosp_dist_temp <- cbind(ID = IDlist[p], replicate = "no complete traits in plot", euclidean_dist = NA, grouping = NA, nurse = NA, target = NA)
         twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
   }
-  
-  }else { #if the plot does not ahve all the traits, do the following:
-    twosp_dist_temp <- cbind(ID = IDlist[p], replicate = "not all traits measured in plot", euclidean_dist = NA, grouping = NA, nurse = NA, target = NA)
-    twosp_dist <- rbind(twosp_dist, twosp_dist_temp)
-  }
-  
 }
 ##How many plots were thrown out?
 nrow(twosp_dist[which(twosp_dist$replicate %in% c("no complete traits in plot", "not all traits measured in plot")), ])
@@ -346,7 +337,7 @@ twosp_dist <- twosp_dist |>
   inner_join(siteinfo, by = "ID") 
 
 #save the output
-write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp.csv")
+write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp_traits_varying.csv")
 
 ####Models of dist ~ association####
 twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1) 
