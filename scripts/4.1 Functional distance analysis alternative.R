@@ -439,7 +439,7 @@ for(p in 1:length(IDlist)) {
           filler_row = data.frame(taxon = splist[s], trait = traits_tofill[f], mean_value = NA)
           FT_mean <- rbind(FT_mean, filler_row)
         }
-      }}} #now FT_mean is a s filled as possible
+      }}} #now FT_mean is as filled as possible
     
     #Get it into wide format
     FT_wide <- FT_mean |>
@@ -464,12 +464,12 @@ for(p in 1:length(IDlist)) {
         
         if(t == 1) {
         
-          trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
-          trait_diff$trait <- as.character(traitlist[[t]])
+          trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
+          trait_diff$trait <- traitlist[t]
         
           } else {
-            temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = sp_positions)) #add the positions/associations of species
-            temp_trait_diff$trait <- traitlist[[t]]
+            temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
+            temp_trait_diff$trait <- traitlist[t]
           
             trait_diff <- rbind(trait_diff, temp_trait_diff)
           }
@@ -479,7 +479,7 @@ for(p in 1:length(IDlist)) {
           temp_trait_diff <- data.frame(ID = IDlist[p], 
                                         replicate = "No trait values", 
                                         euclidean_dist = NA, grouping = NA, 
-                                        nurse = NA, target = NA)
+                                        nurse = NA, target = NA, trait = traitlist[t])
           trait_diff <- rbind(trait_diff, temp_trait_diff)
         }
       }}}
