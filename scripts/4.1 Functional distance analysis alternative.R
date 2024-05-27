@@ -417,11 +417,12 @@ for(p in 1:length(IDlist)) {
   
   #Find out if traits are missing:
   splist <- c(unique(FT_mean$taxon)) #species in plot
-  traits_required <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","percentC", "percentN")
+  traits_required <- c("MaxH","MaxLS","MeanLA","MeanLDMC","MeanLL","MeanSLA","percentC", "percentN") #traits that should be there
   
   for (s in 1:length(splist)) {
+    #traits present
     traits_present <- FT_mean[which(FT_mean$taxon == splist[s]) , ]$trait
-    #get missing traits
+    #missing traits
     traits_tofill <- c(traits_required[which(is.na(match(traits_required, traits_present)))])
     
     #if there are missing traits:
@@ -448,7 +449,7 @@ for(p in 1:length(IDlist)) {
       mutate(C_N_ratio = percentC/percentN) |> 
       select(!c(percentC, percentN))
     
-    if(nrow(FT_wide >0)) { #only do the following if FT_wide has entries:
+
     
       for(t in 1:length(traitlist)) {
         #isolate one trait from the sp x trait matrix
@@ -462,19 +463,19 @@ for(p in 1:length(IDlist)) {
         #get the difference in trait values between every two species
         trait_diff_matrix <- outer(one_trait, one_trait, FUN = "-")
         
-        if(t == 1) {
-        
-          trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
-          trait_diff$trait <- traitlist[t]
-        
-          } else {
-            temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
-            temp_trait_diff$trait <- traitlist[t]
+          if(t == 1 & p == 1) { #only for the first run of the loop
           
-            trait_diff <- rbind(trait_diff, temp_trait_diff)
-          }
+            trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
+            trait_diff$trait <- traitlist[t]
+          
+            } else {
+              temp_trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
+              temp_trait_diff$trait <- traitlist[t]
+            
+              trait_diff <- rbind(trait_diff, temp_trait_diff)
+            }
         
-        #if there are no trait diffrences, just put an NA value in
+        #if there are no trait values, just put an NA in
         }else {
           temp_trait_diff <- data.frame(ID = IDlist[p], 
                                         replicate = "No trait values", 
@@ -482,7 +483,9 @@ for(p in 1:length(IDlist)) {
                                         nurse = NA, target = NA, trait = traitlist[t])
           trait_diff <- rbind(trait_diff, temp_trait_diff)
         }
-      }}}
+  }#end loop through traits
+}#end loop through IDlist
+
 #!! there are differnces = 0 because sometimes the dominant species also occurs in the bare or nurse microsite. Thus the dominant and target sp can be the same
 ###mmm it overwrites plots, but doesnt run as long
 
