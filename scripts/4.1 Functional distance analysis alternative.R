@@ -448,9 +448,7 @@ for(p in 1:length(IDlist)) {
       column_to_rownames(var = "taxon") |> 
       mutate(C_N_ratio = percentC/percentN) |> 
       select(!c(percentC, percentN))
-    
-
-    
+  
       for(t in 1:length(traitlist)) {
         #isolate one trait from the sp x trait matrix
         #remove sp with NA values for the trait
@@ -487,7 +485,6 @@ for(p in 1:length(IDlist)) {
 }#end loop through IDlist
 
 #!! there are differnces = 0 because sometimes the dominant species also occurs in the bare or nurse microsite. Thus the dominant and target sp can be the same
-###mmm it overwrites plots, but doesnt run as long
 
 #Add ardidty and graz
 trait_diff$ID <- as.numeric(trait_diff$ID)
