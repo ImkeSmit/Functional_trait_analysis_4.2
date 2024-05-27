@@ -549,6 +549,16 @@ plot(simres)#underispersed, HOV violated
 ggplot(maxh_data, aes(x = association, y = trait_difference)) +
   geom_boxplot()
 
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+maxh_test_nurse <- t.test(maxh_data[which(maxh_data$association == "nurse") , ]$trait_difference, 
+                          mu = 0, alternative = "two.sided")
+#p <0.001, true mean greater than 0
+
+maxh_test_bare <- t.test(maxh_data[which(maxh_data$association == "bare") , ]$trait_difference, 
+                          mu = 0, alternative = "two.sided")
+#p <0.001, true mean greater than 0
+
 
 #MaxLS#
 maxls_data <- trait_ass_join |> 
@@ -581,6 +591,16 @@ r.squaredGLMM(maxls_mod)
 maxls_simres <- simulateResiduals(maxls_mod)
 plot(maxls_simres)#unerdispersed, HOV violated
 
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+maxls_test_nurse <- t.test(maxls_data[which(maxls_data$association == "nurse") , ]$trait_difference, 
+                          mu = 0, alternative = "two.sided")
+#p <0.001, true mean greater than 0
+
+maxls_test_bare <- t.test(maxls_data[which(maxls_data$association == "bare") , ]$trait_difference, 
+                         mu = 0, alternative = "two.sided")
+#p <0.001, true mean greater than 0
+
 
 #MeanLA#
 meanla_data <- trait_ass_join |> 
@@ -605,6 +625,16 @@ r.squaredGLMM(meanla_mod)
 #model diagnostics
 meanla_simres <- simulateResiduals(meanla_mod)
 plot(meanla_simres)#underdispersed, HOV violated
+
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+meanla_test_nurse <- t.test(meanla_data[which(meanla_data$association == "nurse") , ]$trait_difference, 
+                          mu = 0, alternative = "two.sided")
+#p = 0.6672, mean equal to 0
+
+meanla_test_bare <- t.test(meanla_data[which(meanla_data$association == "bare") , ]$trait_difference, 
+                         mu = 0, alternative = "two.sided")
+#p <0.001, true mean less than 0
 
 
 #MeanLDMC#
@@ -633,6 +663,17 @@ plot(meanldmc_simres)#residuals normal, HOV violated
 ggplot(meanldmc_data, aes(x = association, y = trait_difference))+
   geom_boxplot()
 
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+meanldmc_test_nurse <- t.test(meanldmc_data[which(meanldmc_data$association == "nurse") , ]$trait_difference, 
+                            mu = 0, alternative = "two.sided")
+#p <0.001, mean greater than 0
+
+meanldmc_test_bare <- t.test(meanldmc_data[which(meanldmc_data$association == "bare") , ]$trait_difference, 
+                           mu = 0, alternative = "two.sided")
+#p <0.001, mean greater than 0
+
+
 #MeanLL#
 meanll_data <- trait_ass_join |> 
   filter(trait == "MeanLL") |> 
@@ -656,6 +697,16 @@ r.squaredGLMM(meanll_mod)
 #model diagnostics
 meanll_simres <- simulateResiduals(meanll_mod)
 plot(meanll_simres)#a little overdispersed, HOV violated
+
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+meanll_test_nurse <- t.test(meanll_data[which(meanll_data$association == "nurse") , ]$trait_difference, 
+                              mu = 0, alternative = "two.sided")
+#p <0.001, mean less than 0
+
+meanll_test_bare <- t.test(meanll_data[which(meanll_data$association == "bare") , ]$trait_difference, 
+                             mu = 0, alternative = "two.sided")
+#p <0.001, mean greater than 0
 
 
 #MeanSLA#
@@ -684,6 +735,16 @@ plot(meansla_simres)#a little underdispersed, HOV violated
 ggplot(meansla_data, aes(x = association, y = trait_difference))+
   geom_boxplot()
 
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+meansla_test_nurse <- t.test(meansla_data[which(meansla_data$association == "nurse") , ]$trait_difference, 
+                            mu = 0, alternative = "two.sided")
+#p <0.001, mean less than 0
+
+meansla_test_bare <- t.test(meansla_data[which(meansla_data$association == "bare") , ]$trait_difference, 
+                           mu = 0, alternative = "two.sided")
+#p <0.001, mean less than 0
+
 
 #C_N_ratio#
 cn_data <- trait_ass_join |> 
@@ -710,3 +771,14 @@ plot(cn_simres)#resiuals normal enough, HOV ok
 
 ggplot(cn_data, aes(x = association, y = trait_difference))+
   geom_boxplot()
+
+
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+cn_test_nurse <- t.test(cn_data[which(cn_data$association == "nurse") , ]$trait_difference, 
+                             mu = 0, alternative = "two.sided")
+#p <0.001, mean less than 0
+
+cn_test_bare <- t.test(cn_data[which(cn_data$association == "bare") , ]$trait_difference, 
+                            mu = 0, alternative = "two.sided")
+#p <0.001, mean greater than 0
