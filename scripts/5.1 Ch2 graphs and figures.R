@@ -317,9 +317,38 @@ trait_ass_join <- trait_diff |>
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$trait_difference <- as.numeric(trait_ass_join$trait_difference)
 
-annotations <- data.frame(trait = c(unique(trait_ass_join$trait)),  
-                          p_value = c("      ***", "", "", "       ***", "", "       ***", "      ***"), 
-                          ycoord = c(640, 0, 0, 0.70, 0, 95, 25))
+annotations <- data.frame(trait = rep(c(unique(trait_ass_join$trait)),2), 
+                             association = c(rep("bare", 7), rep("nurse", 7)))
+annotations<- annotations[order(annotations$trait) , ]
+annotations$t_test_significance <- c("  *", "  *", #C:N
+                                        "  *", "  *", #H
+                                        "  *", " ", #LA
+                                        "  *", "  *", #LDMC
+                                        "  *", "  *", #LL
+                                        "  *", "  *", #LS
+                                        "  *", "  *" )#SLA
+annotations$anova_significance <- c("    a", "    b", #C:N
+                                     "    a", "    b", #H
+                                     " ", " ", #LA
+                                     "    a", "    b", #LDMC
+                                     " ", " ", #LL
+                                     " ", " ", #LS
+                                     "    a", "    b" )#SLA
+annotations$ycoord_t <- c(15, 10, #C:N
+                          100, 150, #H
+                          2, 2, #LA
+                          0.2, 0.15, #LDMC
+                          8, 5, #LL
+                          60000, 90000, #LS
+                          20, 20)#SLA
+
+annotations$ycoord_anova <- c(32, 32, #C:N
+                          640, 640, #H
+                          0, 0, #LA
+                          0.7, 0.7, #LDMC
+                          0, 0, #LL
+                          0, 0, #LS
+                          95, 95)#SLA
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
@@ -328,7 +357,8 @@ trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_differe
   facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
   ylab("Difference") +
   xlab("Target species association") +
-  geom_text(data = annotations, aes(x = "nurse", y = ycoord,label = p_value),color = "brown3", size = 8)+
+  geom_text(data = annotations, aes(x = annotations$association, y = ycoord_t, label = t_test_significance), size = 8)+
+  geom_text(data = annotations, aes(x = annotations$association, y = ycoord_anova, label = anova_significance), size = 5)+
   theme_classic() 
 
 ggsave("one_dimensional_trait_distances.png", trait_distances, path = "Figures", 
