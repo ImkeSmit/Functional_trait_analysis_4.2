@@ -271,7 +271,7 @@ ggsave("ninta_trait_scatterplots.png", ninta_nurse_traits, height = 1200, width 
 
 ###Fdist ~ association####
 #import functional distances
-twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1)
+twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp_traits_varying.csv", row.names = 1)
 
 ###Lets join the results of the CHi2 tests to twosp-dist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
@@ -283,10 +283,10 @@ dist_ass_join <- twosp_dist |>
   left_join(ass, by = c("target", "ID")) |> 
   filter(association %in% c("nurse", "bare")) #only work with these associations
 dist_ass_join$association <- as.factor(dist_ass_join$association)
-dist_ass_join$trait <- "all traits"
 
 dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
             geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
+            stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
             ylab("Distance") +
             xlab("target species association") +
             scale_x_discrete(labels = c("bare", "dominant")) +
@@ -297,7 +297,7 @@ ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, un
 
 ###one dimensional Fdist~association####
 #import 1D trait difference data
-trait_diff <- read.csv("Functional trait data\\results\\trait_differences_between_2sp.csv", row.names = 1)
+trait_diff <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1)
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
   select(ID, species, association) |> 
@@ -317,9 +317,9 @@ trait_ass_join <- trait_diff |>
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$trait_difference <- as.numeric(trait_ass_join$trait_difference)
 
-annotations <- data.frame(trait = c(unique(trait_ass_join$trait)), 
-                          p_value = c("     ***", "       ***", "       *", "      ***", "", "", ""), 
-                          ycoord = c(600, 420000, 21, 0.38,0,0,0))
+annotations <- data.frame(trait = c(unique(trait_ass_join$trait)),  
+                          p_value = c("      ***", "", "", "       ***", "", "       ***", "      ***"), 
+                          ycoord = c(640, 0, 0, 0.70, 0, 95, 25))
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
   geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
