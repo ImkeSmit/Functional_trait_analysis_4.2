@@ -361,6 +361,11 @@ dist_ass_join$nurse <- as.factor(dist_ass_join$nurse)
 dist_ass_join$SITE_ID <- as.factor(dist_ass_join$SITE_ID)
 dist_ass_join$euclidean_dist <- as.numeric(dist_ass_join$euclidean_dist)
 
+#how many of each association?
+dist_ass_join |> 
+  group_by(association) |> 
+  summarise(obs = n()) #618 bare, 1791 nurse
+
 ##does the distance between nurses and bare associated species differ from the distance between nurses and nurse associated species?
 dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
 
