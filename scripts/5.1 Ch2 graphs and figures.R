@@ -334,12 +334,12 @@ annotations$anova_significance <- c("    a", "    b", #C:N
                                      " ", " ", #LL
                                      " ", " ", #LS
                                      "    a", "    b" )#SLA
-annotations$ycoord_t <- c(15, 10, #C:N
+annotations$ycoord_t <- c(15, 8, #C:N
                           100, 150, #H
                           2, 2, #LA
                           0.2, 0.15, #LDMC
                           8, 5, #LL
-                          60000, 90000, #LS
+                          50000, 90000, #LS
                           20, 20)#SLA
 
 annotations$ycoord_anova <- c(32, 32, #C:N
@@ -357,8 +357,8 @@ trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_differe
   facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
   ylab("Difference") +
   xlab("Target species association") +
-  geom_text(data = annotations, aes(x = annotations$association, y = ycoord_t, label = t_test_significance), size = 8)+
-  geom_text(data = annotations, aes(x = annotations$association, y = ycoord_anova, label = anova_significance), size = 5)+
+  geom_text(data = annotations, aes(x = annotations$association, y = ycoord_t, label = t_test_significance), size = 8, color = "brown3")+
+  geom_text(data = annotations, aes(x = annotations$association, y = ycoord_anova, label = anova_significance), size = 5, color = "brown3")+
   theme_classic() 
 
 ggsave("one_dimensional_trait_distances.png", trait_distances, path = "Figures", 
