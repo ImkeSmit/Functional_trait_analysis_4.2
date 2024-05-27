@@ -340,13 +340,12 @@ twosp_dist <- twosp_dist |>
 write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_between_2sp_traits_varying.csv")
 
 ####Models of dist ~ association####
-twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp.csv", row.names = 1) 
+twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp_traits_varying.csv", row.names = 1) 
 
 twosp_dist$GRAZ <- as.factor(twosp_dist$GRAZ)
 twosp_dist$SITE_ID <- as.factor(twosp_dist$SITE_ID)
 twosp_dist$grouping <- as.factor(twosp_dist$grouping)
 twosp_dist$arid_sq <- (twosp_dist$ARIDITY.v3)^2
-
 
 ###Lets join the results of the CHi2 tests to twosp-dist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
@@ -368,7 +367,7 @@ dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = di
 dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
-anova(dist_ass_null, dist_ass_mod) #p = 0.7132 
+anova(dist_ass_null, dist_ass_mod) #p = 4.563e-11 ***
 
 emmeans(dist_ass_mod, specs = "association")
 cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
@@ -377,18 +376,12 @@ cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
 simres <- simulateResiduals(dist_ass_mod)
 plot(simres)
 #a little underdispersed
-#HOV ok
-
+#HOV violated
 
 ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
   geom_boxplot() +
-  ylab("Euclidean distance between dominant and target species") +
-  xlab("target species association") +
-  annotate(geom = "text", x = unique(dist_ass_join$association), y = c(12,12,12,12) , 
-           label = c("b", "b", "a", "ab")) + #put letters in order of dist$association
   theme_classic()
 
-##Nurse and bare are not significantly different, so the difference in the nurse and target traits do not matter for facilitation
 
 
 ###One-dimensional (trait) difference between species####
@@ -500,11 +493,11 @@ trait_diff <- trait_diff |>
   filter(!is.na(trait_difference), !trait_difference == "NaN") |> 
   inner_join(siteinfo, by = "ID") 
 
-write.csv(trait_diff, "Functional trait data\\results\\trait_differences_between_2sp.csv")
+write.csv(trait_diff, "Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv")
 
 
 ###models of trait difference ~association####
-trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp.csv", row.names = 1)
+trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1)
 trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
@@ -519,16 +512,6 @@ trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 
-trait_ass_join |> 
-  filter(trait == "MeanLA") |> 
-  group_by(association) |> 
-  summarise(sample_size = n())
-  
-  ggplot(aes(x = association, y = trait_difference)) +
-  geom_boxplot() +
-  stat_summary(fun =)
-
-
 #MaxH model#
 maxh_data <- trait_ass_join |> 
   filter(trait == "MaxH") |> 
@@ -537,7 +520,6 @@ maxh_data <- trait_ass_join |>
          neginv_trait_difference = -1/(1+trait_difference))
 hist(maxh_data$neginv_trait_difference)
 hist(maxh_data$trait_difference)
-maxh_data$replicate <- as.factor(maxh_data$replicate)
 
 #null model
 maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
@@ -546,13 +528,16 @@ maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), da
 
 summary(maxh_mod)
 Anova(maxh_mod) #significant effect
-anova(maxh_null, maxh_mod) #p = < 2.2e-16 ***
+anova(maxh_null, maxh_mod) #p = 1.113e-07 ***
 emmeans(maxh_mod, specs = "association")
 r.squaredGLMM(maxh_mod)
 
 #model diagnostics
 simres <- simulateResiduals(maxh_mod)
 plot(simres)#underispersed, HOV violated
+
+ggplot(maxh_data, aes(x = association, y = trait_difference)) +
+  geom_boxplot()
 
 
 #MaxLS#
@@ -573,14 +558,14 @@ maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_I
 #models do not converge for untransformed response, forced to use sqrt despite NA values
 
 summary(maxls_mod)
-Anova(maxls_mod) #significant effect
-anova(maxls_null, maxls_mod) #p = 2.881e-16 ***
+Anova(maxls_mod) 
+anova(maxls_null, maxls_mod) #p = 0.6987
 emmeans(maxls_mod, specs = "association")
 r.squaredGLMM(maxls_mod)
 
 #model diagnostics
 maxls_simres <- simulateResiduals(maxls_mod)
-plot(maxls_simres)#unerdispersed
+plot(maxls_simres)#unerdispersed, HOV violated
 
 
 #MeanLA#
@@ -598,8 +583,8 @@ meanla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = me
 meanla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
 
 summary(meanla_mod)
-Anova(meanla_mod) #significant effect
-anova(meanla_null, meanla_mod) #p = 0.008328 **
+Anova(meanla_mod) 
+anova(meanla_null, meanla_mod) #0.4486
 emmeans(meanla_mod, specs = "association")
 r.squaredGLMM(meanla_mod)
 
@@ -631,6 +616,8 @@ r.squaredGLMM(meanldmc_mod)
 meanldmc_simres <- simulateResiduals(meanldmc_mod)
 plot(meanldmc_simres)#residuals normal, HOV violated
 
+ggplot(meanldmc_data, aes(x = association, y = trait_difference))+
+  geom_boxplot()
 
 #MeanLL#
 meanll_data <- trait_ass_join |> 
@@ -648,7 +635,7 @@ meanll_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), 
 
 summary(meanll_mod)
 Anova(meanll_mod) #no significant effect
-anova(meanll_null, meanll_mod) #p = 0.379
+anova(meanll_null, meanll_mod) #p = 0.5138
 emmeans(meanll_mod, specs = "association")
 r.squaredGLMM(meanll_mod)
 
@@ -671,14 +658,17 @@ meansla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = m
 meansla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meansla_data)
 
 summary(meansla_mod)
-Anova(meansla_mod) #no effect
-anova(meansla_null, meansla_mod) #p = 0.4862
+Anova(meansla_mod) #
+anova(meansla_null, meansla_mod) #p = 0.0002708 ***
 emmeans(meansla_mod, specs = "association")
 r.squaredGLMM(meansla_null)
 
 #model diagnostics
 meansla_simres <- simulateResiduals(meansla_mod)
 plot(meansla_simres)#a little underdispersed, HOV violated
+
+ggplot(meansla_data, aes(x = association, y = trait_difference))+
+  geom_boxplot()
 
 
 #C_N_ratio#
@@ -695,11 +685,14 @@ cn_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = cn_dat
 cn_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = cn_data)
 
 summary(cn_mod)
-Anova(cn_mod) #no effect
-anova(cn_null, cn_mod) #p = 0.4859
+Anova(cn_mod) 
+anova(cn_null, cn_mod) #p = 9.832e-05 ***
 emmeans(cn_mod, specs = "association")
 r.squaredGLMM(cn_mod)
 
 #model diagnostics
 cn_simres <- simulateResiduals(cn_mod)
-plot(cn_simres)#resiuals normal enough, HOV violated
+plot(cn_simres)#resiuals normal enough, HOV ok
+
+ggplot(cn_data, aes(x = association, y = trait_difference))+
+  geom_boxplot()
