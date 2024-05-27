@@ -526,6 +526,11 @@ maxh_data <- trait_ass_join |>
 hist(maxh_data$neginv_trait_difference)
 hist(maxh_data$trait_difference)
 
+#how many of each association?
+maxh_data |> 
+  group_by(association) |> 
+  summarise(obs = n()) #751 bare, 1963 nurse
+
 #null model
 maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
 #alternative model
@@ -555,6 +560,10 @@ hist(maxls_data$trait_difference)
 hist(maxls_data$neginv_trait_difference)
 hist(maxls_data$sqrt_trait_difference)
 
+#how many of each association?
+maxls_data |> 
+  group_by(association) |> 
+  summarise(obs = n()) #751 bare, 1963 nurse
 
 #null model
 maxls_null <- glmmTMB(sqrt_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxls_data) #cannot use transformations because of 0 and - values
