@@ -98,11 +98,13 @@ modeldat_final <- modeldat |>
 
 write.csv(modeldat_final, "Functional trait data//Clean data//nint_nurse_traits.csv")
 
+#import the data that will be used for modelling
+modeldat_final <- read.csv("Functional trait data//Clean data//nint_nurse_traits.csv", row.names = 1)
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
-cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")])
+cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")], method = "pearson")
 corrplot(cormat, method = "number")
 #nothing is highly correlated except for N and CN ratio
 
