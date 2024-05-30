@@ -350,16 +350,18 @@ annotations$ycoord_anova <- c(32, 32, #C:N
                           0, 0, #LS
                           95, 95)#SLA
 
-trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference)) +
-  geom_boxplot(fill = "darkslategrey", alpha = 0.6)+
+trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference, fill = association)) +
+  geom_boxplot(alpha = 0.6)+
   stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
-  scale_x_discrete(labels = c("bare", "dominant")) +
+  scale_fill_manual(values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) + 
+  scale_x_discrete(labels = c(expression("∆"["db"]), expression("∆"["dd"]))) +
   facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
   ylab("Difference") +
   xlab("Target species association") +
   geom_text(data = annotations, aes(x = annotations$association, y = ycoord_t, label = t_test_significance), size = 8, color = "brown3")+
   geom_text(data = annotations, aes(x = annotations$association, y = ycoord_anova, label = anova_significance), size = 5, color = "brown3")+
-  theme_classic() 
+  theme_classic() +
+  theme(legend.position = "none", axis.text.x = (element_text(size = 11)))
 
 ggsave("one_dimensional_trait_distances.png", trait_distances, path = "Figures", 
        height = 1700, width = 2000, units = "px")
