@@ -341,7 +341,6 @@ write.csv(twosp_dist, "Functional trait data\\results\\Functional_distances_betw
 
 ####Models of dist ~ association####
 twosp_dist <- read.csv("Functional trait data\\results\\Functional_distances_between_2sp_traits_varying.csv", row.names = 1) 
-
 twosp_dist$GRAZ <- as.factor(twosp_dist$GRAZ)
 twosp_dist$SITE_ID <- as.factor(twosp_dist$SITE_ID)
 twosp_dist$grouping <- as.factor(twosp_dist$grouping)
@@ -365,6 +364,10 @@ dist_ass_join$euclidean_dist <- as.numeric(dist_ass_join$euclidean_dist)
 dist_ass_join |> 
   group_by(association) |> 
   summarise(obs = n()) #618 bare, 1791 nurse
+#how many species?
+length(unique(dist_ass_join$target)) #71, many species are lost when we filter out the other associations
+length(unique(dist_ass_join$nurse)) #45
+length(unique(dist_ass_join$ID)) #41
 
 ##does the distance between nurses and bare associated species differ from the distance between nurses and nurse associated species?
 dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
