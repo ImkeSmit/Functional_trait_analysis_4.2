@@ -142,6 +142,10 @@ nintc_rich_SLA_mod <- glmmTMB(NIntc_richness_binom ~ nurse_meanSLA, data = model
 pred_data1 <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
 pred_data1$nintc_richness_binom_prediction <- predict(nintc_rich_SLA_mod, pred_data1, type = "response")
 pred_data1$nintc_richness_true_prediction <- 2*pred_data1$nintc_richness_binom_prediction -1 #backtransform from binomial
+#how many points on graph?
+modeldat_final |> 
+  filter(!is.na(nurse_meanSLA) & !is.na(NIntc_richness)) |> 
+  summarise(n = n()) #2637
 
 nintc_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
@@ -155,6 +159,11 @@ nintc_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_ri
 nintc_cover_SLA_mod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
 pred_data1$nintc_cover_binom_prediction <- predict(nintc_cover_SLA_mod, pred_data1, type = "response")
 pred_data1$nintc_cover_true_prediction <- 2*pred_data1$nintc_cover_binom_prediction -1 #backtransform from binomial
+
+#how many points on graph?
+modeldat_final |> 
+  filter(!is.na(nurse_meanSLA) & !is.na(NIntc_cover)) |> 
+  summarise(n = n()) #2625
 
 nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
@@ -170,6 +179,11 @@ pred_data2 <- data.frame(nurse_mean_C_N_ratio = c(unique(modeldat_final$nurse_me
 pred_data2$nintc_richness_binom_prediction <- predict(nintc_rich_CN_mod, pred_data2, type = "response")
 pred_data2$nintc_richness_true_prediction <- 2*pred_data2$nintc_richness_binom_prediction -1 #backtransform from binomial
 
+#how many points on graph?
+modeldat_final |> 
+  filter(!is.na(nurse_mean_C_N_ratio) & !is.na(NIntc_richness)) |> 
+  summarise(n = n()) #2637
+
 nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
@@ -182,6 +196,11 @@ nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NI
 nintc_cover_CN_mod <- glmmTMB(NIntc_cover_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
 pred_data2$nintc_cover_binom_prediction <- predict(nintc_cover_CN_mod, pred_data2, type = "response")
 pred_data2$nintc_cover_true_prediction <- 2*pred_data2$nintc_cover_binom_prediction -1 #backtransform from binomial
+
+#how many points on graph?
+modeldat_final |> 
+  filter(!is.na(nurse_mean_C_N_ratio) & !is.na(NIntc_cover)) |> 
+  summarise(n = n()) #2625
 
 nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
