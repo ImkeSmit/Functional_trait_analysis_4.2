@@ -37,6 +37,7 @@ Raoq_graz <- long_FD_results |>
   filter(FD_metrics == "RaoQ") |> 
   ggplot(aes(y = log(value), x = GRAZ, fill = GRAZ)) +
   geom_boxplot(alpha = 0.6)+
+  stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
   scale_fill_manual(values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4")) +
   theme_classic() +
   ylab("") +
@@ -284,13 +285,15 @@ dist_ass_join <- twosp_dist |>
   filter(association %in% c("nurse", "bare")) #only work with these associations
 dist_ass_join$association <- as.factor(dist_ass_join$association)
 
-dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
-            geom_boxplot(fill = "darkslategrey", alpha = 0.6) +
+dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist, fill = association)) +
+            geom_boxplot(alpha = 0.6) +
+            scale_fill_manual(values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1]))+
             stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
             ylab("Distance") +
             xlab("target species association") +
             scale_x_discrete(labels = c("bare", "dominant")) +
-            theme_classic()
+            theme_classic() +
+            theme(legend.position = "none")
 ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, units = "px", 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
