@@ -144,7 +144,7 @@ pred_data1$nintc_richness_binom_prediction <- predict(nintc_rich_SLA_mod, pred_d
 pred_data1$nintc_richness_true_prediction <- 2*pred_data1$nintc_richness_binom_prediction -1 #backtransform from binomial
 
 nintc_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[C]~richness)) +
   xlab("") +
@@ -157,7 +157,7 @@ pred_data1$nintc_cover_binom_prediction <- predict(nintc_cover_SLA_mod, pred_dat
 pred_data1$nintc_cover_true_prediction <- 2*pred_data1$nintc_cover_binom_prediction -1 #backtransform from binomial
 
 nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[C]~cover)) +
   xlab("mean SLA of dominant plant") +
@@ -171,7 +171,7 @@ pred_data2$nintc_richness_binom_prediction <- predict(nintc_rich_CN_mod, pred_da
 pred_data2$nintc_richness_true_prediction <- 2*pred_data2$nintc_richness_binom_prediction -1 #backtransform from binomial
 
 nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab("") +
   xlab("") +
@@ -184,7 +184,7 @@ pred_data2$nintc_cover_binom_prediction <- predict(nintc_cover_CN_mod, pred_data
 pred_data2$nintc_cover_true_prediction <- 2*pred_data2$nintc_cover_binom_prediction -1 #backtransform from binomial
 
 nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab("") +
   xlab("mean C:N of dominant plant") +
@@ -216,7 +216,7 @@ pred_data3$ninta_richness_binom_prediction <- predict(ninta_rich_SLA_mod, pred_d
 pred_data3$ninta_richness_true_prediction <- 3*pred_data3$ninta_richness_binom_prediction -1 #backtransform from binomial
 
 ninta_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NInta_richness)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[A]~richness)) +
   xlab("") +
@@ -229,7 +229,7 @@ pred_data3$ninta_cover_binom_prediction <- predict(ninta_cover_SLA_mod, pred_dat
 pred_data3$ninta_cover_true_prediction <- 3*pred_data3$ninta_cover_binom_prediction -1 #backtransform from binomial
 
 ninta_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NInta_cover)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[A]~cover)) +
   xlab("mean SLA of dominant plant") +
@@ -243,7 +243,7 @@ pred_data4$ninta_richness_binom_prediction <- predict(nintc_rich_CN_mod, pred_da
 pred_data4$ninta_richness_true_prediction <- 3*pred_data4$ninta_richness_binom_prediction -1 #backtransform from binomial
 
 ninta_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NInta_richness)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab("") +
   xlab("") +
@@ -256,7 +256,7 @@ pred_data4$ninta_cover_binom_prediction <- predict(ninta_cover_CN_mod, pred_data
 pred_data4$ninta_cover_true_prediction <- 3*pred_data4$ninta_cover_binom_prediction -1 #backtransform from binomial
 
 ninta_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NInta_cover)) +
-  geom_jitter(width = 5, height = 0.2, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab("") +
   xlab("mean C:N of dominant plant") +
