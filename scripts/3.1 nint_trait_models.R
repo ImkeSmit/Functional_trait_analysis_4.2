@@ -239,7 +239,7 @@ write.csv(results_table, "Functional trait data\\results\\nint_nurse_traits_mode
 
 
 ###select the model with the lowest AIC####
-results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_model_results_17Apr2024.csv", row.names = 1)
+results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_model_results_20May2024.csv", row.names = 1)
 
 best_subset_models <- results_table |> 
   filter(!is.na(AIC)) |> 
