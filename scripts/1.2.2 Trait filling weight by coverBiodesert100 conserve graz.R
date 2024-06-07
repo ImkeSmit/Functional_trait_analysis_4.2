@@ -294,18 +294,24 @@ write.csv2(sp_matches, "Functional trait data\\Clean data\\filled_sp_matches.csv
 fac_species <- read.csv("Functional trait data\\Clean data\\facilitation_species_and_positions.csv", row.names = 1) |>
   rename(taxon = spname) |> 
   select(taxon) |> 
-  distinct(taxon)
+  distinct(taxon) 
+fac_sp_total <- nrow(fac_species)
 
 #import unfilled trait data
 FT_species <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots.csv", row.names = 1) |> 
   select(taxon) |> 
   distinct(taxon)
+FT_sp_total <- nrow(FT_species)
 
 only_in_fac <- fac_species |> #species only sampled in the facilitation survey
-  anti_join(FT_species, by = "taxon")
+  anti_join(FT_species, by = "taxon") |> 
+  summarise(fac_only = n())
+percent_only_in_fac <- only_in_fac/fac_sp_total *100
 
 only_in_FT <- FT_species |> #species only sampled in the trait survey
-  anti_join(fac_species, by = "taxon")
+  anti_join(fac_species, by = "taxon") |> 
+  summarise(FT_only = n())
+percent_only_in_FT <- only_in_FT/FT_sp_total *100
 
 
 ###Assess change in trait coverage###
