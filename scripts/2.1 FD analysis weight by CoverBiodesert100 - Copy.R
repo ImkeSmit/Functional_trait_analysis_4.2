@@ -15,7 +15,6 @@ library(corrplot)
 ##Import filled FT data for the facilitation plots
 FT_raw <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv", row.names = 1)
 
-
 FT <- FT_raw|> 
   mutate(taxon = str_replace(taxon, " ", "_")) |> 
   pivot_wider(names_from = trait, values_from = value) |> 
@@ -28,7 +27,6 @@ FT <- FT_raw|>
 #get species in the FT data
 FT_sp <- FT |> 
   distinct(taxon)
-
 
 #make a cover matrix using coverBiodesert100
 #remember coverBiodesert100_FT is the cover of the"filler"
