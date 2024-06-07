@@ -3,7 +3,7 @@ library(tidyverse)
 library(tidylog)
 library(ggplot2)
 
-FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots.csv", row.names = 1)
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv", row.names = 1)
 
 ###Histograms of all the traits
 ##MAxH, MAxLS, MeanLA, MeanLL
