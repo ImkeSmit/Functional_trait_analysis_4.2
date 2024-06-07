@@ -142,6 +142,9 @@ length(unique(modeldat_final$nurse_sp)) #66
 #number of replicates
 nrow(modeldat_final) #2625
 
+#%of replicates included in this analysis
+nrow(modeldat_final)/nrow(nint_result) *100 #57.5
+
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Create a table for results
