@@ -313,6 +313,15 @@ only_in_FT <- FT_species |> #species only sampled in the trait survey
   summarise(FT_only = n())
 percent_only_in_FT <- only_in_FT/FT_sp_total *100
 
+#Overlap in FT and fac data?
+overlap <- FT_species |> 
+  inner_join(fac_species, by = "taxon") |> 
+  summarise(overlapping_sp = n())
+
+#%of sp that overlap
+#all unique sp in FT and trait data
+unique_allsp <- nrow(unique(rbind(fac_species, FT_species)))
+overlap/unique_allsp *100 #61.14
 
 ###Assess change in trait coverage###
 #import unfilled trait data
