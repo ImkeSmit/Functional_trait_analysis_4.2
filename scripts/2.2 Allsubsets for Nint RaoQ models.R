@@ -186,7 +186,7 @@ AllSubsets <- function(ResponseVariableColumn, PredictorsColumns, data.source = 
 
 ####RUN AllSubsets####
 #import FD results
-FD_results <- read.csv("Functional trait data\\results\\FD_results_4Mar2024.csv", row.names = 1) 
+FD_results <- read.csv("Functional trait data\\results\\FD_results_20May2024.csv", row.names = 1) 
 
 FD_results$FRic <- as.numeric(FD_results$FRic)
 FD_results$qual.FRic <- as.numeric(FD_results$qual.FRic)
