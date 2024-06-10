@@ -137,42 +137,6 @@ modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 #choose a colour for the line;
 chosen_col <- brewer.pal(6, "Dark2")[6]
 
-###NIntc richness ~ SLA
-nintc_rich_SLA_mod <- glmmTMB(NIntc_richness_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
-pred_data1 <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
-pred_data1$nintc_richness_binom_prediction <- predict(nintc_rich_SLA_mod, pred_data1, type = "response")
-pred_data1$nintc_richness_true_prediction <- 2*pred_data1$nintc_richness_binom_prediction -1 #backtransform from binomial
-#how many points on graph?
-modeldat_final |> 
-  filter(!is.na(nurse_meanSLA) & !is.na(NIntc_richness)) |> 
-  summarise(n = n()) #2637
-
-nintc_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_richness)) +
-  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
-  theme_classic() +
-  ylab(expression(NInt[C]~richness)) +
-  xlab("") +
-  geom_line(data = pred_data1, 
-            aes(x = nurse_meanSLA, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
-
-###NIntc cover ~ SLA
-nintc_cover_SLA_mod <- glmmTMB(NIntc_cover_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
-pred_data1$nintc_cover_binom_prediction <- predict(nintc_cover_SLA_mod, pred_data1, type = "response")
-pred_data1$nintc_cover_true_prediction <- 2*pred_data1$nintc_cover_binom_prediction -1 #backtransform from binomial
-
-#how many points on graph?
-modeldat_final |> 
-  filter(!is.na(nurse_meanSLA) & !is.na(NIntc_cover)) |> 
-  summarise(n = n()) #2625
-
-nintc_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NIntc_cover)) +
-  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
-  theme_classic() +
-  ylab(expression(NInt[C]~cover)) +
-  xlab("mean SLA of dominant plant") +
-  geom_line(data = pred_data1, aes(x = nurse_meanSLA, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
-
-
 ###NIntc richness ~ C:N
 nintc_rich_CN_mod <- glmmTMB(NIntc_richness_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
 pred_data2 <- data.frame(nurse_mean_C_N_ratio = c(unique(modeldat_final$nurse_mean_C_N_ratio)))
@@ -187,8 +151,8 @@ modeldat_final |>
 nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
-  ylab("") +
-  xlab("") +
+  ylab(expression(NInt[C]~richness)) +
+  xlab("mean C:N of dominant plant") +
   geom_line(data = pred_data2, 
             aes(x = nurse_mean_C_N_ratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
 
@@ -205,14 +169,14 @@ modeldat_final |>
 nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
-  ylab("") +
+  ylab(expression(NInt[C]~cover)) +
   xlab("mean C:N of dominant plant") +
   geom_line(data = pred_data2, 
             aes(x = nurse_mean_C_N_ratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
 
 #arrange the above four figures on the same plot
-nintc_nurse_traits <- ggarrange(nintc_richness_SLA,nintc_richness_CN, nintc_cover_SLA, nintc_cover_CN,  nrow = 2, ncol = 2, labels = c("a", "b", "c", "d"))
-ggsave("nintc_trait_scatterplots.png", nintc_nurse_traits, height = 1200, width = 1500, units = "px", 
+nintc_nurse_traits <- ggarrange(nintc_richness_CN, nintc_cover_CN,  nrow = 1, ncol = 2, labels = c("a", "b"))
+ggsave("nintc_trait_scatterplots.png", nintc_nurse_traits, width = 1500, height = 700, units = "px", 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
@@ -228,29 +192,16 @@ modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 #choose a colour for the line;
 chosen_col <- brewer.pal(6, "Dark2")[6]
 
-###NInta richness ~ SLA
-ninta_rich_SLA_mod <- glmmTMB(NInta_richness_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
-pred_data3 <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
-pred_data3$ninta_richness_binom_prediction <- predict(ninta_rich_SLA_mod, pred_data3, type = "response")
-pred_data3$ninta_richness_true_prediction <- 3*pred_data3$ninta_richness_binom_prediction -1 #backtransform from binomial
-
-ninta_richness_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NInta_richness)) +
-  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
-  theme_classic() +
-  ylab(expression(NInt[A]~richness)) +
-  xlab("") +
-  geom_line(data = pred_data3, 
-            aes(x = nurse_meanSLA, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1)
-
 ###NInta cover ~ SLA
 ninta_cover_SLA_mod <- glmmTMB(NInta_cover_binom ~ nurse_meanSLA, data = modeldat_final, family = binomial)
+pred_data3 <- data.frame(nurse_meanSLA = c(unique(modeldat_final$nurse_meanSLA)))
 pred_data3$ninta_cover_binom_prediction <- predict(ninta_cover_SLA_mod, pred_data3, type = "response")
 pred_data3$ninta_cover_true_prediction <- 3*pred_data3$ninta_cover_binom_prediction -1 #backtransform from binomial
 
 ninta_cover_SLA <- ggplot(modeldat_final, aes(x = nurse_meanSLA, y = NInta_cover)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
-  ylab(expression(NInt[A]~cover)) +
+  ylab("") +
   xlab("mean SLA of dominant plant") +
   geom_line(data = pred_data3, aes(x = nurse_meanSLA, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1)
 
@@ -264,8 +215,8 @@ pred_data4$ninta_richness_true_prediction <- 3*pred_data4$ninta_richness_binom_p
 ninta_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NInta_richness)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
-  ylab("") +
-  xlab("") +
+  ylab(expression(NInt[A]~richness)) +
+  xlab("mean C:N of dominant plant") +
   geom_line(data = pred_data4, 
             aes(x = nurse_mean_C_N_ratio, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1)
 
@@ -277,14 +228,14 @@ pred_data4$ninta_cover_true_prediction <- 3*pred_data4$ninta_cover_binom_predict
 ninta_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NInta_cover)) +
   geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
-  ylab("") +
-  xlab("mean C:N of dominant plant") +
+  ylab(expression(NInt[A]~cover)) +
+  xlab("") +
   geom_line(data = pred_data4, 
             aes(x = nurse_mean_C_N_ratio, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1)
 
 #arrange the above four figures on the same plot
-ninta_nurse_traits <- ggarrange(ninta_richness_SLA,ninta_richness_CN, ninta_cover_SLA, ninta_cover_CN,
-                                nrow = 2, ncol = 2, labels = c("a", "b", "c", "d"))
+ninta_nurse_traits <- ggarrange(ninta_cover_CN,ninta_cover_SLA, ninta_richness_CN,
+                                nrow = 2, ncol = 2, labels = c("a", "b", "c"))
 ggsave("ninta_trait_scatterplots.png", ninta_nurse_traits, height = 1200, width = 1500, units = "px", 
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
