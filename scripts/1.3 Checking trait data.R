@@ -2,8 +2,26 @@
 library(tidyverse)
 library(tidylog)
 library(ggplot2)
+library(corrplot)
 
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv", row.names = 1)
+
+##Corelation matrix
+FT_wide <- FT |> 
+  select(ID, ARIDITY.v3_comm, taxon, trait, value) |> 
+  group_by(ID, taxon, trait) |> 
+  mutate(mean_val = mean(value)) |> 
+  ungroup() |> 
+  select(!value) |> 
+  distinct() |> 
+  pivot_wider(id_cols = c("ID", "ARIDITY.v3_comm", "taxon"), names_from = trait, values_from = mean_val) |> 
+  mutate(C_N_ratio = percentC/percentN) |> 
+  select(!c(percentC, percentN)) |> 
+  filter(!is.na(MeanLL), !is.na(MeanSLA), !is.na(MeanLA), !is.na(MaxH), !is.na(MaxLS), !is.na(MeanLDMC), !is.na(C_N_ratio))
+
+cormat <- cor(FT_wide[, -which(colnames(FT_wide) %in% c("ID", "taxon"))], method = "pearson")
+corrplot(cormat, method = "number")
+
 
 ###Histograms of all the traits
 ##MAxH, MAxLS, MeanLA, MeanLL
