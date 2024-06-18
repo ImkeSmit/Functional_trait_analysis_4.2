@@ -6,7 +6,7 @@ library(corrplot)
 
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_graz_conserved.csv", row.names = 1)
 
-##Corelation matrix
+##Corelation matrix of traits
 FT_wide <- FT |> 
   select(ID, ARIDITY.v3_comm, taxon, trait, value) |> 
   group_by(ID, taxon, trait) |> 
@@ -21,6 +21,18 @@ FT_wide <- FT |>
 
 cormat <- cor(FT_wide[, -which(colnames(FT_wide) %in% c("ID", "taxon"))], method = "pearson")
 corrplot(cormat, method = "number")
+
+
+##correlation matrix of climate variables
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  select(ID, AMT:ARIDITY.v3) |> 
+  select(!AI) |> 
+  select(!ARIDITY) |> 
+  filter(ID %in% c(unique(FT$ID)))
+
+
+cormat2 <- cor(siteinfo[, -which(colnames(siteinfo) == "ID")], method = "pearson")
+corrplot(cormat2, method = "number", type = "lower", number.digits = 1)
 
 
 ###Histograms of all the traits
