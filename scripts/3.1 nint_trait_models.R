@@ -19,7 +19,7 @@ nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation a
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv",
                row.names = 1) 
 
-##For each replicate, we need to get the NIntc value and the traits of the nurse
+##For each replicate, we need to get the NIntc value and the traits of the nurse####
 #names of the traits collectd
 traits_collected <- c(unique(FT$trait))
 #plot Id's
@@ -98,11 +98,34 @@ modeldat_final <- modeldat |>
 
 write.csv(modeldat_final, "Functional trait data//Clean data//nint_nurse_traits.csv")
 
-#import the data that will be used for modelling
+###import nint_nurse_traits####
 modeldat_final <- read.csv("Functional trait data//Clean data//nint_nurse_traits.csv", row.names = 1)
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+
+##examine distributions
+LL_hist <- ggplot(modeldat_final, aes(x = nurse_mean_LL)) +geom_histogram()
+
+SLA_hist <- ggplot(modeldat_final, aes(x = nurse_meanSLA)) +geom_histogram()
+
+LDMC_hist <- ggplot(modeldat_final, aes(x = nurse_meanLDMC)) +geom_histogram()
+
+LA_hist <- ggplot(modeldat_final, aes(x = nurse_meanLA)) +geom_histogram()
+
+H_hist <- ggplot(modeldat_final, aes(x = nurse_mean_H)) +geom_histogram()
+
+LS_hist <- ggplot(modeldat_final, aes(x = nurse_mean_LS)) +geom_histogram()
+
+CN_hist <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio)) +geom_histogram()
+
+histograms <- ggarrange(LL_hist, SLA_hist, LDMC_hist, LA_hist, H_hist, LS_hist, CN_hist)
+ggsave("trait_histograms.png", histograms, path = "Figures", width = 1800, height = 1400, units = "px")
+
+#all are highly left skewed except for SLA, LDMC and CN ratio
+#The rest must be logged before using in analyses
+
+
 
 cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")], method = "pearson")
 corrplot(cormat, method = "number")
