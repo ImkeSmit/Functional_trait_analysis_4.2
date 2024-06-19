@@ -188,12 +188,12 @@ modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
 formulas <- AllSubsets(ResponseVariableColumn = which(colnames(modeldat_final) == "NIntc_richness_binom"), 
-                       PredictorsColumns = c(which(colnames(modeldat_final) %in% c("aridity", "graz", "nurse_meanLA", 
-                                                            "nurse_meanSLA", "nurse_mean_H", "nurse_mean_LS", "nurse_mean_C_N_ratio"))), 
+                       PredictorsColumns = c(which(colnames(modeldat_final) %in% c("aridity", "graz", "log_nurse_meanLA", 
+                                                            "nurse_meanSLA", "log_nurse_mean_H", "log_nurse_mean_C_N_ratio"))), 
                        data.source = modeldat_final, 
                        Add.PolynomialTerms = TRUE,
-                       Polynom.exclude = c(which(colnames(modeldat_final) %in% c("graz", "nurse_meanLA", 
-                                                  "nurse_meanSLA", "nurse_mean_H", "nurse_mean_LS", "nurse_mean_C_N_ratio"))), 
+                       Polynom.exclude = c(which(colnames(modeldat_final) %in% c("graz", "log_nurse_meanLA", 
+                                                  "nurse_meanSLA", "log_nurse_mean_H", "log_nurse_mean_C_N_ratio"))), 
                        Polynom.order = 2, 
                        Do.PredictorInteractions = FALSE, 
                        Do.Random.effect = TRUE, 
