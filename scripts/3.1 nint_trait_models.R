@@ -94,7 +94,15 @@ modeldat_final <- modeldat |>
          !is.na(nurse_mean_LS), 
          !is.na(nurse_mean_C_N_ratio), 
          !is.na(nurse_meanSLA), 
-         !is.na(nurse_mean_H))
+         !is.na(nurse_mean_H)) |> 
+  #and log transform the traits
+  mutate(log_nurse_meanLL = log10(nurse_mean_LL), 
+         log_nurse_meanSLA = log10(nurse_meanSLA), 
+         log_nurse_meanLDMC = log10(nurse_meanLDMC), 
+         log_nurse_meanLA = log10(nurse_meanLA), 
+         log_nurse_meanH = log10(nurse_mean_H), 
+         log_nurse_meanLS = log10(nurse_mean_LS), 
+         log_nurse_meanCNratio = log10(nurse_mean_C_N_ratio))
 
 write.csv(modeldat_final, "Functional trait data//Clean data//nint_nurse_traits.csv")
 
@@ -104,7 +112,7 @@ modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
-##examine distributions
+##examine raw distributions
 LL_hist <- ggplot(modeldat_final, aes(x = nurse_mean_LL)) +geom_histogram()
 
 SLA_hist <- ggplot(modeldat_final, aes(x = nurse_meanSLA)) +geom_histogram()
@@ -119,14 +127,32 @@ LS_hist <- ggplot(modeldat_final, aes(x = nurse_mean_LS)) +geom_histogram()
 
 CN_hist <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio)) +geom_histogram()
 
-histograms <- ggarrange(LL_hist, SLA_hist, LDMC_hist, LA_hist, H_hist, LS_hist, CN_hist)
-ggsave("trait_histograms.png", histograms, path = "Figures", width = 1800, height = 1400, units = "px")
-
-#all are highly left skewed except for SLA, LDMC and CN ratio
-#The rest must be logged before using in analyses
+raw_histograms <- ggarrange(LL_hist, SLA_hist, LDMC_hist, LA_hist, H_hist, LS_hist, CN_hist)
+ggsave("raw_nurse_trait_histograms.png", histograms, path = "Figures", width = 1800, height = 1400, units = "px")
 
 
+##examine logged distributions
+##examine raw distributions
+LL_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanLL)) +geom_histogram()
 
+SLA_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanSLA)) +geom_histogram()
+
+LDMC_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanLDMC)) +geom_histogram()
+
+LA_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanLA)) +geom_histogram()
+
+H_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanH)) +geom_histogram()
+
+LS_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanLS)) +geom_histogram()
+
+CN_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio)) +geom_histogram()
+
+log_histograms <- ggarrange(LL_hist, SLA_hist, LDMC_hist, LA_hist, H_hist, LS_hist, CN_hist)
+ggsave("log_nurse_trait_histograms.png", histograms, path = "Figures", width = 1800, height = 1400, units = "px")
+
+
+
+##do correlations with LOG!
 cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")], method = "pearson")
 corrplot(cormat, method = "number")
 #nothing is highly correlated except for N and CN ratio
