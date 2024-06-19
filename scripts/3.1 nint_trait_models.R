@@ -89,12 +89,7 @@ modeldat_final <- modeldat |>
        NInta_richness_binom = (NInta_richness - (-1)) / (2 - (-1)), 
        NInta_cover_binom = (NInta_cover - (-1)) / (2 - (-1)), 
        nurse_mean_C_N_ratio = nurse_mean_percentC/nurse_mean_percentN) |> 
-  filter(!is.na(NIntc_richness_binom), 
-         !is.na(nurse_meanLA), 
-         !is.na(nurse_mean_LS), 
-         !is.na(nurse_mean_C_N_ratio), 
-         !is.na(nurse_meanSLA), 
-         !is.na(nurse_mean_H)) |> 
+  filter(!is.na(NIntc_richness_binom)) |> 
   #and log transform the traits
   mutate(log_nurse_meanLL = log10(nurse_mean_LL), 
          log_nurse_meanSLA = log10(nurse_meanSLA), 
@@ -128,7 +123,7 @@ LS_hist <- ggplot(modeldat_final, aes(x = nurse_mean_LS)) +geom_histogram()
 CN_hist <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio)) +geom_histogram()
 
 raw_histograms <- ggarrange(LL_hist, SLA_hist, LDMC_hist, LA_hist, H_hist, LS_hist, CN_hist)
-ggsave("raw_nurse_trait_histograms.png", histograms, path = "Figures", width = 1800, height = 1400, units = "px")
+ggsave("raw_nurse_trait_histograms.png", raw_histograms, path = "Figures", width = 1800, height = 1400, units = "px")
 
 
 ##examine logged distributions
@@ -148,22 +143,24 @@ LS_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanLS)) +geom_histogram()
 CN_hist <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio)) +geom_histogram()
 
 log_histograms <- ggarrange(LL_hist, SLA_hist, LDMC_hist, LA_hist, H_hist, LS_hist, CN_hist)
-ggsave("log_nurse_trait_histograms.png", histograms, path = "Figures", width = 1800, height = 1400, units = "px")
+ggsave("log_nurse_trait_histograms.png", log_histograms, path = "Figures", width = 1800, height = 1400, units = "px")
 
 
 
-##do correlations with LOG!
-cormat <- cor(modeldat_final[, which(colnames(modeldat_final) %like% "%mean%")], method = "pearson")
-corrplot(cormat, method = "number")
-#nothing is highly correlated except for N and CN ratio
+##do correlations 
+cordata <- modeldat_final |> 
+  distinct(ID, nurse_sp, .keep_all = T) |> 
+  select(contains("mean")) |>
+  select(!contains("percent")) |> 
+  na.omit()
 
-##All variables are very left skewed except for CN ratio which is very right skewed.
-hist(modeldat_final$nurse_mean_H)
-hist(modeldat_final$nurse_meanLA)
-hist(modeldat_final$nurse_meanSLA)
-hist(modeldat_final$nurse_mean_LS)
-hist(modeldat_final$nurse_mean_C_N_ratio)
+png("nurse_trait_correlation.png")
 
+cormat <- cor(cordata, method = "spearman")
+corrplot(cormat, method = "number", type = "lower")
+dev.off()
+
+##LS is highly correlated with H!
 
 ###Now we can run the allsubsets models####
 #import the model formulas
