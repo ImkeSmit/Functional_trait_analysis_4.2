@@ -152,7 +152,7 @@ cordata <- modeldat_final |>
   distinct(ID, nurse_sp, .keep_all = T) |> 
   select(contains("mean")) |>
   select(!contains("percent")) |> 
-  na.omit()
+  na.omit() #remove all rows that have an NA in any column
 
 png("nurse_trait_correlation.png")
 
