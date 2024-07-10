@@ -1,208 +1,85 @@
 ###Create model formulas with different predictor combinations fro the nint nurse trait models####
-##Ceate a function called AllSubsets to do this
-library(DescTools)
 library(tidyverse)
 
-###CREATE substrRight FUNCTION TO USE IN AllSubsets####
-substrRight <- function(x, n){substr(x, nchar(x) - n + 1, nchar(x))}
+###Get the model formulas####
+predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC", 
+                "log_nurse_meanLA", "log_nurse_meanSLA", "log_nurse_meanH", "log_nurse_meanCNratio",
+                "graz:aridity", "graz:RASE", "graz:AMT", #grazing-climate interactions
+                "graz:pH", "graz:SAC", #grazing-soil interactions
+                "RASE:AMT", "RASE:aridity", "AMT:aridity", #climate-climate interactions
+                #trait-environment interactions
+                "graz:log_nurse_meanLA", "graz:log_nurse_meanSLA", "graz:log_nurse_meanH", "graz:log_nurse_meanCNratio", 
+                "aridity:log_nurse_meanLA", "aridity:log_nurse_meanSLA", "aridity:log_nurse_meanH", "aridity:log_nurse_meanCNratio", 
+                "AMT:log_nurse_meanLA", "AMT:log_nurse_meanSLA", "AMT:log_nurse_meanH", "AMT:log_nurse_meanCNratio",
+                "RASE:log_nurse_meanLA", "RASE:log_nurse_meanSLA", "RASE:log_nurse_meanH", "RASE:log_nurse_meanCNratio",
+                "pH:log_nurse_meanLA", "pH:log_nurse_meanSLA", "pH:log_nurse_meanH", "pH:log_nurse_meanCNratio",
+                "SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio")
 
-###CREATE AllSubsets FUNCTION####
-AllSubsets <- function(ResponseVariableColumn, PredictorsColumns, data.source = data1, Add.PolynomialTerms = FALSE, Polynom.exclude = NA, 
-                       Polynom.order = NA, Do.PredictorInteractions = FALSE, Interaction.Level = NA, ModelProportion = NA, 
-                       Do.Random.effect = FALSE, random.effect = NA, scale.poly = TRUE, exclude_from_interactions = NA) {
+#how many combinations are possible?
+n_possible_models = 2^length(predictors) -1
+
+modlist <- data.frame(formula = character())
+l = 1
+for(counter1 in 1:length(predictors)) {
+  combos <- as.matrix(combn(predictors, counter1))
   
-  PredictorCombinations <- list()
-  PredictorCombinations2 <- list()
-  InteractionCombinations <- list()
-  InteractionCombinations2 <- list()
-  InteractionCombinations3 <- list()
-  
-  AllPredictorsColumns <- c(PredictorsColumns)
-  
-  # convert column numbers to variable names
-  AllPredictorsNames <- colnames(data.source)[AllPredictorsColumns]
-  ResponseVariable.name <- colnames(data.source)[ResponseVariableColumn]
-  
-  # count number of explanatory variables
-  NumberExplanatoryVariables <- length(AllPredictorsNames)
-  
-  # add new response variable if using proportional odds model
-  if (!is.na(ModelProportion == TRUE)) {ResponseVariable.name <- ModelProportion}
-  
-  # only allow polynomial terms or interaction terms
-  #if (Add.PolynomialTerms == TRUE) {Do.PredictorInteractions <- FALSE}
-  #if (Add.PolynomialTerms == TRUE & Polynom.order < 2 | Add.PolynomialTerms == TRUE & is.na(Polynom.order)) {Polynom.order <- 2}
-  
-  # add polynomial terms
-  if (Add.PolynomialTerms == TRUE) {
-    if (any(!is.na(Polynom.exclude))) {Polynom.predictors <- setdiff(PredictorsColumns, Polynom.exclude)} else {Polynom.predictors <- PredictorsColumns}
-    Polynom.predictors.names <- colnames(data.source)[Polynom.predictors]
-    Polynom.ColNames <- paste(Polynom.predictors.names, 2, sep = "")
-    Polynom.ColNames2 <- Polynom.ColNames
-    for (i in 1 : length(Polynom.predictors)) {
-      if (scale.poly == TRUE) {
-        temp.matrix <- scale(data.source[, Polynom.predictors[i]]^2)
-      } else {
-        temp.matrix <- data.source[, Polynom.predictors[i]]^2
-      }
-      data.source <- cbind(data.source, temp.matrix)
-      colnames(data.source)[dim(data.source)[2]] <- Polynom.ColNames[i]
-    }
-    if (Polynom.order > 2) {
-      for (j in 3 : Polynom.order) {
-        Polynom.ColNames <- paste(Polynom.predictors.names, j, sep = "")
-        Polynom.ColNames2 <- c(Polynom.ColNames2, Polynom.ColNames)
-        for (i in 1 : length(Polynom.predictors)) {
-          if (scale.poly == TRUE) {
-            temp.matrix <- scale(data.source[, Polynom.predictors[i]]^j)
-          } else {                    
-            temp.matrix <- data.source[, Polynom.predictors[i]]^j
-          }
-          data.source <- cbind(data.source, temp.matrix)
-          colnames(data.source)[dim(data.source)[2]] <- Polynom.ColNames[i]
-        }
-      }
-    }
-    AllPredictorsNames <- c(AllPredictorsNames, Polynom.ColNames2)
-    NumberExplanatoryVariables <- length(AllPredictorsNames)
-  }
-  
-  # add interaction terms if required
-  if (Do.PredictorInteractions) {
-    for (counter in 1 : Interaction.Level) {
-      if(is.na(exclude_from_interactions) == TRUE) {
-        temp.combn <- t(combn(AllPredictorsNames, counter))
-      }else {
-        temp.combn <- t(combn(AllPredictorsNames[-exclude_from_interactions], counter)) 
-      }
-      for (counter2 in 1 : length(temp.combn[,1])) {
-        InteractionCombinations[[length(InteractionCombinations) + 1]] <- temp.combn[counter2, ]
-      }}
-    if(is.na(exclude_from_interactions) == FALSE) {
-      InteractionCombinations <- InteractionCombinations[- c(1 : (NumberExplanatoryVariables - length(exclude_from_interactions)))]
-    }
-    # InteractionCombinations <- InteractionCombinations[- length(InteractionCombinations)]
+  for(counter2 in 1:ncol(combos)) {
+    mod <- paste(c(combos[, counter2]), collapse = "+")
     
-    #remove intercations with NA in them
-    for(i in 1:length(InteractionCombinations)) {
-      if(length(InteractionCombinations[[i]]) > 1) {
-        InteractionCombinations2[[length(InteractionCombinations2) +1]] <- InteractionCombinations[[i]]
-      }
-    } 
-    
-    for (counter3 in 1 : length(InteractionCombinations2)) {
-      temp.number.predictors <- length(InteractionCombinations2[[counter3]])
-      for (counter4 in 2 : temp.number.predictors) {
-        if (counter4 == 2) {
-          temp.form <- paste(InteractionCombinations2[[counter3]][1], InteractionCombinations2[[counter3]][2], sep = ":")
-        } else {temp.form <- paste(temp.form, InteractionCombinations2[[counter3]][counter4], sep = ":")}
-        InteractionCombinations3[[counter3]] <- temp.form
-      }
-    }
-    #remove the aridity:aridity2 interaction
-    InteractionCombinations3 <- InteractionCombinations3[- which(InteractionCombinations3 == "aridity:aridity2")]
-    AllPredictorsNames <- c(AllPredictorsNames, InteractionCombinations3)
-    NumberExplanatoryVariables <- length(AllPredictorsNames)
-  }
+    modlist[l, 1] <- mod
+    l = l+1
+  }}
+
+# Function to check if a model is valid
+is_valid_model <- function(model) {
+  terms <- unlist(strsplit(model, "\\+"))
   
+  # Define main effects and their corresponding interaction/squared terms
+  interactions <- list("graz" = c("graz:aridity", "graz:RASE", "graz:AMT", "graz:pH", "graz:SAC", 
+                                  "graz:log_nurse_meanLA", "graz:log_nurse_meanSLA", "graz:log_nurse_meanH", "graz:log_nurse_meanCNratio"),
+                       "aridity" = c("graz:aridity", "RASE:aridity", "AMT:aridity", 
+                                     "aridity:log_nurse_meanLA", "aridity:log_nurse_meanSLA", "aridity:log_nurse_meanH", "aridity:log_nurse_meanCNratio"),
+                       "RASE" = c("graz:RASE", "RASE:AMT", "RASE:aridity", 
+                                  "RASE:log_nurse_meanLA", "RASE:log_nurse_meanSLA", "RASE:log_nurse_meanH", "RASE:log_nurse_meanCNratio"),
+                       "AMT" = c("graz:AMT", "RASE:AMT", "AMT:aridity", 
+                                 "AMT:log_nurse_meanLA", "AMT:log_nurse_meanSLA", "AMT:log_nurse_meanH", "AMT:log_nurse_meanCNratio"),
+                       "pH" = c("graz:pH", "pH:log_nurse_meanLA", "pH:log_nurse_meanSLA", "pH:log_nurse_meanH", "pH:log_nurse_meanCNratio"),
+                       "SAC" = c("graz:SAC", "SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio"), 
+                       "log_nurse_meanLA" = c("graz:log_nurse_meanLA", "aridity:log_nurse_meanLA", "AMT:log_nurse_meanLA", 
+                                              "RASE:log_nurse_meanLA", "pH:log_nurse_meanLA", "SAC:log_nurse_meanLA"), 
+                       "log_nurse_meanSLA" = c("graz:log_nurse_meanSLA", "aridity:log_nurse_meanSLA", "AMT:log_nurse_meanSLA", 
+                                               "RASE:log_nurse_meanSLA", "pH:log_nurse_meanSLA", "SAC:log_nurse_meanSLA"), 
+                       "log_nurse_meanH" = c("graz:log_nurse_meanH", "aridity:log_nurse_meanH", "AMT:log_nurse_meanH", 
+                                             "RASE:log_nurse_meanH", "pH:log_nurse_meanH", "SAC:log_nurse_meanH"),
+                       "log_nurse_meanCNratio" = c("graz:log_nurse_meanCNratio", "aridity:log_nurse_meanCNratio", "AMT:log_nurse_meanCNratio", 
+                                                   "RASE:log_nurse_meanCNratio", "pH:log_nurse_meanCNratio", "SAC:log_nurse_meanCNratio"))
   
-  # loop through counter of 1 : NumberExplanatoryVariables, creating each combination of variables, then placing in list
-  for (counter in c(1 : NumberExplanatoryVariables)) {
-    
-    temp.combn <- t(combn(AllPredictorsNames, counter))
-    
-    for (counter2 in 1 : length(temp.combn[,1])) {
-      PredictorCombinations[[length(PredictorCombinations) + 1]] <- temp.combn[counter2, ]
-      
-      #keep track of how many combinations there are in the console
-      print(paste("counter= ", counter, "out of", NumberExplanatoryVariables, "counter2= ", counter2, "out of", length(temp.combn[,1])))
+  squared_terms <- list("aridity" = "aridity2", "AMT" = "AMT2")
+  
+  # Check for interaction terms without main effects
+  for (main_effect in names(interactions)) {
+    if (any(interactions[[main_effect]] %in% terms) && !(main_effect %in% terms)) {
+      return(FALSE)
     }
   }
   
-  # eliminate any potential models that contain interaction or polynomial, but not base or linear terms
-  models.to.drop <- NULL
-  
-  # check for interaction terms
-  for (check1 in 1 : length(PredictorCombinations)) {
-    if(length(grep(":", PredictorCombinations[[check1]])) > 0) { #if there are interactions in the model
-      interaction.terms.temp <- NULL
-      for (check2 in grep(":", PredictorCombinations[[check1]])) {
-        interaction.terms.temp <- c(interaction.terms.temp, strsplit(as.character(PredictorCombinations[[check1]][check2]), ":"))
-      }
-      interaction.terms.temp <- unique(unlist(interaction.terms.temp))
-      Univariate.models <- setdiff(c(1 : length(PredictorCombinations[[check1]])), grep(":", PredictorCombinations[[check1]]))
-      Univariate.terms <- NULL
-      for (check3 in 1 : length(Univariate.models)) {
-        Univariate.terms <- c(Univariate.terms, PredictorCombinations[[check1]][check3])}
-      Univariate.terms <- unlist(Univariate.terms)
-      if (any(is.na(match(interaction.terms.temp, Univariate.terms)))) {
-        models.to.drop <- c(models.to.drop, check1)
-      }
+  # Check for squared terms without main effects
+  for (main_effect in names(squared_terms)) {
+    if ((squared_terms[[main_effect]] %in% terms) && !(main_effect %in% terms)) {
+      return(FALSE)
     }
   }
-  PredictorCombinations[models.to.drop] <- NULL
   
-  # check for polynomial terms
-  
-  if (is.na(Polynom.order)) { 
-    Polynom.order = 2
-    models.to.drop <- NULL
-    for (check1 in 1 : length(PredictorCombinations)) {                 # loop through all models
-      pred.terms <- unlist(PredictorCombinations[check1])
-      for (check2 in seq(from = Polynom.order, to = 2)) {                             # loop through all possible polynomial terms
-        for (check3 in 1 : length(pred.terms)) {                    # loop through each term
-          if(substrRight(pred.terms[check3], 1) == check2) {
-            base.var = substr(pred.terms[check3], 1, nchar(pred.terms[check3]) - 1)
-            required.vars = c(base.var, paste(base.var, 2 : check2, sep = ""))
-            # check if all required variables are present in model
-            if (!all(required.vars %in% pred.terms) == TRUE) {
-              models.to.drop <- c(models.to.drop, check1)
-            }
-          }}}}
-    
-    
-    # check that only unique model numbers given for models to drop
-    models.to.drop <- unique(models.to.drop)
-    PredictorCombinations[models.to.drop] <- NULL
-  }
-  
-  #loop through each combination in "PredictorCombinations"
-  for (counter3 in 1 : length(PredictorCombinations)) {
-    temp.number.predictors <- length(PredictorCombinations[[counter3]])
-    for (counter4 in 1 : temp.number.predictors) {
-      if (counter4 == 1) {temp.form <- paste(ResponseVariable.name, PredictorCombinations[[counter3]][1], sep = "~")} else {temp.form <- paste(temp.form, PredictorCombinations[[counter3]][counter4], sep = "+")}
-      if (Do.Random.effect == TRUE) {PredictorCombinations2[[counter3]] <- paste(temp.form, random.effect, sep = "+")} else {PredictorCombinations2[[counter3]] <- temp.form}
-    }
-  }
-  data1 <<- data.source	
-  PredictorCombinations2
-}  # end of function
-
-
-####RUN AllSubsets####
-#the nint trait results
-modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) 
-
-modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
-modeldat_final$graz <- as.factor(modeldat_final$graz)
-modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
-
-formulas <- AllSubsets(ResponseVariableColumn = which(colnames(modeldat_final) == "NIntc_richness_binom"), 
-                       PredictorsColumns = c(which(colnames(modeldat_final) %in% c("aridity", "graz", "log_nurse_meanLA", 
-                                                            "nurse_meanSLA", "log_nurse_mean_H", "log_nurse_mean_C_N_ratio"))), 
-                       data.source = modeldat_final, 
-                       Add.PolynomialTerms = TRUE,
-                       Polynom.exclude = c(which(colnames(modeldat_final) %in% c("graz", "log_nurse_meanLA", 
-                                                  "nurse_meanSLA", "log_nurse_mean_H", "log_nurse_mean_C_N_ratio"))), 
-                       Polynom.order = 2, 
-                       Do.PredictorInteractions = FALSE, 
-                       Do.Random.effect = TRUE, 
-                       random.effect = "(1|nurse_sp) + (1|site_ID)") 
-#Save the formulas output because it takes so long to run
-
-formula_table <- data.frame(formula  = character(length = length(formulas)))
-for(f in 1:length(formulas)) {
-  one_formula <- formulas[[f]]
-  formula_table[f, 1] <- one_formula
+  return(TRUE)
 }
+
+#run modlist through the function to see which models are valid
+validity = c()
+for(m in 1:nrow(modlist)) {
+  validity[m] <- is_valid_model(modlist[m, 1])
+}
+#subset modlist to keep only valid models
+valid_modlist <- data.frame(predictors = modlist[c(which(validity == TRUE)), ])
+
+write.csv(valid_modlist, "Facilitation data\\results\\nint_clim_soil_model_formulas_22Jun2024.csv")
 write.csv(formula_table, "Functional trait data\\Results\\nint_nurse_trait_formulas.csv")
