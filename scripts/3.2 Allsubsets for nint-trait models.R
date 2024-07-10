@@ -81,5 +81,4 @@ for(m in 1:nrow(modlist)) {
 #subset modlist to keep only valid models
 valid_modlist <- data.frame(predictors = modlist[c(which(validity == TRUE)), ])
 
-write.csv(valid_modlist, "Facilitation data\\results\\nint_clim_soil_model_formulas_22Jun2024.csv")
-write.csv(formula_table, "Functional trait data\\Results\\nint_nurse_trait_formulas.csv")
+write.csv(valid_modlist,"Functional trait data\\Results\\nint_nurse_trait_clim_soil_formulas.csv")
