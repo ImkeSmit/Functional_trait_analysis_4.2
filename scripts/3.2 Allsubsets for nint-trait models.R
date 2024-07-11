@@ -1,36 +1,7 @@
 ###Create model formulas with different predictor combinations fro the nint nurse trait models####
 library(tidyverse)
 
-###Get the model formulas####
-predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC", 
-                "log_nurse_meanLA", "log_nurse_meanSLA", "log_nurse_meanH", "log_nurse_meanCNratio",
-                "graz:aridity", "graz:RASE", "graz:AMT", #grazing-climate interactions
-                "graz:pH", "graz:SAC", #grazing-soil interactions
-                "RASE:AMT", "RASE:aridity", "AMT:aridity", #climate-climate interactions
-                #trait-environment interactions
-                "graz:log_nurse_meanLA", "graz:log_nurse_meanSLA", "graz:log_nurse_meanH", "graz:log_nurse_meanCNratio", 
-                "aridity:log_nurse_meanLA", "aridity:log_nurse_meanSLA", "aridity:log_nurse_meanH", "aridity:log_nurse_meanCNratio", 
-                "AMT:log_nurse_meanLA", "AMT:log_nurse_meanSLA", "AMT:log_nurse_meanH", "AMT:log_nurse_meanCNratio",
-                "RASE:log_nurse_meanLA", "RASE:log_nurse_meanSLA", "RASE:log_nurse_meanH", "RASE:log_nurse_meanCNratio",
-                "pH:log_nurse_meanLA", "pH:log_nurse_meanSLA", "pH:log_nurse_meanH", "pH:log_nurse_meanCNratio",
-                "SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio")
-
-#how many combinations are possible?
-n_possible_models = 2^length(predictors) -1
-
-modlist <- data.frame(formula = character())
-l = 1
-for(counter1 in 1:length(predictors)) {
-  combos <- as.matrix(combn(predictors, counter1))
-  
-  for(counter2 in 1:ncol(combos)) {
-    mod <- paste(c(combos[, counter2]), collapse = "+")
-    
-    modlist[l, 1] <- mod
-    l = l+1
-  }}
-
-# Function to check if a model is valid
+###Function to check if model is valid####
 is_valid_model <- function(model) {
   terms <- unlist(strsplit(model, "\\+"))
   
@@ -73,12 +44,43 @@ is_valid_model <- function(model) {
   return(TRUE)
 }
 
-#run modlist through the function to see which models are valid
-validity = c()
-for(m in 1:nrow(modlist)) {
-  validity[m] <- is_valid_model(modlist[m, 1])
-}
-#subset modlist to keep only valid models
-valid_modlist <- data.frame(predictors = modlist[c(which(validity == TRUE)), ])
+
+###Loop that creates the model formulas####
+predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC", 
+                "log_nurse_meanLA", "log_nurse_meanSLA", "log_nurse_meanH", "log_nurse_meanCNratio",
+                "graz:aridity", "graz:RASE", "graz:AMT", #grazing-climate interactions
+                "graz:pH", "graz:SAC", #grazing-soil interactions
+                "RASE:AMT", "RASE:aridity", "AMT:aridity", #climate-climate interactions
+                #trait-environment interactions
+                "graz:log_nurse_meanLA", "graz:log_nurse_meanSLA", "graz:log_nurse_meanH", "graz:log_nurse_meanCNratio", 
+                "aridity:log_nurse_meanLA", "aridity:log_nurse_meanSLA", "aridity:log_nurse_meanH", "aridity:log_nurse_meanCNratio", 
+                "AMT:log_nurse_meanLA", "AMT:log_nurse_meanSLA", "AMT:log_nurse_meanH", "AMT:log_nurse_meanCNratio",
+                "RASE:log_nurse_meanLA", "RASE:log_nurse_meanSLA", "RASE:log_nurse_meanH", "RASE:log_nurse_meanCNratio",
+                "pH:log_nurse_meanLA", "pH:log_nurse_meanSLA", "pH:log_nurse_meanH", "pH:log_nurse_meanCNratio",
+                "SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio")
+
+#how many combinations are possible?
+n_possible_models = 2^length(predictors) -1
+
+modlist <- data.frame(formula = character())
+l = 1
+for(counter1 in 1:length(predictors)) {
+  combos <- as.matrix(combn(predictors, counter1)) #create a matrix where each column is a combination of n = counter1 variables
+  
+  for(counter2 in 1:ncol(combos)) {
+    #print counter 1 and 2 so that we can see where we're at
+    print(paste("counter1 =", counter1, "out of", length(predictors), "||", "counter2 =", counter2, "out of", ncol(combos)))
+    
+    mod <- paste(c(combos[, counter2]), collapse = "+") #make a formula out of each column in the matrix
+    
+    #check that the formula is valid before putting it in the dataframe
+    validity <- is_valid_model(mod)
+    
+    if(validity == TRUE) {
+    
+    modlist[l, 1] <- mod
+    l = l+1
+  }}}
+
 
 write.csv(valid_modlist,"Functional trait data\\Results\\nint_nurse_trait_clim_soil_formulas.csv")
