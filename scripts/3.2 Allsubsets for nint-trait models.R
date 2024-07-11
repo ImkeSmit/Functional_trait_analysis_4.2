@@ -76,7 +76,7 @@ for(counter1 in 1:length(predictors)) {
     #check that the formula is valid before putting it in the dataframe
     validity <- is_valid_model(mod)
     
-    if(validity == TRUE) {
+    if(validity == TRUE) {#only add it to modlist if validity is true
     
     modlist[l, 1] <- mod
     l = l+1
