@@ -63,24 +63,37 @@ predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC
 n_possible_models = 2^length(predictors) -1 #eish 1.759219e+13 = 17 592 190 000 000
 #max size of an R df is 2^31 -1 = 2 147 483 648
 
-modlist <- data.frame(formula = character())
-l = 1
-for(counter1 in 1:length(predictors)) {
-  combos <- as.matrix(combn(predictors, counter1)) #create a matrix where each column is a combination of n = counter1 variables
-  
-  for(counter2 in 1:ncol(combos)) {
-    #print counter 1 and 2 so that we can see where we're at
-    print(paste("counter1 =", counter1, "out of", length(predictors), "||", "counter2 =", counter2, "out of", ncol(combos)))
-    
-    mod <- paste(c(combos[, counter2]), collapse = "+") #make a formula out of each column in the matrix
-    
-    #check that the formula is valid before putting it in the dataframe
-    validity <- is_valid_model(mod)
-    
-    if(validity == TRUE) {#only add it to modlist if validity is true
-    
-    modlist[l, 1] <- mod
-    l = l+1
-  }}}
+### Loop that creates the model formulas in chunks ####
+chunk_size <- 2^31-1 # Adjust this size based on available memory
+output_file <- "Functional trait data\\results\\nint_nurse_trait_clim_soil_formulas.csv"
 
-write.csv(modlist,"Functional trait data\\Results\\nint_nurse_trait_clim_soil_formulas.csv")
+# Initialize the output file
+write.csv(data.frame(formula = character()), output_file, row.names = FALSE)
+
+for (counter1 in 1:length(predictors)) {
+  combos <- as.matrix(combn(predictors, counter1)) # Create a matrix where each column is a combination of n = counter1 variables
+  n_combos <- ncol(combos)
+  
+  # Process in chunks
+  for (start_idx in seq(1, n_combos, by = chunk_size)) {
+    end_idx <- min(start_idx + chunk_size - 1, n_combos)
+    chunk <- combos[, c(start_idx:end_idx), drop = FALSE]
+    
+    modlist <- data.frame(formula = character())
+    l <- 1
+    
+    for (counter2 in 1:ncol(chunk)) {
+      mod <- paste(c(chunk[, counter2]), collapse = "+") # Make a formula out of each column in the matrix
+      validity <- is_valid_model(mod)
+      
+      if (validity == TRUE) { # Only add it to modlist if validity is true
+        modlist[l, 1] <- mod
+        l <- l + 1
+      }
+    }
+    
+    if (nrow(modlist) > 0) {
+      write.table(modlist, output_file, append = TRUE, sep = ",", row.names = FALSE)
+    }
+  }
+}
