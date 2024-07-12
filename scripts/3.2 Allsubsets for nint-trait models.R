@@ -103,3 +103,5 @@ for (counter1 in 1:length(predictors)) {
     }
   }
 }
+
+#breaks at counter1= 9 because then combos is too big for R!
