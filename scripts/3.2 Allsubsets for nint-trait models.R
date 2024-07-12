@@ -60,14 +60,12 @@ predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC
                 "SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio")
 
 #how many combinations are possible?
-n_possible_models = 2^length(predictors) -1 #eish 1.759219e+13
+n_possible_models = 2^length(predictors) -1 #eish 1.759219e+13 = 17 592 190 000 000
+#max size of an R df is 2^31 -1 = 2 147 483 648
 
-#Because the max size of an R df is 2^31 -1, we will split up the operation and make several dataframes containing model formulas.
-
-###Counter1-7####
-modlist1_7 <- data.frame(formula = character())
+modlist <- data.frame(formula = character())
 l = 1
-for(counter1 in c(1:7)) {
+for(counter1 in 1:length(predictors)) {
   combos <- as.matrix(combn(predictors, counter1)) #create a matrix where each column is a combination of n = counter1 variables
   
   for(counter2 in 1:ncol(combos)) {
@@ -81,32 +79,8 @@ for(counter1 in c(1:7)) {
     
     if(validity == TRUE) {#only add it to modlist if validity is true
     
-    modlist1_7[l, 1] <- mod
+    modlist[l, 1] <- mod
     l = l+1
   }}}
 
-write.csv(modlist1_7,"Functional trait data\\Results\\nint_nurse_trait_clim_soil_formulas_part1.csv")
-
-
-###Counter8-9####
-modlist8_9 <- data.frame(formula = character())
-l = 1
-for(counter1 in c(8:9)) {
-  combos <- as.matrix(combn(predictors, counter1)) #create a matrix where each column is a combination of n = counter1 variables
-  
-  for(counter2 in 1:ncol(combos)) {
-    #print counter 1 and 2 so that we can see where we're at
-    print(paste("counter1 =", counter1, "out of", length(predictors), "||", "counter2 =", counter2, "out of", ncol(combos)))
-    
-    mod <- paste(c(combos[, counter2]), collapse = "+") #make a formula out of each column in the matrix
-    
-    #check that the formula is valid before putting it in the dataframe
-    validity <- is_valid_model(mod)
-    
-    if(validity == TRUE) {#only add it to modlist if validity is true
-      
-      modlist8_9[l, 1] <- mod
-      l = l+1
-    }}}
-
-write.csv(modlist8_9,"Functional trait data\\Results\\nint_nurse_trait_clim_soil_formulas_part2.csv")
+write.csv(modlist,"Functional trait data\\Results\\nint_nurse_trait_clim_soil_formulas.csv")
