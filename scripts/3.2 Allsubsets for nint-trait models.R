@@ -71,19 +71,22 @@ output_file <- "Functional trait data\\results\\nint_nurse_trait_clim_soil_formu
 write.csv(data.frame(formula = character()), output_file, row.names = FALSE)
 
 for (counter1 in 1:length(predictors)) {
-  combos <- as.matrix(combn(predictors, counter1)) # Create a matrix where each column is a combination of n = counter1 variables
+  # Create a matrix where each column is a combination of n = counter1 variables
+  combos <- as.matrix(combn(predictors, counter1)) 
   n_combos <- ncol(combos)
   
   # Process in chunks
   for (start_idx in seq(1, n_combos, by = chunk_size)) {
     end_idx <- min(start_idx + chunk_size - 1, n_combos)
-    chunk <- combos[, c(start_idx:end_idx), drop = FALSE]
+    chunk <- combos[, c(start_idx:end_idx), drop = FALSE] #isolate a chunk
     
-    modlist <- data.frame(formula = character())
+    modlist <- data.frame(formula = character()) #create df to put the formulas in 
     l <- 1
     
     for (counter2 in 1:ncol(chunk)) {
-      mod <- paste(c(chunk[, counter2]), collapse = "+") # Make a formula out of each column in the matrix
+      # Make a formula out of each column in the matrix
+      mod <- paste(c(chunk[, counter2]), collapse = "+") 
+      #check that the model is valid
       validity <- is_valid_model(mod)
       
       if (validity == TRUE) { # Only add it to modlist if validity is true
@@ -93,7 +96,7 @@ for (counter1 in 1:length(predictors)) {
     }
     
     if (nrow(modlist) > 0) {
-      write.table(modlist, output_file, append = TRUE, sep = ",", row.names = FALSE)
+      write.table(modlist, output_file, append = TRUE, sep = ",", row.names = FALSE) #append the new model to the existing file
     }
   }
 }
