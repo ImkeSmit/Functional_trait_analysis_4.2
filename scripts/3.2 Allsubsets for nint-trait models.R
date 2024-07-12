@@ -92,6 +92,8 @@ for (counter1 in 1:length(predictors)) {
       if (validity == TRUE) { # Only add it to modlist if validity is true
         modlist[l, 1] <- mod
         l <- l + 1
+        #print counter 1 and 2 so that we know where we are at
+        print("counter1=", counter1, "out of 44", "counter2=", counter2, "out of", ncol(chunk))
       }
     }
     
