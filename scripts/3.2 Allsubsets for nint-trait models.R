@@ -89,11 +89,12 @@ for (counter1 in 1:length(predictors)) {
       #check that the model is valid
       validity <- is_valid_model(mod)
       
+      #print counter 1 and 2 so that we know where we are at
+      print(paste("counter1=", counter1, "out of 44", "counter2=", counter2, "out of", ncol(chunk)))
+      
       if (validity == TRUE) { # Only add it to modlist if validity is true
         modlist[l, 1] <- mod
         l <- l + 1
-        #print counter 1 and 2 so that we know where we are at
-        print(paste("counter1=", counter1, "out of 44", "counter2=", counter2, "out of", ncol(chunk)))
       }
     }
     
