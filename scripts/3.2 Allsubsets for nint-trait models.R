@@ -90,7 +90,7 @@ for (counter1 in 1:length(predictors)) {
       validity <- is_valid_model(mod)
       
       #print counter 1 and 2 so that we know where we are at
-      print(paste("counter1=", counter1, "out of 44", "counter2=", counter2, "out of", ncol(chunk)))
+      print(paste("counter1=", counter1, "out of",length(preditcors), "counter2=", counter2, "out of", ncol(chunk)))
       
       if (validity == TRUE) { # Only add it to modlist if validity is true
         modlist[l, 1] <- mod
@@ -99,10 +99,8 @@ for (counter1 in 1:length(predictors)) {
     }
     
     if (nrow(modlist) > 0) {
-      write.table(modlist, output_file, append = TRUE, sep = ",", row.names = FALSE) #append the new model to the existing file
+      write.table(modlist, output_file, append = TRUE, sep = ",", row.names = FALSE, col.names = FALSE) #append the new model to the existing file
     }
   }
 }
 
-#breaks at counter1= 9 because then combos is too big for R!
-#took c. 8 hours to run to counter1 = 9
