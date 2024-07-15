@@ -154,7 +154,7 @@ cordata <- modeldat_final |>
   select(!contains("percent")) |> 
   na.omit() #remove all rows that have an NA in any column
 
-png("nurse_trait_correlation.png")
+png("Figures\\nurse_trait_correlation.png")
 
 cormat <- cor(cordata, method = "spearman")
 corrplot(cormat, method = "number", type = "lower")
@@ -220,11 +220,13 @@ nrow(modeldat_final) #3735
 #%of replicates included in this analysis
 nrow(modeldat_final)/nrow(nint_result) *100 #81.81818
 
-
 ###Loop through the formulas for NIntc ~ nurse traits####
-#Create a table for results
-results_table <- data.frame(Response = character(), AIC = numeric(), BIC = numeric(), 
-                            Warnings = character(), row.names = NULL)
+#Initialise output file for results
+output_file <- "Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv"
+
+# Initialize the output file
+write.csv(data.frame(Response = character(), AIC = numeric(), BIC = numeric(), 
+                     Warnings = character()), output_file, row.names = FALSE)
 
 # Initialize warning_msg outside the loop
 warning_msg <- ""
@@ -295,11 +297,9 @@ for(r in 1:length(response_list)) {
                              Warnings = warning_msg)
     
     
-    results_table <- rbind(results_table, result_row)
+    write.table(result_row, output_file, append = TRUE, sep = ",", row.names = FALSE, col.names = FALSE) #append the new model to the existing file
   }
 }
-
-results_table
 ##LOOK AT WARNINGS
 ##The warnings are sort of cumulative. Once the is one warning of fitTMB, all warning_msg will contain it.
 ##I don't know how to fix this yet
