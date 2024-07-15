@@ -164,13 +164,12 @@ dev.off()
 
 ###Now we can run the allsubsets models####
 #import the model formulas
-formula_table <- read.csv("Functional trait data\\results\\nint_nurse_trait_formulas.csv", row.names = 1) |> 
-  separate_wider_delim(formula, delim = "~", names = c("response", "predictors")) |> 
-  select(predictors) |> 
-  distinct(predictors) |> 
-  add_row(predictors = "1+(1|nurse_sp)+(1|site_ID)")
+formula_table <- read.table("Functional trait data\\results\\nint_nurse_trait_clim_soil_formulas.csv", sep = ",", header = T) |> 
+  rename(predictors = formula) |> 
+  mutate(predictors = paste(predictors, "(1|nurse_sp)+(1|site_ID)", sep = "+")) |> #add the random effect to all formulas
+  add_row(predictors = "1+(1|nurse_sp)+(1|site_ID)")  #add the null model
 
-#import the data
+#import the nint nurse traits
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
   mutate(aridity2 = aridity^2) |> 
   filter(!is.na(NIntc_richness_binom)) |> 
@@ -181,15 +180,17 @@ modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
 
+
+
 ####descriptive stats####
 #number of dominant species
-length(unique(modeldat_final$nurse_sp)) #66
+length(unique(modeldat_final$nurse_sp)) #87
 
 #number of replicates
-nrow(modeldat_final) #2625
+nrow(modeldat_final) #3735
 
 #%of replicates included in this analysis
-nrow(modeldat_final)/nrow(nint_result) *100 #57.5
+nrow(modeldat_final)/nrow(nint_result) *100 #81.81818
 
 
 ###Loop through the formulas for NIntc ~ nurse traits####
