@@ -310,7 +310,7 @@ results_table
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-write.csv(results_table, "Functional trait data\\results\\nint_nurse_traits_model_results_20May2024.csv")
+write.csv(results_table, "Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv")
 
 
 ###select the model with the lowest AIC####
