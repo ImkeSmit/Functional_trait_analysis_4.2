@@ -223,8 +223,7 @@ nrow(modeldat_final)/nrow(nint_result) *100 #81.81818
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Create a table for results
-results_table <- data.frame(Response = character(), Model = character(), Chisq = numeric(), 
-                            Df = integer(), Pr_value = numeric(), AIC = numeric(), 
+results_table <- data.frame(Response = character(), AIC = numeric(), BIC = numeric(), 
                             Warnings = character(), row.names = NULL)
 
 # Initialize warning_msg outside the loop
@@ -251,27 +250,26 @@ for(r in 1:length(response_list)) {
     # Clear existing warning messages
     warnings()
     
-    # Initialize anova_result and AIC_model outside the tryCatch block
-    anova_result <- NULL
+    # Initialize AIC_model outside the tryCatch block
     AIC_model <- NULL
+    BIC_model <- NULL
     
     tryCatch( #tryCatch looks for errors and warinngs in the expression
       expr = {
         model <- glmmTMB(formula, family = binomial, data = data)
         
-        # Perform Anova 
-        anova_result <- Anova(model, type = 2)
         # Get AIC
         AIC_model <- AIC(model)
+        BIC_model <- BIC(model)
         
         warning_messages <- warnings()
         
         ##Do nothing if the warinng is about non integer successes
         # Check for the non-integer #successes warning
-        if ("non-integer #successes" %in% warning_messages) {
+        #if ("non-integer #successes" %in% warning_messages) {
           # Handle non-integer #successes warning (e.g., print a message)
-          message("Ignoring non-integer #successes warning")
-        }
+         # message("Ignoring non-integer #successes warning")
+        #}
         
         #Print the warning message if it is about model fit
         # Check for other warnings, excluding the non-integer #successes warning
@@ -292,10 +290,8 @@ for(r in 1:length(response_list)) {
     # Extract relevant information
     result_row <- data.frame(Response = response_var,
                              Model = paste(response_var, "~",  predictors), 
-                             Chisq = ifelse(!is.null(anova_result), anova_result$Chisq[1], NA), 
-                             Df = ifelse(!is.null(anova_result), anova_result$"Df"[1], NA), 
-                             Pr_value = ifelse(!is.null(anova_result), anova_result$"Pr(>Chisq)"[1], NA), 
                              AIC = ifelse(!is.null(AIC_model), AIC_model, NA),
+                             BIC = ifelse(!is.null(BIC_model), BIC_model, NA),
                              Warnings = warning_msg)
     
     
