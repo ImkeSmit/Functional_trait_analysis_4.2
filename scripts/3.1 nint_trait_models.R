@@ -179,8 +179,36 @@ modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+modeldat_final$ID <- as.factor(modeldat_final$ID)
 
+##Add the other environmental covariates to modeldat final
+#import siteinfo, we will use this to add ID to drypop
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |> 
+  select(ID, plotref) |> 
+  distinct() |> 
+  na.omit()
 
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  select(!plotref)
+drypop$ID <- as.factor(drypop$ID)
+
+#join the env covariates to the nurse nint data
+modeldat_final <- modeldat_final |> 
+  inner_join(drypop, by = "ID") |> 
+  rename(pH = "pH.b", SAC = "SAC.b") |> 
+  mutate(AMT2 = AMT^2)
+
+hist(modeldat_final$AMT)
+hist(modeldat_final$RASE)
+hist(modeldat_final$aridity)
+hist(modeldat_final$pH)
+hist(modeldat_final$SAC)
 
 ####descriptive stats####
 #number of dominant species
