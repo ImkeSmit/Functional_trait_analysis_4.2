@@ -225,7 +225,7 @@ nrow(modeldat_final)/nrow(nint_result) *100 #81.81818
 output_file <- "Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv"
 
 # Initialize the output file
-write.csv(data.frame(Response = character(), AIC = numeric(), BIC = numeric(), 
+write.csv(data.frame(Response = character(), Model = character(), AIC = numeric(), BIC = numeric(), 
                      Warnings = character()), output_file, row.names = FALSE)
 
 # Initialize warning_msg outside the loop
