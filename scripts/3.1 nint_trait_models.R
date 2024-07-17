@@ -306,7 +306,10 @@ for(r in 1:length(response_list)) {
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-write.csv(results_table, "Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv")
+##RUN TIME: first 51120 = 18 hrs
+#start nintc richness binom 16:00 15 Jul
+#start nintc cover binom 12:00 16 Jul
+#stop nintc cover binom at 22:14 17 Jul
 
 
 ###select the model with the lowest AIC####
