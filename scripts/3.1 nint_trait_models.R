@@ -313,12 +313,14 @@ for(r in 1:length(response_list)) {
 
 
 ###select the model with the lowest AIC####
-results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_model_results_20May2024.csv", row.names = 1)
+results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv", 
+                          col.names = c("Response", "Model","AIC", "BIC", "Warnings"))
 
 best_subset_models <- results_table |> 
+  filter(Response %in% c("NIntc_richness_binom", "NIntc_cover_binom")) |> 
   filter(!is.na(AIC)) |> 
-  group_by(Response) |> 
-  top_n(-5, AIC) # get the 3 lowest AIC values
+  group_by(Response) |>
+  filter(AIC == min(AIC))
 #the models selcted for nintc and ninta cover contain aridity2 but not aridity, so I guess we select the next lowest model
 
 
