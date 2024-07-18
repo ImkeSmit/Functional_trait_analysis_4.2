@@ -12,6 +12,7 @@ library(MuMIn)
 library(corrplot)
 library(ggpubr)
 
+###Get the traits of the dominant sp in each replicate####
 #import nint results
 nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\NIntc_results_allcountries_6Feb2024.csv", row.names = 1) 
 
@@ -19,7 +20,7 @@ nint_result <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation a
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv",
                row.names = 1) 
 
-##For each replicate, we need to get the NIntc value and the traits of the nurse####
+##For each replicate, we need to get the NIntc value and the traits of the nurse###
 #names of the traits collectd
 traits_collected <- c(unique(FT$trait))
 #plot Id's
@@ -101,7 +102,7 @@ modeldat_final <- modeldat |>
 
 write.csv(modeldat_final, "Functional trait data//Clean data//nint_nurse_traits.csv")
 
-###import nint_nurse_traits####
+###descriptive statistics of nint_nurse_traits####
 modeldat_final <- read.csv("Functional trait data//Clean data//nint_nurse_traits.csv", row.names = 1)
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
@@ -152,11 +153,12 @@ cordata <- modeldat_final |>
   distinct(ID, nurse_sp, .keep_all = T) |> 
   select(contains("mean")) |>
   select(!contains("percent")) |> 
+  select(!contains("log")) |> 
   na.omit() #remove all rows that have an NA in any column
 
 png("Figures\\nurse_trait_correlation.png")
 
-cormat <- cor(cordata, method = "spearman")
+cormat <- cor(cordata, method = "pearson")
 corrplot(cormat, method = "number", type = "lower")
 dev.off()
 
@@ -311,8 +313,8 @@ for(r in 1:length(response_list)) {
 #start nintc cover binom 12:00 16 Jul
 #stop nintc cover binom at 22:14 17 Jul
 
-
-###select the model with the lowest AIC####
+###Post hoc tests on best models####
+###select the model with the lowest AIC###
 results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv", 
                           col.names = c("Response", "Model","AIC", "BIC", "Warnings"))
 
@@ -323,19 +325,48 @@ best_subset_models <- results_table |>
   filter(AIC == min(AIC))
 #the models selcted for nintc and ninta cover contain aridity2 but not aridity, so I guess we select the next lowest model
 
-
-##Get the info of the best subset models##
+#import the nint nurse traits
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
-  mutate(aridity2 = aridity^2)
+  mutate(aridity2 = aridity^2) |> 
+  filter(!is.na(NIntc_richness_binom)) |> 
+  filter(!is.na(NIntc_cover_binom)) |> 
+  filter(!is.na(NInta_richness_binom)) |> 
+  filter(!is.na(NInta_cover_binom))
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+modeldat_final$ID <- as.factor(modeldat_final$ID)
+
+##Add the other environmental covariates to modeldat final
+#import siteinfo, we will use this to add ID to drypop
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |> 
+  select(ID, plotref) |> 
+  distinct() |> 
+  na.omit()
+
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  select(!plotref)
+drypop$ID <- as.factor(drypop$ID)
+
+#join the env covariates to the nurse nint data
+modeldat_final <- modeldat_final |> 
+  inner_join(drypop, by = "ID") |> 
+  rename(pH = "pH.b", SAC = "SAC.b") |> 
+  mutate(AMT2 = AMT^2)
+
+###Nintc richness
 
 #nintc richness null model:
 nintc_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
 
 #NIntc richness best model
-nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:SAC+(1|nurse_sp)+(1|site_ID), 
                                  family = binomial, data = modeldat_final)
 
 summary(nintc_richness_bestmod)
@@ -344,19 +375,22 @@ Anova(nintc_richness_bestmod)
 r.squaredGLMM(nintc_richness_bestmod)
 #model diagnostics
 nintc_richness_bestmod_simres <- simulateResiduals(nintc_richness_bestmod)
-plot(nintc_richness_bestmod_simres)#HOV looks ok
+plot(nintc_richness_bestmod_simres)#HOV violated
 #residuals underdispersed
 testDispersion(simulateResiduals(nintc_richness_bestmod, re.form = NULL)) #dispersion test significant
-testZeroInflation(nintc_richness_bestmod_simres) #less zeroes than expected
+testZeroInflation(nintc_richness_bestmod_simres) #more zeroes than expected
 
+emmeans(nintc_richness_bestmod, specs = "graz")
 
-###
+###Nintc cover
 
 #nintc cover null model:
 nintc_cover_null <- glmmTMB(NIntc_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
 
 #NIntc cover best model
-nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ aridity+ nurse_mean_C_N_ratio + (1|nurse_sp) +(1|site_ID), 
+nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~  graz+aridity+RASE+pH+SAC+
+                                 log_nurse_meanLA+log_nurse_meanSLA+log_nurse_meanH+log_nurse_meanCNratio+
+                                 graz:RASE+graz:pH+graz:SAC + (1|nurse_sp) +(1|site_ID), 
                                   family = binomial, data = modeldat_final)
 
 summary(nintc_cover_bestmod)
@@ -368,7 +402,9 @@ nintc_cover_bestmod_simres <- simulateResiduals(nintc_cover_bestmod)
 plot(nintc_cover_bestmod_simres)#HOV looks ok
 #residuals underdiespersed
 testDispersion(nintc_cover_bestmod_simres) #dispersion test significant
-testZeroInflation(nintc_cover_bestmod_simres) #less zeroes than expected
+testZeroInflation(nintc_cover_bestmod_simres) #more zeroes than expected
+
+emmeans(nintc_cover_bestmod, specs = "graz")
 
 ###
 
