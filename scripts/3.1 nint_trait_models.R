@@ -224,7 +224,7 @@ nrow(modeldat_final)/nrow(nint_result) *100 #81.81818
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Initialise output file for results
-output_file <- "Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv"
+output_file <- "Functional trait data\\results\\nintA_nurse_traits_clim_soil_model_results_15Jul2024.csv"
 
 # Initialize the output file
 write.csv(data.frame(Response = character(), Model = character(), AIC = numeric(), BIC = numeric(), 
@@ -235,8 +235,11 @@ warning_msg <- ""
 
 ##Also loop through response variables
 #loop through Nintc first
-response_list <- c("NIntc_richness_binom", "NIntc_cover_binom", "NInta_richness_binom", "NInta_cover_binom")
-datalist = c("modeldat_final", "modeldat_final", "modeldat_final", "modeldat_final")
+#response_list <- c("NIntc_richness_binom", "NIntc_cover_binom", "NInta_richness_binom", "NInta_cover_binom")
+#datalist = c("modeldat_final", "modeldat_final", "modeldat_final", "modeldat_final")
+
+response_list <- c("NInta_richness_binom", "NInta_cover_binom")
+datalist = c("modeldat_final", "modeldat_final")
 
 ##LOOP THROUGH MODELS STARTS HERE##
 #Loop through response variables
@@ -312,6 +315,10 @@ for(r in 1:length(response_list)) {
 #start nintc richness binom 16:00 15 Jul
 #start nintc cover binom 12:00 16 Jul
 #stop nintc cover binom at 22:14 17 Jul
+
+#start nintA richness binom 16:14 on 18 July
+
+##Output is saved in two files, nintA_nurse_traits_clim_soil_model_results_15Jul2024, and nintC_nurse_traits_clim_soil_model_results_15Jul2024
 
 ###Post hoc tests on best models####
 ###select the model with the lowest AIC###
