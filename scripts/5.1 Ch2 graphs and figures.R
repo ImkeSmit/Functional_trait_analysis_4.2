@@ -127,34 +127,77 @@ ggsave("NInta_RaoQ_scatterplots.png", ninta_Raoq, height = 800, width = 1500, un
 
 
 ####NIntc ~ trait graphs####
+#import the nint nurse traits
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
-  mutate(aridity2 = aridity^2)
+  mutate(aridity2 = aridity^2) |> 
+  filter(!is.na(NIntc_richness_binom)) |> 
+  filter(!is.na(NIntc_cover_binom)) |> 
+  filter(!is.na(NInta_richness_binom)) |> 
+  filter(!is.na(NInta_cover_binom))
 modeldat_final$nurse_sp <- as.factor(modeldat_final$nurse_sp)
 modeldat_final$graz <- as.factor(modeldat_final$graz)
 modeldat_final$site_ID <- as.factor(modeldat_final$site_ID)
+modeldat_final$ID <- as.factor(modeldat_final$ID)
+
+##Add the other environmental covariates to modeldat final
+#import siteinfo, we will use this to add ID to drypop
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |> 
+  select(ID, plotref) |> 
+  distinct() |> 
+  na.omit()
+
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  select(!plotref)
+drypop$ID <- as.factor(drypop$ID)
+
+#join the env covariates to the nurse nint data
+modeldat_final <- modeldat_final |> 
+  inner_join(drypop, by = "ID") |> 
+  rename(pH = "pH.b", SAC = "SAC.b") |> 
+  mutate(AMT2 = AMT^2)
 ##we will make scatterplots with model predictions overlaid
 
 #choose a colour for the line;
 chosen_col <- brewer.pal(6, "Dark2")[6]
 
-###NIntc richness ~ C:N
-nintc_rich_CN_mod <- glmmTMB(NIntc_richness_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
-pred_data2 <- data.frame(nurse_mean_C_N_ratio = c(unique(modeldat_final$nurse_mean_C_N_ratio)))
-pred_data2$nintc_richness_binom_prediction <- predict(nintc_rich_CN_mod, pred_data2, type = "response")
-pred_data2$nintc_richness_true_prediction <- 2*pred_data2$nintc_richness_binom_prediction -1 #backtransform from binomial
+###Get core df to make predictions over
+pred_dat_core <- modeldat_final |> 
+  select(ID, site_ID, nurse_sp, graz, RASE, SAC, aridity, pH,
+         log_nurse_meanLA, log_nurse_meanH, log_nurse_meanSLA, log_nurse_meanCNratio) |> 
+  distinct(ID, nurse_sp, .keep_all = T)
+
+nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+
+                                    log_nurse_meanCNratio+graz:SAC, 
+                                  family = binomial, data = modeldat_final)
+
+###NINtc richness~ C:N
+
+pred_dat1 <- pred_dat_core |> 
+  filter(!is.na(log_nurse_meanCNratio)) |> 
+  mutate(graz = 1, SAC = mean(SAC), RASE = mean(RASE), log_nurse_meanLA = mean(log_nurse_meanLA, na.rm = T), 
+         log_nurse_meanH = mean(log_nurse_meanH, na.rm = T)) #set all variables except CN to their mean
+
+pred_dat1$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat1, type = "response")
+pred_dat1$nintc_richness_true_prediction <- 2*pred_dat1$nintc_richness_binom_prediction -1 #backtransform from binomial
 
 #how many points on graph?
 modeldat_final |> 
   filter(!is.na(nurse_mean_C_N_ratio) & !is.na(NIntc_richness)) |> 
-  summarise(n = n()) #2637
+  summarise(n = n()) #2659
 
-nintc_richness_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_richness)) +
-  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+nintc_richness_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NIntc_richness)) +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[C]~richness)) +
-  xlab("mean C:N of dominant plant") +
-  geom_line(data = pred_data2, 
-            aes(x = nurse_mean_C_N_ratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
+  xlab("log(C:N)") +
+  geom_line(data = pred_dat1, 
+            aes(x = log_nurse_meanCNratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
 
 ###NIntc cover ~ C:N
 nintc_cover_CN_mod <- glmmTMB(NIntc_cover_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
