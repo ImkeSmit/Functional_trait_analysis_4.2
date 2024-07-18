@@ -172,12 +172,17 @@ pred_dat_core <- modeldat_final |>
          log_nurse_meanLA, log_nurse_meanH, log_nurse_meanSLA, log_nurse_meanCNratio) |> 
   distinct(ID, nurse_sp, .keep_all = T)
 
+#best models
 nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+
                                     log_nurse_meanCNratio+graz:SAC, 
                                   family = binomial, data = modeldat_final)
 
-###NINtc richness~ C:N
+nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~  graz+aridity+RASE+pH+SAC+
+                                 log_nurse_meanLA+log_nurse_meanSLA+log_nurse_meanH+log_nurse_meanCNratio+
+                                 graz:RASE+graz:pH+graz:SAC , 
+                               family = binomial, data = modeldat_final)
 
+###NINtc richness~ C:N
 pred_dat1 <- pred_dat_core |> 
   filter(!is.na(log_nurse_meanCNratio)) |> 
   mutate(graz = 1, SAC = mean(SAC), RASE = mean(RASE), log_nurse_meanLA = mean(log_nurse_meanLA, na.rm = T), 
@@ -199,23 +204,64 @@ nintc_richness_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = N
   geom_line(data = pred_dat1, 
             aes(x = log_nurse_meanCNratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
 
+###NINtc richness~ LA
+pred_dat3 <- pred_dat_core |> 
+  filter(!is.na(log_nurse_meanLA)) |> 
+  mutate(graz = 1, SAC = mean(SAC), RASE = mean(RASE), log_nurse_meanCNratio = mean(log_nurse_meanCNratio, na.rm = T), 
+         log_nurse_meanH = mean(log_nurse_meanH, na.rm = T)) #set all variables except LA to their mean
+
+pred_dat3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat3, type = "response")
+pred_dat3$nintc_richness_true_prediction <- 2*pred_dat3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+nintc_richness_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NIntc_richness)) +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~richness)) +
+  xlab("log(LA)") +
+  geom_line(data = pred_dat3, 
+            aes(x = log_nurse_meanLA, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
+
+###NINtc richness~ H
+pred_dat4 <- pred_dat_core |> 
+  filter(!is.na(log_nurse_meanH)) |> 
+  mutate(graz = 1, SAC = mean(SAC), RASE = mean(RASE), log_nurse_meanCNratio = mean(log_nurse_meanCNratio, na.rm = T), 
+         log_nurse_meanLA = mean(log_nurse_meanLA, na.rm = T)) #set all variables except H to their mean
+
+pred_dat4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat4, type = "response")
+pred_dat4$nintc_richness_true_prediction <- 2*pred_dat4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+nintc_richness_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NIntc_richness)) +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  theme_classic() +
+  ylab(expression(NInt[C]~richness)) +
+  xlab("log(H)") +
+  geom_line(data = pred_dat4, 
+            aes(x = log_nurse_meanH, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
+
+
 ###NIntc cover ~ C:N
-nintc_cover_CN_mod <- glmmTMB(NIntc_cover_binom ~ nurse_mean_C_N_ratio, data = modeldat_final, family = binomial)
-pred_data2$nintc_cover_binom_prediction <- predict(nintc_cover_CN_mod, pred_data2, type = "response")
-pred_data2$nintc_cover_true_prediction <- 2*pred_data2$nintc_cover_binom_prediction -1 #backtransform from binomial
+pred_dat2 <- pred_dat_core |> 
+  filter(!is.na(log_nurse_meanCNratio)) |> 
+  mutate(graz = 1, SAC = mean(SAC), RASE = mean(RASE), pH = mean(pH), aridity = mean(aridity),
+         log_nurse_meanLA = mean(log_nurse_meanLA, na.rm = T), log_nurse_meanSLA = mean(log_nurse_meanSLA, na.rm = T), 
+         log_nurse_meanH = mean(log_nurse_meanH, na.rm = T)) #set all variables except CN to their mean
+
+pred_dat2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, pred_dat2, type = "response")
+pred_dat2$nintc_cover_true_prediction <- 2*pred_dat2$nintc_cover_binom_prediction -1 #backtransform from binomial
 
 #how many points on graph?
 modeldat_final |> 
   filter(!is.na(nurse_mean_C_N_ratio) & !is.na(NIntc_cover)) |> 
-  summarise(n = n()) #2625
+  summarise(n = n()) #2659
 
-nintc_cover_CN <- ggplot(modeldat_final, aes(x = nurse_mean_C_N_ratio, y = NIntc_cover)) +
-  geom_jitter(width = 5, height = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+nintc_cover_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NIntc_cover)) +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
   theme_classic() +
   ylab(expression(NInt[C]~cover)) +
-  xlab("mean C:N of dominant plant") +
-  geom_line(data = pred_data2, 
-            aes(x = nurse_mean_C_N_ratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
+  xlab("log(C:N)") +
+  geom_line(data = pred_dat2, 
+            aes(x = log_nurse_meanCNratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
+
 
 #arrange the above four figures on the same plot
 nintc_nurse_traits <- ggarrange(nintc_richness_CN, nintc_cover_CN,  nrow = 1, ncol = 2, labels = c("a", "b"))
