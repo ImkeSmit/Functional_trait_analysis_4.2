@@ -216,12 +216,22 @@ hist(modeldat_final$SAC)
 #number of dominant species
 length(unique(modeldat_final$nurse_sp)) #87
 
-#number of replicates
-nrow(modeldat_final) #3735
+#number of replicates included in analysis
+modeldat_final |> 
+  filter(!is.na(nurse_meanSLA)) |> 
+  filter(!is.na(nurse_meanLA)) |>
+  filter(!is.na(nurse_mean_H)) |>
+  filter(!is.na(nurse_mean_C_N_ratio)) |> 
+  summarise(n = n()) #2625 complete cases
 
 #%of replicates included in this analysis
-nrow(modeldat_final)/nrow(nint_result) *100 #81.81818
+#complete cases in nint_result
+nint_result |> 
+  filter(!is.na(NIntc_richness)) |> 
+  filter(!is.na(NIntc_cover)) |> 
+  summarise(n = n()) #3735
 
+2625/3735 *100 #70.28112
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Initialise output file for results
 output_file <- "Functional trait data\\results\\nintA_nurse_traits_clim_soil_model_results_15Jul2024.csv"
@@ -389,6 +399,14 @@ testZeroInflation(nintc_richness_bestmod_simres) #more zeroes than expected
 
 emmeans(nintc_richness_bestmod, specs = "graz")
 
+#how many reps included?
+modeldat_final |> 
+  filter(!is.na(NIntc_richness_binom)) |> 
+  filter(!is.na(log_nurse_meanLA)) |>
+  filter(!is.na(log_nurse_meanH)) |>
+  filter(!is.na(log_nurse_meanCNratio)) |>
+  summarise(n = n()) #2625
+
 ###Nintc cover
 
 #nintc cover null model:
@@ -412,6 +430,15 @@ testDispersion(nintc_cover_bestmod_simres) #dispersion test significant
 testZeroInflation(nintc_cover_bestmod_simres) #more zeroes than expected
 
 emmeans(nintc_cover_bestmod, specs = "graz")
+
+#how many reps included?
+modeldat_final |> 
+  filter(!is.na(NIntc_cover_binom)) |> 
+  filter(!is.na(log_nurse_meanLA)) |>
+  filter(!is.na(log_nurse_meanSLA)) |>
+  filter(!is.na(log_nurse_meanH)) |>
+  filter(!is.na(log_nurse_meanCNratio)) |>
+  summarise(n = n()) #2625
 
 ###
 
