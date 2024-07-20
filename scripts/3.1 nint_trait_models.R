@@ -327,6 +327,8 @@ for(r in 1:length(response_list)) {
 #stop nintc cover binom at 22:14 17 Jul
 
 #start nintA richness binom 16:14 on 18 July
+#start nintA cover binom 13:00 on 19July
+#end nintA cover 21:50 20 Jul
 
 ##Output is saved in two files, nintA_nurse_traits_clim_soil_model_results_15Jul2024, and nintC_nurse_traits_clim_soil_model_results_15Jul2024
 
