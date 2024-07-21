@@ -463,6 +463,7 @@ plot(ninta_richness_bestmod_simres)#HOV looks ok
 #residuals underdispersed
 testDispersion(ninta_richness_bestmod_simres) #jup underdispersion
 testZeroInflation(ninta_richness_bestmod_simres) #less zeroes than expected
+emmeans(ninta_richness_bestmod, specs = "graz")
 
 ###NintA cover
 
@@ -483,3 +484,5 @@ plot(ninta_cover_bestmod_simres)#HOV looks ok
 #residuals underdispersed
 testDispersion(ninta_cover_bestmod_simres) #jup underdispersed
 testZeroInflation(ninta_cover_bestmod_simres) #less zeroes than expected
+
+emmeans(ninta_cover_bestmod, specs = "graz")
