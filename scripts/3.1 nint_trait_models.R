@@ -334,15 +334,16 @@ for(r in 1:length(response_list)) {
 
 ###Post hoc tests on best models####
 ###select the model with the lowest AIC###
-results_table <- read.csv("Functional trait data\\results\\nint_nurse_traits_clim_soil_model_results_15Jul2024.csv", 
-                          col.names = c("Response", "Model","AIC", "BIC", "Warnings"))
+nintC_results <- read.csv("Functional trait data\\results\\nintC_nurse_traits_clim_soil_model_results_15Jul2024.csv", 
+                          col.names = c("Response", "Model","AIC", "BIC", "Warnings")) |> 
+  filter(Response %in% c("NIntc_richness_binom", "NIntc_cover_binom")) #remove some nintA results that snuck in before I stopped the loop
+nintA_results <- read.csv("Functional trait data\\results\\nintA_nurse_traits_clim_soil_model_results_15Jul2024.csv")
 
-best_subset_models <- results_table |> 
-  filter(Response %in% c("NIntc_richness_binom", "NIntc_cover_binom")) |> 
+best_subset_models <- nintC_results |> 
+  bind_rows(nintA_results) |> 
   filter(!is.na(AIC)) |> 
   group_by(Response) |>
   filter(AIC == min(AIC))
-#the models selcted for nintc and ninta cover contain aridity2 but not aridity, so I guess we select the next lowest model
 
 #import the nint nurse traits
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
