@@ -232,6 +232,37 @@ nint_result |>
   summarise(n = n()) #3735
 
 2625/3735 *100 #70.28112
+
+#histograms of the env variables
+##examine raw distributions
+aridity_hist <- ggplot(modeldat_final, aes(x = aridity)) +geom_histogram()
+
+AMT_hist <- ggplot(modeldat_final, aes(x = AMT)) +geom_histogram()
+
+RASE_hist <- ggplot(modeldat_final, aes(x = RASE)) +geom_histogram()
+
+SAC_hist <- ggplot(modeldat_final, aes(x = SAC)) +geom_histogram()
+
+pH_hist <- ggplot(modeldat_final, aes(x = pH)) +geom_histogram()
+
+raw_env_histograms <- ggarrange(aridity_hist, AMT_hist, RASE_hist, SAC_hist, pH_hist)
+ggsave("raw_env_histograms.png", raw_env_histograms, path = "Figures", width = 1800, height = 1400, units = "px")
+
+
+#examine logged distributions
+a <- ggplot(modeldat_final, aes(x = log10(aridity))) +geom_histogram()
+
+b <- ggplot(modeldat_final, aes(x = log10(AMT))) +geom_histogram()
+
+c <- ggplot(modeldat_final, aes(x = log10(RASE))) +geom_histogram()
+
+d <- ggplot(modeldat_final, aes(x = log10(SAC))) +geom_histogram()
+
+e <- ggplot(modeldat_final, aes(x = log10(pH))) +geom_histogram()
+
+log_env_histograms <- ggarrange(a,b,c,d,e)
+ggsave("log_env_histograms.png", log_env_histograms, path = "Figures", width = 1800, height = 1400, units = "px")
+
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Initialise output file for results
 output_file <- "Functional trait data\\results\\nintA_nurse_traits_clim_soil_model_results_15Jul2024.csv"
