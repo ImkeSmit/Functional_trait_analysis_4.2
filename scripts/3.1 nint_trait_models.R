@@ -389,6 +389,9 @@ nintc_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_
 nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:SAC+(1|nurse_sp)+(1|site_ID), 
                                  family = binomial, data = modeldat_final)
 
+test1 <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:SAC+(1|nurse_sp)+(1|site_ID/ID), 
+                 family = binomial, data = modeldat_final) #it runs
+
 summary(nintc_richness_bestmod)
 anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
 Anova(nintc_richness_bestmod)
