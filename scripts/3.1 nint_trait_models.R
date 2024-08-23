@@ -168,8 +168,8 @@ dev.off()
 #import the model formulas
 formula_table <- read.table("Functional trait data\\results\\nint_nurse_trait_clim_soil_formulas.csv", sep = ",", header = T) |> 
   rename(predictors = formula) |> 
-  mutate(predictors = paste(predictors, "(1|nurse_sp)+(1|site_ID)", sep = "+")) |> #add the random effect to all formulas
-  add_row(predictors = "1+(1|nurse_sp)+(1|site_ID)")  #add the null model
+  mutate(predictors = paste(predictors, "(1|nurse_sp)+(1|site_ID/ID)", sep = "+")) |> #add the random effect to all formulas
+  add_row(predictors = "1+(1|nurse_sp)+(1|site_ID/ID)")  #add the null model
 
 #import the nint nurse traits
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
@@ -265,7 +265,7 @@ ggsave("log_env_histograms.png", log_env_histograms, path = "Figures", width = 1
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Initialise output file for results
-output_file <- "Functional trait data\\results\\nintA_nurse_traits_clim_soil_model_results_15Jul2024.csv"
+output_file <- "Functional trait data\\results\\nintC_nurse_traits_clim_soil_nestedRE_model_results_23Aug2024.csv"
 
 # Initialize the output file
 write.csv(data.frame(Response = character(), Model = character(), AIC = numeric(), BIC = numeric(), 
@@ -279,8 +279,14 @@ warning_msg <- ""
 #response_list <- c("NIntc_richness_binom", "NIntc_cover_binom", "NInta_richness_binom", "NInta_cover_binom")
 #datalist = c("modeldat_final", "modeldat_final", "modeldat_final", "modeldat_final")
 
-response_list <- c("NInta_richness_binom", "NInta_cover_binom")
+response_list <- c("NIntc_richness_binom", "NIntc_cover_binom")
 datalist = c("modeldat_final", "modeldat_final")
+
+# Initialize a list to store result rows
+result_list <- list()
+
+# Specify chunk size
+chunk_size <- 100
 
 ##LOOP THROUGH MODELS STARTS HERE##
 #Loop through response variables
@@ -342,10 +348,21 @@ for(r in 1:length(response_list)) {
                              BIC = ifelse(!is.null(BIC_model), BIC_model, NA),
                              Warnings = warning_msg)
     
+    # Add the result row to the list
+    result_list[[length(result_list) + 1]] <- result_row
     
-    write.table(result_row, output_file, append = TRUE, sep = ",", row.names = FALSE, col.names = FALSE) #append the new model to the existing file
+    # If chunk size is reached, write to the file and reset the list
+    if (length(result_list) == chunk_size) {
+      write.table(do.call(rbind, result_list), output_file, append = TRUE, sep = ",", row.names = FALSE, col.names = FALSE)
+      result_list <- list()  # Reset the list
+    }
   }
+} 
+# Write any remaining rows to the file after the loop
+  if (length(result_list) > 0) {
+    write.table(do.call(rbind, result_list), output_file, append = TRUE, sep = ",", row.names = FALSE, col.names = FALSE)
 }
+
 ##LOOK AT WARNINGS
 ##The warnings are sort of cumulative. Once the is one warning of fitTMB, all warning_msg will contain it.
 ##I don't know how to fix this yet
