@@ -358,6 +358,7 @@ dist_ass_join <- twosp_dist |>
 dist_ass_join$association <- as.factor(dist_ass_join$association)
 dist_ass_join$nurse <- as.factor(dist_ass_join$nurse)
 dist_ass_join$SITE_ID <- as.factor(dist_ass_join$SITE_ID)
+dist_ass_join$ID <- as.factor(dist_ass_join$ID)
 dist_ass_join$euclidean_dist <- as.numeric(dist_ass_join$euclidean_dist)
 
 #how many of each association?
@@ -373,6 +374,8 @@ length(unique(dist_ass_join$ID)) #41
 dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
 
 dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
+test <- glmmTMB(euclidean_dist ~ association*ARIDITY.v3 + (1|nurse) + (1|SITE_ID/ID), data = dist_ass_join)
+
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
 anova(dist_ass_null, dist_ass_mod) #p = 4.563e-11 ***
