@@ -169,7 +169,7 @@ dev.off()
 formula_table <- read.table("Functional trait data\\results\\nint_nurse_trait_clim_soil_formulas.csv", sep = ",", header = T) |> 
   rename(predictors = formula) |> 
   mutate(predictors = paste(predictors, "(1|nurse_sp)+(1|site_ID/ID)", sep = "+")) |> #add the random effect to all formulas
-  add_row(predictors = "1+(1|nurse_sp)+(1|site_ID/ID)")  #add the null model
+  add_row(predictors = "1+(1|nurse_sp)+(1|site_ID/ID)")   #add the null model
 
 #import the nint nurse traits
 modeldat_final <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) |> 
@@ -378,11 +378,12 @@ for(r in 1:length(response_list)) {
 #start nintA cover binom 13:00 on 19July
 #end nintA cover 21:50 20 Jul
 
-##Output is saved in two files, nintA_nurse_traits_clim_soil_model_results_15Jul2024, and nintC_nurse_traits_clim_soil_model_results_15Jul2024
+##Output is saved in two files, nintA_nurse_traits_nestedRE_clim_soil_model_results_24Aug2024, and nintC_nurse_traits_nestedRE_clim_soil_model_results_24Aug2024
 
 ##new run with nested RE (chunk size = 200)
 #start nintC richness 14:03 23 Aug
 #end nintc cover 20:00 25 Aug
+#I think it didn't append the last  48 rows in the last remaining chunk of nintc cover
 
 ###Post hoc tests on best models####
 ###select the model with the lowest AIC###
