@@ -286,7 +286,7 @@ datalist = c("modeldat_final", "modeldat_final")
 result_list <- list()
 
 # Specify chunk size
-chunk_size <- 100
+chunk_size <- 200
 
 ##LOOP THROUGH MODELS STARTS HERE##
 #Loop through response variables
@@ -379,6 +379,10 @@ for(r in 1:length(response_list)) {
 #end nintA cover 21:50 20 Jul
 
 ##Output is saved in two files, nintA_nurse_traits_clim_soil_model_results_15Jul2024, and nintC_nurse_traits_clim_soil_model_results_15Jul2024
+
+##new run with nested RE (chunk size = 200)
+#start nintC richness 14:03 23 Aug
+#end nintc cover 20:00 25 Aug
 
 ###Post hoc tests on best models####
 ###select the model with the lowest AIC###
