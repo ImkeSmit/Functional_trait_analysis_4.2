@@ -369,21 +369,11 @@ for(r in 1:length(response_list)) {
 ##Look at the warning meassages printed. Remmber that every model will have the non integer warning.
 ##!!MOdels with NA in the CHisq have convergence problems. 
 
-##RUN TIME: first 51120 = 18 hrs
-#start nintc richness binom 16:00 15 Jul
-#start nintc cover binom 12:00 16 Jul
-#stop nintc cover binom at 22:14 17 Jul
-
-#start nintA richness binom 16:14 on 18 July
-#start nintA cover binom 13:00 on 19July
-#end nintA cover 21:50 20 Jul
-
 ##Output is saved in two files, nintA_nurse_traits_nestedRE_clim_soil_model_results_24Aug2024, and nintC_nurse_traits_nestedRE_clim_soil_model_results_24Aug2024
 
 ##new run with nested RE (chunk size = 200)
 #start nintC richness 14:03 23 Aug
 #end nintc cover 20:00 25 Aug
-#I think it didn't append the last  48 rows in the last remaining chunk of nintc cover
 
 ###Post hoc tests on best models####
 ###select the model with the lowest AIC###
