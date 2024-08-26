@@ -426,14 +426,12 @@ modeldat_final <- modeldat_final |>
 ###Nintc richness
 
 #nintc richness null model:
-nintc_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+nintc_richness_null <- glmmTMB(NIntc_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID/ID), family = binomial, data = modeldat_final)
 
 #NIntc richness best model
-nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:SAC+(1|nurse_sp)+(1|site_ID), 
+nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:SAC+(1|nurse_sp)+(1|site_ID/ID), 
                                  family = binomial, data = modeldat_final)
 
-test1 <- glmmTMB(NIntc_richness_binom ~  graz+RASE+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:SAC+(1|nurse_sp)+(1|site_ID/ID), 
-                 family = binomial, data = modeldat_final) #it runs
 
 summary(nintc_richness_bestmod)
 anova(nintc_richness_null, nintc_richness_bestmod) #p = 0.05172
@@ -459,12 +457,12 @@ modeldat_final |>
 ###Nintc cover
 
 #nintc cover null model:
-nintc_cover_null <- glmmTMB(NIntc_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+nintc_cover_null <- glmmTMB(NIntc_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID/ID), family = binomial, data = modeldat_final)
 
 #NIntc cover best model
 nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~  graz+aridity+RASE+pH+SAC+
                                  log_nurse_meanLA+log_nurse_meanSLA+log_nurse_meanH+log_nurse_meanCNratio+
-                                 graz:RASE+graz:pH+graz:SAC + (1|nurse_sp) +(1|site_ID), 
+                                 graz:RASE+graz:pH+graz:SAC + (1|nurse_sp) +(1|site_ID/ID), 
                                   family = binomial, data = modeldat_final)
 
 summary(nintc_cover_bestmod)
