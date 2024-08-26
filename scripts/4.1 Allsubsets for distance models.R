@@ -1,4 +1,4 @@
-###Create model formulas with different predictor combinations fro the nint nurse trait models####
+###Create model formulas with different predictor combinations for the distanc ~association models####
 library(tidyverse)
 
 ###Function to check if model is valid####
@@ -6,24 +6,14 @@ is_valid_model <- function(model) {
   terms <- unlist(strsplit(model, "\\+"))
   
   # Define main effects and their corresponding interaction/squared terms
-  interactions <- list("graz" = c("graz:aridity", "graz:RASE", "graz:AMT", "graz:pH", "graz:SAC", 
-                                  "graz:log_nurse_meanLA", "graz:log_nurse_meanSLA", "graz:log_nurse_meanH", "graz:log_nurse_meanCNratio"),
-                       "aridity" = c("graz:aridity", "RASE:aridity", "AMT:aridity", 
-                                     "aridity:log_nurse_meanLA", "aridity:log_nurse_meanSLA", "aridity:log_nurse_meanH", "aridity:log_nurse_meanCNratio"),
-                       "RASE" = c("graz:RASE", "RASE:AMT", "RASE:aridity", 
-                                  "RASE:log_nurse_meanLA", "RASE:log_nurse_meanSLA", "RASE:log_nurse_meanH", "RASE:log_nurse_meanCNratio"),
-                       "AMT" = c("graz:AMT", "RASE:AMT", "AMT:aridity", 
-                                 "AMT:log_nurse_meanLA", "AMT:log_nurse_meanSLA", "AMT:log_nurse_meanH", "AMT:log_nurse_meanCNratio"),
-                       "pH" = c("graz:pH", "pH:log_nurse_meanLA", "pH:log_nurse_meanSLA", "pH:log_nurse_meanH", "pH:log_nurse_meanCNratio"),
-                       "SAC" = c("graz:SAC", "SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio"), 
-                       "log_nurse_meanLA" = c("graz:log_nurse_meanLA", "aridity:log_nurse_meanLA", "AMT:log_nurse_meanLA", 
-                                              "RASE:log_nurse_meanLA", "pH:log_nurse_meanLA", "SAC:log_nurse_meanLA"), 
-                       "log_nurse_meanSLA" = c("graz:log_nurse_meanSLA", "aridity:log_nurse_meanSLA", "AMT:log_nurse_meanSLA", 
-                                               "RASE:log_nurse_meanSLA", "pH:log_nurse_meanSLA", "SAC:log_nurse_meanSLA"), 
-                       "log_nurse_meanH" = c("graz:log_nurse_meanH", "aridity:log_nurse_meanH", "AMT:log_nurse_meanH", 
-                                             "RASE:log_nurse_meanH", "pH:log_nurse_meanH", "SAC:log_nurse_meanH"),
-                       "log_nurse_meanCNratio" = c("graz:log_nurse_meanCNratio", "aridity:log_nurse_meanCNratio", "AMT:log_nurse_meanCNratio", 
-                                                   "RASE:log_nurse_meanCNratio", "pH:log_nurse_meanCNratio", "SAC:log_nurse_meanCNratio"))
+  interactions <- list("association" = c("graz:association", "aridity:association", "RASE:association", "AMT:association",
+                                         "pH:association", "SAC:association"),
+                        "graz" = c("graz:aridity", "graz:RASE", "graz:AMT", "graz:pH", "graz:SAC", "graz:association"),
+                       "aridity" = c("graz:aridity", "RASE:aridity", "AMT:aridity", "aridity:association"),
+                       "RASE" = c("graz:RASE", "RASE:AMT", "RASE:aridity", "RASE:association"),
+                       "AMT" = c("graz:AMT", "RASE:AMT", "AMT:aridity", "AMT:association"),
+                       "pH" = c("graz:pH", "pH:association"),
+                       "SAC" = c("graz:SAC", "SAC:association"))
   
   squared_terms <- list("aridity" = "aridity2", "AMT" = "AMT2")
   
@@ -46,11 +36,12 @@ is_valid_model <- function(model) {
 
 
 ###Loop that creates the model formulas####
-predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC", 
-                "log_nurse_meanLA", "log_nurse_meanSLA", "log_nurse_meanH", "log_nurse_meanCNratio",
+predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC", "association",
                 "graz:aridity", "graz:RASE", "graz:AMT", #grazing-climate interactions
                 "graz:pH", "graz:SAC", #grazing-soil interactions
-                "RASE:AMT", "RASE:aridity", "AMT:aridity") #climate-climate interactions
+                "RASE:AMT", "RASE:aridity", "AMT:aridity", #climate-climate interactions
+                "graz:association", "aridity:association", "RASE:association", "AMT:association", #association-env interactions
+                "pH:association", "SAC:association") 
 #trait-environment interactions, remove them for now
 #"graz:log_nurse_meanLA", "graz:log_nurse_meanSLA", "graz:log_nurse_meanH", "graz:log_nurse_meanCNratio", 
 #"aridity:log_nurse_meanLA", "aridity:log_nurse_meanSLA", "aridity:log_nurse_meanH", "aridity:log_nurse_meanCNratio", 
