@@ -51,12 +51,12 @@ predictors <- c("graz", "aridity", "aridity2", "AMT", "AMT2", "RASE", "pH", "SAC
 #"SAC:log_nurse_meanLA", "SAC:log_nurse_meanSLA", "SAC:log_nurse_meanH", "SAC:log_nurse_meanCNratio")
 
 #how many combinations are possible?
-n_possible_models = 2^length(predictors) -1 #1048575
+n_possible_models = 2^length(predictors) -1 #8388607 even more than the nint trait models
 #max size of an R df is 2^31 -1 = 2 147 483 648
 
 ### Loop that creates the model formulas in chunks ####
 chunk_size <- 2^31-1 # Adjust this size based on available memory
-output_file <- "Functional trait data\\results\\nint_nurse_trait_clim_soil_formulas.csv"
+output_file <- "Functional trait data\\results\\distance_association_model_formulas.csv"
 
 # Initialize the output file
 write.csv(data.frame(formula = character()), output_file, row.names = FALSE)
@@ -81,7 +81,7 @@ for (counter1 in 1:length(predictors)) {
       validity <- is_valid_model(mod)
       
       #print counter 1 and 2 so that we know where we are at
-      print(paste("counter1=", counter1, "out of",length(preditcors), "counter2=", counter2, "out of", ncol(chunk)))
+      print(paste("counter1=", counter1, "out of",length(predictors), "counter2=", counter2, "out of", ncol(chunk)))
       
       if (validity == TRUE) { # Only add it to modlist if validity is true
         modlist[l, 1] <- mod
@@ -94,4 +94,5 @@ for (counter1 in 1:length(predictors)) {
     }
   }
 }
-
+ 
+#results in 122 423 models which is wayyyy to many
