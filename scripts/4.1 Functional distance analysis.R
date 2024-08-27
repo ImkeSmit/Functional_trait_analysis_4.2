@@ -393,10 +393,12 @@ plot(simres)
 #a little underdispersed
 #HOV violated
 
-ggplot(dist_ass_join, aes(x = association, y = euclidean_dist)) +
-  geom_boxplot() +
-  theme_classic()
+##t tests to see if traits are different from the nurse
+dist_nurse_ass_test <- t.test(dist_ass_join[which(dist_ass_join$association == "nurse") , ]$euclidean_dist, 
+                        mu = 0, alternative = "greater")
 
+dist_bare_ass_test <- t.test(dist_ass_join[which(dist_ass_join$association == "bare") , ]$euclidean_dist, 
+                              mu = 0, alternative = "greater")
 
 
 ###One-dimensional (trait) difference between species####
