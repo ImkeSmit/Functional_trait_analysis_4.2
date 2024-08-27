@@ -7,8 +7,8 @@ library(car)
 library(emmeans)
 library(DHARMa)
 library(MuMIn)
-library(multcomp)
-library(multcompView)
+#library(multcomp)
+#library(multcompView)
 
 #This script gets th euclidean distance between the nurse species and every  other sp in the replicate. 
 #It doesn't average those distances, if there are 3 target sp in the replicate there will be 3 distances.
@@ -376,10 +376,9 @@ length(unique(dist_ass_join$nurse)) #45
 length(unique(dist_ass_join$ID)) #41
 
 ##does the distance between nurses and bare associated species differ from the distance between nurses and nurse associated species?
-dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
+dist_ass_null <- glmmTMB(euclidean_dist ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = dist_ass_join)
 
-dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID), data = dist_ass_join)
-test <- glmmTMB(euclidean_dist ~ association*ARIDITY.v3 + (1|nurse) + (1|SITE_ID/ID), data = dist_ass_join)
+dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID/ID), data = dist_ass_join)
 
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
