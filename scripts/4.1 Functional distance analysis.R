@@ -382,7 +382,7 @@ dist_ass_mod <- glmmTMB(euclidean_dist ~ association + (1|nurse) + (1|SITE_ID/ID
 
 summary(dist_ass_mod)
 Anova(dist_ass_mod)
-anova(dist_ass_null, dist_ass_mod) #p = 4.563e-11 ***
+anova(dist_ass_null, dist_ass_mod) #p = <0.001
 
 emmeans(dist_ass_mod, specs = "association")
 cld(glht(model = dist_ass_mod, mcp(association = "Tukey")))
