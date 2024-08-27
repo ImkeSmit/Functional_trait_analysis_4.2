@@ -528,6 +528,8 @@ trait_ass_join <- trait_fdist |>
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
+trait_ass_join$ID <- as.factor(trait_ass_join$ID)
+
 
 #MaxH model#
 maxh_data <- trait_ass_join |> 
@@ -544,9 +546,9 @@ maxh_data |>
   summarise(obs = n()) #751 bare, 1963 nurse
 
 #null model
-maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
+maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
 #alternative model
-maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = maxh_data)
+maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = maxh_data)
 
 summary(maxh_mod)
 Anova(maxh_mod) #significant effect
@@ -588,15 +590,15 @@ maxls_data |>
   summarise(obs = n()) #751 bare, 1963 nurse
 
 #null model
-maxls_null <- glmmTMB(sqrt_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = maxls_data) #cannot use transformations because of 0 and - values
+maxls_null <- glmmTMB(sqrt_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = maxls_data) #cannot use transformations because of 0 and - values
 #alternative model
-maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = maxls_data)
+maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = maxls_data)
 #models do not converge for untransformed response, forced to use sqrt despite NA values
 
 summary(maxls_mod)
 Anova(maxls_mod) 
 anova(maxls_null, maxls_mod) #p = 0.6987
-emmeans(maxls_mod, specs = "association")
+emmeans(maxls_mod, specs = "association") #use emmeans for the post hoc tests and report those results in table!
 r.squaredGLMM(maxls_mod)
 
 #model diagnostics
@@ -624,9 +626,9 @@ hist(meanla_data$trait_difference)
 hist(meanla_data$neginv_trait_difference)
 
 #null model
-meanla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanla_data) #cannot use transformed respinse because of 0 and - values
+meanla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = meanla_data) #cannot use transformed respinse because of 0 and - values
 #alternative model
-meanla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanla_data)
+meanla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = meanla_data)
 
 summary(meanla_mod)
 Anova(meanla_mod) 
@@ -658,9 +660,9 @@ meanldmc_data <- trait_ass_join |>
 hist(meanldmc_data$trait_difference)
 
 #null model
-meanldmc_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
+meanldmc_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = meanldmc_data)
 #alternative model
-meanldmc_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanldmc_data)
+meanldmc_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = meanldmc_data)
 
 summary(meanldmc_mod)
 Anova(meanldmc_mod) #significant effect
@@ -696,9 +698,9 @@ hist(meanll_data$trait_difference)
 hist(meanll_data$neginv_trait_difference)
 
 #null model
-meanll_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meanll_data) #cannot use transfromations because of 0 and - values
+meanll_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = meanll_data) #cannot use transfromations because of 0 and - values
 #alternative model
-meanll_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meanll_data)
+meanll_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = meanll_data)
 
 summary(meanll_mod)
 Anova(meanll_mod) #no significant effect
@@ -728,11 +730,13 @@ meansla_data <- trait_ass_join |>
          log_trait_difference = log(trait_difference), 
          neginv_trait_difference = -1/(1+trait_difference))
 hist(meansla_data$trait_difference)
+hist(meansla_data$neginv_trait_difference)
 
 #null model
 meansla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meansla_data)
 #alternative model
 meansla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meansla_data)
+#model doesnt converge with site_ID/ID RE
 
 summary(meansla_mod)
 Anova(meansla_mod) #
