@@ -561,10 +561,16 @@ dist_ass_join <- twosp_dist |>
   filter(association %in% c("nurse", "bare")) #only work with these associations
 dist_ass_join$association <- as.factor(dist_ass_join$association)
 
+stars <- data.frame(symbols = c("   *", "   *"), ycoord = c(6.2, 5.5), association = c("bare", "nurse"))
+letters <- data.frame(symbols = c("a", "b"), ycoord = c(7.9, 7.9), association = c("bare", "nurse"))
+
 dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist, fill = association)) +
             geom_boxplot(alpha = 0.6) +
             scale_fill_manual(values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1]))+
             stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
+            geom_text(data = stars, aes(x = association, y = ycoord, label = symbols), size = 7, color = "brown3") +
+            geom_text(data = letters, aes(x = association, y = ycoord, label = symbols), size = 5, color = "brown3") +
+            ylim(0,8) +
             ylab("Distance") +
             xlab("target species association") +
             scale_x_discrete(labels = c("bare", "dominant")) +
@@ -608,10 +614,10 @@ annotations$t_test_significance <- c("  *", "  *", #C:N
                                         "  *", "  *" )#SLA
 annotations$anova_significance <- c("    a", "    b", #C:N
                                      "    a", "    b", #H
-                                     " ", " ", #LA
+                                    "    a", "    b", #LA
                                      "    a", "    b", #LDMC
                                      " ", " ", #LL
-                                     " ", " ", #LS
+                                    "    a", "    b", #LS
                                      "    a", "    b" )#SLA
 annotations$ycoord_t <- c(15, 8, #C:N
                           100, 150, #H
@@ -623,10 +629,10 @@ annotations$ycoord_t <- c(15, 8, #C:N
 
 annotations$ycoord_anova <- c(32, 32, #C:N
                           640, 640, #H
-                          0, 0, #LA
+                          23, 23, #LA
                           0.7, 0.7, #LDMC
                           0, 0, #LL
-                          0, 0, #LS
+                          700000, 700000, #LS
                           95, 95)#SLA
 
 trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_difference, fill = association)) +
