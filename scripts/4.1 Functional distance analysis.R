@@ -771,9 +771,9 @@ cn_data <- trait_ass_join |>
 hist(cn_data$trait_difference)
 
 #null model
-cn_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = cn_data)
+cn_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = cn_data)
 #alternative model
-cn_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = cn_data)
+cn_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = cn_data)
 
 summary(cn_mod)
 Anova(cn_mod) 
