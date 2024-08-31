@@ -265,7 +265,7 @@ ggsave("log_env_histograms.png", log_env_histograms, path = "Figures", width = 1
 
 ###Loop through the formulas for NIntc ~ nurse traits####
 #Initialise output file for results
-output_file <- "Functional trait data\\results\\nintC_nurse_traits_clim_soil_nestedRE_model_results_23Aug2024.csv"
+output_file <- "Functional trait data\\results\\nintA_nurse_traits_clim_soil_nestedRE_model_results_31Aug2024.csv"
 
 # Initialize the output file
 write.csv(data.frame(Response = character(), Model = character(), AIC = numeric(), BIC = numeric(), 
@@ -279,14 +279,14 @@ warning_msg <- ""
 #response_list <- c("NIntc_richness_binom", "NIntc_cover_binom", "NInta_richness_binom", "NInta_cover_binom")
 #datalist = c("modeldat_final", "modeldat_final", "modeldat_final", "modeldat_final")
 
-response_list <- c("NIntc_richness_binom", "NIntc_cover_binom")
-datalist = c("modeldat_final", "modeldat_final")
+response_list <- c("NInta_richness_binom")
+datalist = c("modeldat_final")
 
 # Initialize a list to store result rows
 result_list <- list()
 
 # Specify chunk size
-chunk_size <- 200
+chunk_size <- 150
 
 ##LOOP THROUGH MODELS STARTS HERE##
 #Loop through response variables
@@ -374,6 +374,11 @@ for(r in 1:length(response_list)) {
 ##new run with nested RE (chunk size = 200)
 #start nintC richness 14:03 23 Aug
 #end nintc cover 20:00 25 Aug
+
+##run nintA with nested RE (chink size = 150)
+#only load nintA richness onto the loop
+#start nintA richness at 16:33 on 16 Aug
+
 
 ###Post hoc tests on best models####
 ###select the model with the lowest AIC###
