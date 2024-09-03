@@ -279,7 +279,7 @@ warning_msg <- ""
 #response_list <- c("NIntc_richness_binom", "NIntc_cover_binom", "NInta_richness_binom", "NInta_cover_binom")
 #datalist = c("modeldat_final", "modeldat_final", "modeldat_final", "modeldat_final")
 
-response_list <- c("NInta_richness_binom")
+response_list <- c("NInta_cover_binom")
 datalist = c("modeldat_final")
 
 # Initialize a list to store result rows
@@ -378,6 +378,9 @@ for(r in 1:length(response_list)) {
 ##run nintA with nested RE (chink size = 150)
 #only load nintA richness onto the loop
 #start nintA richness at 16:33 on 16 Aug
+#forgot to note end time
+
+#start nintA cover on 19:46 on 3 Sept
 
 
 ###Post hoc tests on best models####
