@@ -732,17 +732,17 @@ meansla_data <- trait_ass_join |>
 hist(meansla_data$trait_difference)
 hist(meansla_data$neginv_trait_difference)
 
-#null model
-meansla_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID), data = meansla_data)
-#alternative model
-meansla_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID), data = meansla_data)
-#model doesnt converge with site_ID/ID RE
+#run the sla models with lmer because glmmTMB doesnt converge with the nested RE
+
+meansla_null <- lmer(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = meansla_data)
+
+meansla_mod <- lmer(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = meansla_data)
 
 summary(meansla_mod)
 Anova(meansla_mod) #
 anova(meansla_null, meansla_mod) #p = 0.0002708 ***
 emmeans(meansla_mod, specs = "association")
-r.squaredGLMM(meansla_null)
+r.squaredGLMM(meansla_mod)
 
 #model diagnostics
 meansla_simres <- simulateResiduals(meansla_mod)
