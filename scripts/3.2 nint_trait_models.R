@@ -520,10 +520,10 @@ emmeans(ninta_richness_bestmod, specs = "graz")
 ###NintA cover
 
 #ninta cover null model:
-ninta_cover_null <- glmmTMB(NInta_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+ninta_cover_null <- glmmTMB(NInta_cover_binom ~ 1 + (1|nurse_sp) +(1|site_ID/ID), family = binomial, data = modeldat_final)
 
 #NInta cover best model
-ninta_cover_bestmod <- glmmTMB(NInta_cover_binom ~ graz+aridity+RASE+pH+SAC+log_nurse_meanLA+log_nurse_meanSLA+log_nurse_meanH+log_nurse_meanCNratio+graz:RASE+graz:pH+graz:SAC+(1|nurse_sp)+(1|site_ID), 
+ninta_cover_bestmod <- glmmTMB(NInta_cover_binom ~ graz+aridity+pH+SAC+log_nurse_meanLA+log_nurse_meanSLA+log_nurse_meanH+log_nurse_meanCNratio+graz:pH+graz:SAC+(1|nurse_sp)+(1|site_ID/ID), 
                                family = binomial, data = modeldat_final)
 
 summary(ninta_cover_bestmod)
