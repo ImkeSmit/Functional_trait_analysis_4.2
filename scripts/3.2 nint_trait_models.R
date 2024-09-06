@@ -499,10 +499,10 @@ modeldat_final |>
 ###NIntA richness
 
 #ninta richness null model:
-ninta_richness_null <- glmmTMB(NInta_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID), family = binomial, data = modeldat_final)
+ninta_richness_null <- glmmTMB(NInta_richness_binom ~ 1 + (1|nurse_sp) +(1|site_ID/ID), family = binomial, data = modeldat_final)
 
 #NInta richness best model
-ninta_richness_bestmod <- glmmTMB(NInta_richness_binom ~ graz+pH+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:pH+graz:SAC+(1|nurse_sp)+(1|site_ID), 
+ninta_richness_bestmod <- glmmTMB(NInta_richness_binom ~ graz+pH+SAC+log_nurse_meanLA+log_nurse_meanH+log_nurse_meanCNratio+graz:pH+graz:SAC+(1|nurse_sp)+(1|site_ID/ID), 
                                   family = binomial, data = modeldat_final)
 
 summary(ninta_richness_bestmod)
