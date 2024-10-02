@@ -389,8 +389,8 @@ ninta_richness_bestmod <- glmmTMB(NInta_richness_binom ~ graz+pH+SAC+log_nurse_m
                                   family = binomial, data = modeldat_final)
 
 
-ninta_cover_bestmod <- glmmTMB(NInta_cover_binom ~ graz+aridity+RASE+pH+SAC+log_nurse_meanLA+log_nurse_meanSLA+
-                                 log_nurse_meanH+log_nurse_meanCNratio+graz:RASE+graz:pH+graz:SAC, 
+ninta_cover_bestmod <- glmmTMB(NInta_cover_binom ~ graz+aridity+pH+SAC+log_nurse_meanLA+log_nurse_meanSLA+log_nurse_meanH+
+                                 log_nurse_meanCNratio+graz:pH+graz:SAC, 
                                family = binomial, data = modeldat_final)
 
 ###NINtc richness~ C:N
