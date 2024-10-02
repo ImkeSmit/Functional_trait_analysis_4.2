@@ -323,6 +323,46 @@ overlap <- FT_species |>
 unique_allsp <- nrow(unique(rbind(fac_species, FT_species)))
 overlap/unique_allsp *100 #61.14
 
+###What contribution do the only_in_fac species make to the cover of the whole facilitation dataset?
+#import facilitation data
+data_files <- list.files("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3")
+countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "chinaxin", "iranabedi", "iranfarzam", 
+                  "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
+for(i in 1:length(data_files)) {                              
+  assign(paste0(countrynames[i]),                                   
+         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3\\",
+                          data_files[i])))
+}
+
+#gte the covers of all the species
+for(i in 1:length(countrynames)) {
+  cou <- get(countrynames[i])
+  
+  cou2 <- cou |> 
+    select(ID, Number.of.replicate, Cover, Species.within.quadrat)
+  
+  if(i==1) {
+    covertable <- cou2
+  } else {
+    covertable <- rbind(covertable, cou2)
+  }
+}
+
+#get the total cover of the whole covertable
+total_fac_cover <- sum(covertable$Cover, na.rm = T)
+
+#get the total cover of the only_in_fac species
+only_in_fac_sp <- fac_species |> #species only sampled in the facilitation survey
+  anti_join(FT_species, by = "taxon") 
+
+only_in_fac_cover <- covertable |> 
+  filter(Species.within.quadrat %in% c(only_in_fac_sp$taxon)) |> 
+  summarise(coversum = sum(Cover, na.rm = T))
+
+#percent of the total cover made up by only_in_fac species
+only_in_fac_cover$coversum/total_fac_cover*100 #8.58%
+
+
 ###Assess change in trait coverage###
 #import unfilled trait data
 FT_unfilled <- read.csv("Functional trait data\\Clean data\\FT_match_facilitation_plots_plotspecific_species.csv", row.names = 1) |> 
