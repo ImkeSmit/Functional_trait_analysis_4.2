@@ -334,7 +334,7 @@ for(i in 1:length(data_files)) {
                           data_files[i])))
 }
 
-#gte the covers of all the species
+#get the covers of all the species
 for(i in 1:length(countrynames)) {
   cou <- get(countrynames[i])
   
@@ -361,6 +361,41 @@ only_in_fac_cover <- covertable |>
 
 #percent of the total cover made up by only_in_fac species
 only_in_fac_cover$coversum/total_fac_cover*100 #8.58%
+
+
+###%of sp and cover that overlap per plot
+#get the total cover and richness per plot in the complete fac data
+cover_fac <- covertable |> 
+  filter(!is.na(Species.within.quadrat)) |> 
+  group_by(ID) |> 
+  summarise(totalcover_fac = sum(Cover, na.rm = T), 
+            nsp_fac = n_distinct(Species.within.quadrat))
+
+
+#subset covertable for only the overlapping sp
+overlap_sp <- FT_species |> 
+  inner_join(fac_species, by = "taxon") 
+
+cover_overlap <- covertable |> 
+  filter(!is.na(Species.within.quadrat)) |> 
+  filter(Species.within.quadrat %in% c(overlap_sp$taxon)) |> 
+  group_by(ID) |> 
+  summarise(totalcover_overlap = sum(Cover, na.rm = T), 
+         nsp_overlap = n_distinct(Species.within.quadrat))
+
+
+#now get the percent cover and richness that is left over in the fac data per plot
+cover_join <- cover_fac |> 
+  left_join(cover_overlap, by = "ID") |> 
+  mutate(percent_cover_overlap = totalcover_overlap/totalcover_fac*100, 
+         percent_sp_overlap = nsp_overlap/nsp_fac*100)
+
+#get the mean percent overlap in cover and sp per plot
+mean_cover_overlap <- mean(cover_join$percent_cover_overlap) #86.064
+
+mean_sp_overlap <- mean(cover_join$percent_sp_overlap) #80.562
+  
+
 
 
 ###Assess change in trait coverage###
