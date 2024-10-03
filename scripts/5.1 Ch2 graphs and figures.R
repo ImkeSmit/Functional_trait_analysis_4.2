@@ -675,10 +675,6 @@ trait_ass_join$ID <- as.factor(trait_ass_join$ID)
 
 traits <- c("MaxH", "MaxLS", "MeanLA", "MeanLDMC", "MeanLL", "MeanSLA", "C_N_ratio")
 
-#create a list to put the predictions in
-predictions_list <- vector(mode = "list", length = 7)
-names(predictions_list) <- traits
-
 for(t in 1:length(traits)) {
   one_trait_data <- trait_ass_join |> 
     filter(trait == traits[t]) 
@@ -700,17 +696,83 @@ for(t in 1:length(traits)) {
     #select the model to use for prediction
     one_trait_model <- lmer(formula = as.formula("trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID)"), data = one_trait_data)
   } else {
-  
   #select the model to use for prediction
-  one_trait_model <- glmmTMB(formula = as.formula("trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID)"), data = one_trait_data) }
+  one_trait_model <- glmmTMB(formula = as.formula("trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID)"), data = one_trait_data) 
+  }
   
   pred_df_final$trait_diff_predictions <- predict(one_trait_model, pred_df_final)
+  pred_df_final$trait <- traits[t]
   
-  predictions_list[[t]] <- pred_df_final
+  if(t == 1) {
+    predictions_combo <- pred_df_final
+  } else {predictions_combo <- rbind(predictions_combo, pred_df_final) }
   
   rm(pred_df_final)
 }
-  
+
+
+###Now we can make the graph
+#Change the labels of the traits
+predictions_combo2 <- predictions_combo |> 
+  mutate(trait = case_when(trait == "MaxH" ~ "H~(cm)", #rename the traits so that they are labelled nicely in the plot
+                           trait == "MaxLS" ~ "LS~(cm^2)",
+                           trait == "MeanLA" ~ "LA~(cm^2)",
+                           trait == "MeanLDMC" ~ "LDMC~('%')",
+                           trait == "MeanLL" ~ "LL~(cm)",
+                           trait == "MeanSLA" ~ "SLA~(cm^2/g)", 
+                           trait == "C_N_ratio" ~ "C:N"))
+
+
+#df with the annotations
+annotations <- data.frame(trait = rep(c(unique(predictions_combo2$trait)),2), 
+                          association = c(rep("bare", 7), rep("nurse", 7)))
+annotations<- annotations[order(annotations$trait) , ]
+annotations$t_test_significance <- c("  *", "  *", #C:N
+                                     "  *", "  *", #H
+                                     "  *", " ", #LA
+                                     "  *", "  *", #LDMC
+                                     "  *", "  *", #LL
+                                     "  *", "  *", #LS
+                                     "  *", "  *" )#SLA
+annotations$anova_significance <- c("    a", "    b", #C:N
+                                    "    a", "    b", #H
+                                    "    a", "    b", #LA
+                                    "    a", "    b", #LDMC
+                                    " ", " ", #LL
+                                    "    a", "    b", #LS
+                                    "    a", "    b" )#SLA
+annotations$ycoord_t <- c(6, 8, #C:N
+                          160, 150, #H
+                          3, 3, #LA
+                          0.05, 0.2, #LDMC
+                          5, 5, #LL
+                          80000, 80000, #LS
+                          25, 20)#SLA
+
+annotations$ycoord_anova <- c(30, 30, #C:N
+                              630, 630, #H
+                              30, 30, #LA
+                              0.60, 0.60, #LDMC
+                              0, 0, #LL
+                              800000, 800000, #LS
+                              105, 105)#SLA
+
+
+predicted_trait_distances <- ggplot(predictions_combo2, aes(x = association, y = trait_diff_predictions, fill = association)) +
+  geom_boxplot(alpha = 0.6)+
+  stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
+  scale_fill_manual(values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) + 
+  scale_x_discrete(labels = c(expression("∆"["Db"]), expression("∆"["Dd"]))) +
+  facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
+  ylab("Predicted trait difference") +
+  xlab("Target species association") +
+  geom_text(data = annotations, aes(x = association, y = ycoord_t, label = t_test_significance), size = 8, color = "brown3")+
+  geom_text(data = annotations, aes(x = association, y = ycoord_anova, label = anova_significance), size = 5, color = "brown3")+
+  theme_classic() +
+  theme(legend.position = "none", axis.text.x = (element_text(size = 11)))
+
+ggsave("model_predictions_one_dimensional_trait_distances.png", predicted_trait_distances, path = "Figures", 
+       height = 1700, width = 2000, units = "px")  
 
 
 ###Functional distance ~ GRAZ, ARIDITY, microsite affinty####
