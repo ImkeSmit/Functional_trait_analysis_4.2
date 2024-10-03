@@ -590,10 +590,10 @@ maxls_data |>
   summarise(obs = n()) #751 bare, 1963 nurse
 
 #null model
-maxls_null <- glmmTMB(sqrt_trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = maxls_data) #cannot use transformations because of 0 and - values
+maxls_null <- lmer(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = maxls_data) #cannot use transformations because of 0 and - values
 #alternative model
-maxls_mod <- glmmTMB(sqrt_trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = maxls_data)
-#models do not converge for untransformed response, forced to use sqrt despite NA values
+maxls_mod <- lmer(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = maxls_data)
+#models do not converge for TMB
 
 summary(maxls_mod)
 Anova(maxls_mod) 
