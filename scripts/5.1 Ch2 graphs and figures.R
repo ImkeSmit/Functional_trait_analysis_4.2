@@ -580,7 +580,7 @@ ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, un
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
-###one dimensional Fdist~association####
+###one dimensional Fdist~association with raw data####
 #import 1D trait difference data
 trait_diff <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1)
 ##Lets join the results of the CHi2 tests to sla_fdist###
@@ -651,6 +651,66 @@ trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_differe
 ggsave("one_dimensional_trait_distances.png", trait_distances, path = "Figures", 
        height = 1700, width = 2000, units = "px")
 
+
+###one dimensional Fdist~association with model estimates####
+#import the data we model trait differences with
+trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1)
+trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
+##Lets join the results of the CHi2 tests to sla_fdist###
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(target = species)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
+
+trait_ass_join <- trait_fdist |> 
+  left_join(ass, by = c("target", "ID")) |> 
+  filter(association %in% c("nurse", "bare")) #only work with these associations
+trait_ass_join$association <- as.factor(trait_ass_join$association)
+trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
+trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
+trait_ass_join$ID <- as.factor(trait_ass_join$ID)
+
+
+###get the predictions for each trait model
+
+traits <- c("MaxH", "MaxLS", "MeanLA", "MeanLDMC", "MeanLL", "MeanSLA", "C_N_ratio")
+
+#create a list to put the predictions in
+predictions_list <- vector(mode = "list", length = 7)
+names(predictions_list) <- traits
+
+for(t in 1:length(traits)) {
+  one_trait_data <- trait_ass_join |> 
+    filter(trait == traits[t]) 
+  
+  #create data to predict over
+  pred_df_nurse <- one_trait_data |> 
+    dplyr::select(SITE_ID, ID, nurse) |> 
+    distinct() |> 
+    mutate(association = "nurse")
+  
+  pred_df_bare <- one_trait_data |> 
+    dplyr::select(SITE_ID, ID, nurse) |> 
+    distinct() |> 
+    mutate(association = "bare")
+  
+  pred_df_final <- rbind(pred_df_nurse, pred_df_bare)
+  
+  if(t %in% c(2,6)) { #for MaxLS and SLA we need to use lmer, not TMB
+    #select the model to use for prediction
+    one_trait_model <- lmer(formula = as.formula("trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID)"), data = one_trait_data)
+  } else {
+  
+  #select the model to use for prediction
+  one_trait_model <- glmmTMB(formula = as.formula("trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID)"), data = one_trait_data) }
+  
+  pred_df_final$trait_diff_predictions <- predict(one_trait_model, pred_df_final)
+  
+  predictions_list[[t]] <- pred_df_final
+  
+  rm(pred_df_final)
+}
+  
 
 
 ###Functional distance ~ GRAZ, ARIDITY, microsite affinty####
