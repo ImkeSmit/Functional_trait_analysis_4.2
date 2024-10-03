@@ -572,7 +572,7 @@ dist_ass <- ggplot(dist_ass_join, aes(x = association, y = euclidean_dist, fill 
             #geom_text(data = letters, aes(x = association, y = ycoord, label = symbols), size = 5, color = "brown3") +
             ylim(0,8) +
             ylab("Distance") +
-            xlab("target species association") +
+            xlab("Target species association") +
             scale_x_discrete(labels = c("bare", "dominant")) +
             theme_classic() +
             theme(legend.position = "none")
@@ -585,7 +585,7 @@ ggsave("fdist_association_boxplot.png", dist_ass, height = 1000, width = 800, un
 trait_diff <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1)
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
-  select(ID, species, association) |> 
+  dplyr::select(ID, species, association) |> 
   rename(target = species)
 
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
@@ -639,7 +639,7 @@ trait_distances <- ggplot(trait_ass_join, aes(x = association, y = trait_differe
   geom_boxplot(alpha = 0.6)+
   stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
   scale_fill_manual(values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) + 
-  scale_x_discrete(labels = c(expression("∆"["db"]), expression("∆"["dd"]))) +
+  scale_x_discrete(labels = c(expression("∆"["Db"]), expression("∆"["Dd"]))) +
   facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
   ylab("Difference") +
   xlab("Target species association") +
