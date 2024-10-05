@@ -5,6 +5,7 @@ library(RColorBrewer)
 library(multcomp)
 library(multcompView)
 library(glmmTMB)
+library(lme4)
 library(car)
 library(tidyverse)
 library(tidylog)
@@ -700,12 +701,18 @@ for(t in 1:length(traits)) {
   one_trait_model <- glmmTMB(formula = as.formula("trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID)"), data = one_trait_data) 
   }
   
+  #put model predictions in a table
   pred_df_final$trait_diff_predictions <- predict(one_trait_model, pred_df_final)
   pred_df_final$trait <- traits[t]
   
+  #put model residuals in a seperate table
+  residuals_one_trait <- data.frame(model_res = resid(one_trait_model), trait = traits[t])
+  
   if(t == 1) {
     predictions_combo <- pred_df_final
-  } else {predictions_combo <- rbind(predictions_combo, pred_df_final) }
+    residuals_combo <- residuals_one_trait
+  } else { predictions_combo <- rbind(predictions_combo, pred_df_final) 
+            residuals_combo <- rbind(residuals_combo, residuals_one_trait)}
   
   rm(pred_df_final)
 }
