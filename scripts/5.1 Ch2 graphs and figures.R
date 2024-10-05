@@ -672,7 +672,7 @@ trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$ID <- as.factor(trait_ass_join$ID)
 
 
-###get the predictions for each trait model
+###get the predictions and residuals for each trait model
 
 traits <- c("MaxH", "MaxLS", "MeanLA", "MeanLDMC", "MeanLL", "MeanSLA", "C_N_ratio")
 
@@ -706,7 +706,9 @@ for(t in 1:length(traits)) {
   pred_df_final$trait <- traits[t]
   
   #put model residuals in a seperate table
-  residuals_one_trait <- data.frame(model_res = resid(one_trait_model), trait = traits[t])
+  residuals_one_trait <- one_trait_data |> 
+    mutate(model_res = resid(one_trait_model, type = "pearson"), 
+           trait = traits[t])
   
   if(t == 1) {
     predictions_combo <- pred_df_final
@@ -718,7 +720,7 @@ for(t in 1:length(traits)) {
 }
 
 
-###Now we can make the graph
+###Make the graph of model predictions
 #Change the labels of the traits
 predictions_combo2 <- predictions_combo |> 
   mutate(trait = case_when(trait == "MaxH" ~ "H~(cm)", #rename the traits so that they are labelled nicely in the plot
@@ -780,6 +782,21 @@ predicted_trait_distances <- ggplot(predictions_combo2, aes(x = association, y =
 
 ggsave("model_predictions_one_dimensional_trait_distances.png", predicted_trait_distances, path = "Figures", 
        height = 1700, width = 2000, units = "px")  
+
+
+###Make the graph of model residuals
+residuals_graph <- ggplot(residuals_combo, aes(x = association, y = model_res, fill = association)) +
+  geom_boxplot(alpha = 0.6)+
+  stat_summary(fun = mean, geom="point", shape = 23, size = 2, fill = "white", color = "black") +
+  scale_fill_manual(values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) + 
+  scale_x_discrete(labels = c(expression("∆"["Db"]), expression("∆"["Dd"]))) +
+  facet_wrap(~trait, scales = "free_y", labeller = label_parsed) +
+  ylab("Residuals") +
+  xlab("Target species association") +
+  #geom_text(data = annotations, aes(x = association, y = ycoord_t, label = t_test_significance), size = 8, color = "brown3")+
+  #geom_text(data = annotations, aes(x = association, y = ycoord_anova, label = anova_significance), size = 5, color = "brown3")+
+  theme_classic() +
+  theme(legend.position = "none", axis.text.x = (element_text(size = 11)))
 
 
 ###Functional distance ~ GRAZ, ARIDITY, microsite affinty####
