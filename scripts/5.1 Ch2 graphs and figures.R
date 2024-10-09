@@ -1201,8 +1201,12 @@ FT_join2 <- FT_join1 |>
 FT_ass_final <- FT_join2 |> 
   mutate(grouping = case_when(position == "nurse_species" ~ as.character(position), 
                               .default = as.character(association))) |>
-  mutate(taxonplot)
+  filter(grouping %in% c("nurse_species", "bare", "nurse")) |> 
   select(ID, taxon, trait, value, grouping) |> 
-  pivot_wider(names_from = trait, values_from = value) 
+  pivot_wider(names_from = trait, values_from = value, values_fn = mean) #get the mean trait val where there are more than one val for a sp in a plot
 
-ggplot(FT_ass_final, aes(x = ))
+schematic <- ggplot(FT_ass_final, aes(x = log10(MeanSLA), y = log10(MaxH), colour = grouping)) +
+  geom_point() +
+  theme_classic()
+
+ggsave("schematic_scatter.png", schematic, path = "Figures")
