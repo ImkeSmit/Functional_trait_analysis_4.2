@@ -1171,4 +1171,38 @@ trait_differences <- ggplot(FT_3_ass, aes(x = association, y = value)) +
         strip.text = element_text(size = 16))
 
 ggsave("trait_differences.png", trait_differences, path = "Figures",  height = 3500, width = 3400, units = "px")
-  
+
+
+
+####Schematic figure####
+#graph SLA and height of species, colour according to association
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv", row.names = 1) 
+
+sp_positions <- read.csv("Functional trait data\\results\\sp_positions.csv", row.names = 1) |> 
+  filter(position == "nurse_species") |>  #we will only get the nurse species from here. The associations we wil get from the ass table
+  distinct(ID, taxon, .keep_all = T) |> 
+  select(ID, taxon, position)
+
+#add the sp positions to FT so that we can see which are nurses
+FT_join1 <- FT |> 
+  full_join(sp_positions, by = c("taxon", "ID"))
+
+
+#import associations from Chi2 tests
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
+
+FT_join2 <- FT_join1 |> 
+  left_join(ass, by = c("taxon" = "species", "ID" = "ID")) 
+
+#create a 3rd column in which we combine the associations and positions. 
+#If the sp is a nurse in th eposition column, let it overwrite the association
+FT_ass_final <- FT_join2 |> 
+  mutate(grouping = case_when(position == "nurse_species" ~ as.character(position), 
+                              .default = as.character(association))) |>
+  mutate(taxonplot)
+  select(ID, taxon, trait, value, grouping) |> 
+  pivot_wider(names_from = trait, values_from = value) 
+
+ggplot(FT_ass_final, aes(x = ))
