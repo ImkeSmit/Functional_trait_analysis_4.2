@@ -432,3 +432,7 @@ filled_trait_coverage = (filled_n_traits$filled_n_traits/denom)*100
 percent_improvement <- ((filled_n_traits$filled_n_traits - unfilled_n_traits$unfilled_n_traits)/denom)*100
 
 
+#From which sites do the filled data come? So that we can credit these authors
+borrowed_traits <- FT_filled |> 
+  filter(level == "COU") |>  #get all the rows that have traits filled from another site (but in the same country hence the level is COU)
+  distinct(SITE_trait) #get the distinct sitenames that they were borrowed from
