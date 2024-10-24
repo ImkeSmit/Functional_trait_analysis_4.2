@@ -2,8 +2,8 @@
 library(ggplot2)
 library(ggpubr)
 library(RColorBrewer)
-library(multcomp)
-library(multcompView)
+#library(multcomp)
+#library(multcompView)
 library(glmmTMB)
 library(lme4)
 library(car)
@@ -204,7 +204,7 @@ nintc_richness_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = N
   #xlab("log(C:N)") +
   xlab(" ")+
   geom_line(data = pred_dat1, 
-            aes(x = log_nurse_meanCNratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanCNratio, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc richness~ LA
 pred_dat3 <- pred_dat_core |> 
@@ -223,7 +223,7 @@ nintc_richness_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NIntc_
   #ylab(expression(NInt[C]~richness)) +
   #xlab("log(LA)") +
   geom_line(data = pred_dat3, 
-            aes(x = log_nurse_meanLA, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanLA, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc richness~ H
 pred_dat4 <- pred_dat_core |> 
@@ -242,7 +242,7 @@ nintc_richness_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NIntc_ri
   #ylab(expression(NInt[C]~richness)) +
   #xlab("log(H)") +
   geom_line(data = pred_dat4, 
-            aes(x = log_nurse_meanH, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanH, y = nintc_richness_true_prediction), color = chosen_col, lwd = 1.5)
 
 
 ###NIntc cover ~ C:N
@@ -266,7 +266,7 @@ nintc_cover_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NInt
   ylab(expression(NInt[C]~cover)) +
   xlab("log(C:N)") +
   geom_line(data = pred_dat2, 
-            aes(x = log_nurse_meanCNratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanCNratio, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc cover~ LA
 pred_dat5 <- pred_dat_core |> 
@@ -285,7 +285,7 @@ nintc_cover_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NIntc_cov
   #ylab(expression(NInt[C]~cover)) +
   xlab("log(LA)") +
   geom_line(data = pred_dat5, 
-            aes(x = log_nurse_meanLA, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanLA, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc cover~ H
 pred_dat6 <- pred_dat_core |> 
@@ -304,7 +304,7 @@ nintc_cover_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NIntc_cover
   #ylab(expression(NInt[C]~cover)) +
   xlab("log(H)") +
   geom_line(data = pred_dat6, 
-            aes(x = log_nurse_meanH, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanH, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 
 ###NINtc cover~ SLA
@@ -324,7 +324,7 @@ nintc_cover_SLA <- ggplot(modeldat_final, aes(x = log_nurse_meanSLA, y = NIntc_c
   #ylab(expression(NInt[C]~cover)) +
   xlab("log(SLA)") +
   geom_line(data = pred_dat7, 
-            aes(x = log_nurse_meanSLA, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanSLA, y = nintc_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 #arrange the above seven figures on the same plot
 #create a blank plot to act as a placeholder
@@ -415,7 +415,7 @@ ninta_richness_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = N
   #xlab("log(C:N)") +
   xlab(" ")+
   geom_line(data = pred_dat1, 
-            aes(x = log_nurse_meanCNratio, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanCNratio, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc richness~ LA
 pred_dat3 <- pred_dat_core |> 
@@ -434,7 +434,7 @@ ninta_richness_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NInta_
   #ylab(expression(NInt[A]~richness)) +
   #xlab("log(LA)") +
   geom_line(data = pred_dat3, 
-            aes(x = log_nurse_meanLA, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanLA, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc richness~ H
 pred_dat4 <- pred_dat_core |> 
@@ -453,7 +453,7 @@ ninta_richness_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NInta_ri
   #ylab(expression(NInt[A]~richness)) +
   #xlab("log(H)") +
   geom_line(data = pred_dat4, 
-            aes(x = log_nurse_meanH, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanH, y = ninta_richness_true_prediction), color = chosen_col, lwd = 1.5)
 
 
 ###NIntc cover ~ C:N
@@ -477,7 +477,7 @@ ninta_cover_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NInt
   ylab(expression(NInt[A]~cover)) +
   xlab("log(C:N)") +
   geom_line(data = pred_dat2, 
-            aes(x = log_nurse_meanCNratio, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanCNratio, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc cover~ LA
 pred_dat5 <- pred_dat_core |> 
@@ -496,7 +496,7 @@ ninta_cover_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NInta_cov
   #ylab(expression(NInt[A]~cover)) +
   xlab("log(LA)") +
   geom_line(data = pred_dat5, 
-            aes(x = log_nurse_meanLA, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanLA, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 ###NINtc cover~ H
 pred_dat6 <- pred_dat_core |> 
@@ -515,7 +515,7 @@ ninta_cover_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NInta_cover
   #ylab(expression(NInt[A]~cover)) +
   xlab("log(H)") +
   geom_line(data = pred_dat6, 
-            aes(x = log_nurse_meanH, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanH, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 
 ###NINtc cover~ SLA
@@ -535,7 +535,7 @@ ninta_cover_SLA <- ggplot(modeldat_final, aes(x = log_nurse_meanSLA, y = NInta_c
   #ylab(expression(NInt[A]~cover)) +
   xlab("log(SLA)") +
   geom_line(data = pred_dat7, 
-            aes(x = log_nurse_meanSLA, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1)
+            aes(x = log_nurse_meanSLA, y = ninta_cover_true_prediction), color = chosen_col, lwd = 1.5)
 
 #arrange the above seven figures on the same plot
 #create a blank plot to act as a placeholder
