@@ -198,7 +198,7 @@ modeldat_final |>
   summarise(n = n()) #2659
 
 nintc_richness_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NIntc_richness)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(expression(NInt[C]~richness)) +
   #xlab("log(C:N)") +
@@ -216,7 +216,7 @@ pred_dat3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pre
 pred_dat3$nintc_richness_true_prediction <- 2*pred_dat3$nintc_richness_binom_prediction -1 #backtransform from binomial
 
 nintc_richness_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NIntc_richness)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   xlab(" ")+
@@ -235,7 +235,7 @@ pred_dat4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pre
 pred_dat4$nintc_richness_true_prediction <- 2*pred_dat4$nintc_richness_binom_prediction -1 #backtransform from binomial
 
 nintc_richness_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NIntc_richness)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   xlab(" ")+
@@ -261,7 +261,7 @@ modeldat_final |>
   summarise(n = n()) #2659
 
 nintc_cover_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NIntc_cover)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(expression(NInt[C]~cover)) +
   xlab("log(C:N)") +
@@ -279,7 +279,7 @@ pred_dat5$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, pred_dat5
 pred_dat5$nintc_cover_true_prediction <- 2*pred_dat5$nintc_cover_binom_prediction -1 #backtransform from binomial
 
 nintc_cover_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NIntc_cover)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   #ylab(expression(NInt[C]~cover)) +
@@ -298,7 +298,7 @@ pred_dat6$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, pred_dat6
 pred_dat6$nintc_cover_true_prediction <- 2*pred_dat6$nintc_cover_binom_prediction -1 #backtransform from binomial
 
 nintc_cover_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NIntc_cover)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   #ylab(expression(NInt[C]~cover)) +
@@ -318,7 +318,7 @@ pred_dat7$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, pred_dat7
 pred_dat7$nintc_cover_true_prediction <- 2*pred_dat7$nintc_cover_binom_prediction -1 #backtransform from binomial
 
 nintc_cover_SLA <- ggplot(modeldat_final, aes(x = log_nurse_meanSLA, y = NIntc_cover)) +
-  geom_jitter(height = 0.05,width = 0.01, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05,width = 0.01, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   #ylab(expression(NInt[C]~cover)) +
@@ -333,7 +333,7 @@ blank_plot <- ggplot() + theme_void()
 nintc_nurse_traits <- ggarrange(ggarrange(nintc_richness_CN, nintc_richness_H,nintc_richness_LA, blank_plot, nrow = 1, ncol = 4, labels = c("a", "b", "c")),
                                 ggarrange(nintc_cover_CN, nintc_cover_H,nintc_cover_LA, nintc_cover_SLA, nrow = 1, ncol = 4, labels = c("d", "e", "f", "g")),
                                 nrow = 2, ncol = 1)
-ggsave("nintc_trait_scatterplots.png", nintc_nurse_traits, height = 1500, width = 2500, units = "px",
+ggsave("nintc_trait_scatterplots_post_exam.png", nintc_nurse_traits, height = 1500, width = 2500, units = "px",
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 
@@ -409,7 +409,7 @@ modeldat_final |>
   summarise(n = n()) #2659
 
 ninta_richness_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NInta_richness)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(expression(NInt[A]~richness)) +
   #xlab("log(C:N)") +
@@ -427,7 +427,7 @@ pred_dat3$ninta_richness_binom_prediction <- predict(ninta_richness_bestmod, pre
 pred_dat3$ninta_richness_true_prediction <- 3*pred_dat3$ninta_richness_binom_prediction -1 #backtransform from binomial
 
 ninta_richness_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NInta_richness)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   xlab(" ")+
@@ -446,7 +446,7 @@ pred_dat4$ninta_richness_binom_prediction <- predict(ninta_richness_bestmod, pre
 pred_dat4$ninta_richness_true_prediction <- 3*pred_dat4$ninta_richness_binom_prediction -1 #backtransform from binomial
 
 ninta_richness_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NInta_richness)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   xlab(" ")+
@@ -472,7 +472,7 @@ modeldat_final |>
   summarise(n = n()) #2659
 
 ninta_cover_CN <- ggplot(modeldat_final, aes(x = log_nurse_meanCNratio, y = NInta_cover)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(expression(NInt[A]~cover)) +
   xlab("log(C:N)") +
@@ -490,7 +490,7 @@ pred_dat5$ninta_cover_binom_prediction <- predict(ninta_cover_bestmod, pred_dat5
 pred_dat5$ninta_cover_true_prediction <- 3*pred_dat5$ninta_cover_binom_prediction -1 #backtransform from binomial
 
 ninta_cover_LA <- ggplot(modeldat_final, aes(x = log_nurse_meanLA, y = NInta_cover)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   #ylab(expression(NInt[A]~cover)) +
@@ -509,7 +509,7 @@ pred_dat6$ninta_cover_binom_prediction <- predict(ninta_cover_bestmod, pred_dat6
 pred_dat6$ninta_cover_true_prediction <- 3*pred_dat6$ninta_cover_binom_prediction -1 #backtransform from binomial
 
 ninta_cover_H <- ggplot(modeldat_final, aes(x = log_nurse_meanH, y = NInta_cover)) +
-  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05, width = 0.05, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   #ylab(expression(NInt[A]~cover)) +
@@ -529,7 +529,7 @@ pred_dat7$ninta_cover_binom_prediction <- predict(ninta_cover_bestmod, pred_dat7
 pred_dat7$ninta_cover_true_prediction <- 3*pred_dat7$ninta_cover_binom_prediction -1 #backtransform from binomial
 
 ninta_cover_SLA <- ggplot(modeldat_final, aes(x = log_nurse_meanSLA, y = NInta_cover)) +
-  geom_jitter(height = 0.05,width = 0.01, alpha = 0.6, size = 1, colour = "darkslategrey") +
+  geom_jitter(height = 0.05,width = 0.01, alpha = 0.6, size = 1, colour = "azure3") +
   theme_classic() +
   ylab(" ")+
   #ylab(expression(NInt[A]~cover)) +
@@ -544,7 +544,7 @@ blank_plot <- ggplot() + theme_void()
 ninta_nurse_traits <- ggarrange(ggarrange(ninta_richness_CN, ninta_richness_H,ninta_richness_LA, blank_plot, nrow = 1, ncol = 4, labels = c("a", "b", "c")),
                                 ggarrange(ninta_cover_CN, ninta_cover_H,ninta_cover_LA, ninta_cover_SLA, nrow = 1, ncol = 4, labels = c("d", "e", "f", "g")),
                                 nrow = 2, ncol = 1)
-ggsave("ninta_trait_scatterplots.png", ninta_nurse_traits, height = 1500, width = 2500, units = "px",
+ggsave("ninta_trait_scatterplots_post_exam.png", ninta_nurse_traits, height = 1500, width = 2500, units = "px",
        path = "C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Figures")
 
 ###Fdist ~ association####
