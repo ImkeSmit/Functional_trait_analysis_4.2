@@ -1,0 +1,45 @@
+###Script to run stepwise model selection procedure to determine how traits, the environment, 
+###and their interaction affect interaction outcomes
+
+#full model: nint ~ nurse_maxh + nurse_ldmc + graz + climate + soil
+                  # + graz:climate + graz:soil + soil:climate + climate:climate +
+                  # + maxh:climate + maxh:soil + maxh:graz
+                  #ldmc:climate + ldmc:soil + ldmc:graz
+
+modeldat <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) 
+modeldat$nurse_sp <- as.factor(modeldat$nurse_sp)
+modeldat$graz <- as.factor(modeldat$graz)
+modeldat$site_ID <- as.factor(modeldat$site_ID)
+modeldat$ID <- as.factor(modeldat$ID)
+
+##Add the other environmental covariates to modeldat final
+#import siteinfo, we will use this to add ID to drypop
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |> 
+  select(ID, plotref) |> 
+  distinct() |> 
+  na.omit()
+
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  select(!plotref)
+drypop$ID <- as.factor(drypop$ID)
+
+#join the env covariates to the nurse nint data
+modeldat_final <- modeldat |> 
+  inner_join(drypop, by = "ID") |> 
+  rename(pH = "pH.b", SAC = "SAC.b") |> 
+  mutate(AMT2 = AMT^2, 
+         aridity2 = aridity^2) |> 
+  #remove all rows which have NA values in any of our modelling variables
+  drop_na(NIntc_richness_binom, NIntc_cover_binom,NInta_richness_binom, NInta_cover_binom, 
+          nurse_meanLDMC, nurse_mean_H, aridity, AMT, RASE, SAC, pH, graz)
+
+
+
+
+
