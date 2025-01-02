@@ -68,20 +68,42 @@ full_model <- glmmTMB(
   family = binomial  #had to remove sq terms and soil:climate interactions to make model converge
 )
 
+test_model <- glmmTMB(NIntc_richness_binom ~ aridity*log_nurse_meanH +  aridity*log_nurse_meanLDMC + 
+                        aridity2 + Lat_decimal + Long_decimal + (1|nurse_sp), data = modeldat_final, family = binomial)
+
 # Ensure all models maintain random effects by excluding them from being dropped
 options(na.action = "na.fail") # Required for dredge function
 
 # Perform stepwise model selection using dredge
 model_selection <- dredge(
-  full_model, 
-  fixed = c("(1|nurse_sp)", "Long_decimal", "Lat_decimal"),  # Keep random effects in all models
+  test_model,
+  fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC"                                # Use AIC for model ranking
-) #start 11:48
-#ran until 7;00 the next morning, stoll not finished
+) 
+#maybe we can find a way to exclude the model with only lat and long as predictors in the dredge output. 
+#but maybe that is not correct?
 
-write.csv(model_selection, "Functional trait data\\paper_results\\stepwise_results.csv")
+#save model selection results
+write.csv(as.data.frame(model_selection), row.names = FALSE ,"Functional trait data\\paper results\\stepwise_results.csv")
 
 # View model selection table
 print(model_selection)
+#in output: cond(Int) refers to the intercept of the conditional model (test_model in this case).
+#disp(Int) is the intercept of the dispersion model. Since you did not specify a dispersion structure in TMB, this is default settings. do not worry about this column
+#if a column has a number or + in the output, it means the variable was included in that model. 
 
+
+# Extract the best model based on AICc
+best_model <- get.models(model_selection, subset = 1)[[1]] #subset = 1 gets the model with the absolute lowest AIC.
+
+#extract models with AIC difference less than 2
+eq_model <- get.models(model_selection, subset = delta < 2)
+#average these models
+avg_models <- model.avg(eq_model)
+#from vignette:
+#The ‘subset’ (or ‘conditional’) average only averages over the models where the parameter appears. 
+#An alternative, the ‘full’ average assumes that a variable is included in every model, but in some models 
+#the corresponding coefficient (and its respective variance) is set to zero. Unlike the ‘subset average’, 
+#it does not have a tendency of biasing the value away from zero. The ‘full’ average is a type of shrinkage 
+#estimator, and for variables with a weak relationship to the response it is smaller than ‘subset’ estimators.
 
