@@ -58,14 +58,27 @@ SAC:log_nurse_meanH + SAC:log_nurse_meanLDMC +
 Lat_decimal +Long_decimal + #add these to account for spatial structure instead of (1|site_ID/ID)
 (1|nurse_sp)") 
 
+full_formula2 <- as.formula("NIntc_richness_binom ~ 
+                            graz*aridity + graz*RASE + graz*AMT +
+                            graz*pH + graz*SAC +
+                            aridity*RASE + aridity*AMT +
+                            graz*log_nurse_meanH + graz*log_nurse_meanLDMC +
+                            aridity*log_nurse_meanH + aridity*log_nurse_meanLDMC +
+                            AMT*log_nurse_meanH + AMT*log_nurse_meanLDMC +
+                            RASE*log_nurse_meanH + RASE*log_nurse_meanLDMC +
+                            #pH*log_nurse_meanH + pH*log_nurse_meanLDMC +
+                            #SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
+                            Lat_decimal +Long_decimal + #add these to account for spatial structure instead of (1|site_ID/ID)
+                            (1|nurse_sp)")
+
 
 
 # Fit the full model
 options(na.action = "na.omit")
 full_model <- glmmTMB(
-  formula = full_formula,
+  formula = full_formula2,
   data = modeldat_final,    
-  family = binomial  #had to remove sq terms and soil:climate interactions to make model converge
+  family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
 )
 
 test_model <- glmmTMB(NIntc_richness_binom ~ aridity*log_nurse_meanH +  aridity*log_nurse_meanLDMC + 
@@ -76,7 +89,7 @@ options(na.action = "na.fail") # Required for dredge function
 
 # Perform stepwise model selection using dredge
 model_selection <- dredge(
-  test_model,
+  full_model,
   fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC"                                # Use AIC for model ranking
 ) 
@@ -106,4 +119,5 @@ avg_models <- model.avg(eq_model)
 #the corresponding coefficient (and its respective variance) is set to zero. Unlike the ‘subset average’, 
 #it does not have a tendency of biasing the value away from zero. The ‘full’ average is a type of shrinkage 
 #estimator, and for variables with a weak relationship to the response it is smaller than ‘subset’ estimators.
-
+formula(avg_models) #get formula of the averaged model
+summary(avg_models) #get summary of the averaged model
