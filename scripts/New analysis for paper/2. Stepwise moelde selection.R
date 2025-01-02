@@ -77,6 +77,7 @@ model_selection <- dredge(
   fixed = c("(1|nurse_sp)", "Long_decimal", "Lat_decimal"),  # Keep random effects in all models
   rank = "AIC"                                # Use AIC for model ranking
 ) #start 11:48
+#ran until 7;00 the next morning, stoll not finished
 
 write.csv(model_selection, "Functional trait data\\paper_results\\stepwise_results.csv")
 
