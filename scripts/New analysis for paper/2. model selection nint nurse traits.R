@@ -1,4 +1,4 @@
-###Script to run stepwise model selection procedure to determine how traits, the environment, 
+###Script to run model selection procedure to determine how traits, the environment, 
 ###and their interaction affect interaction outcomes
 library(glmmTMB)
 library(MuMIn)
