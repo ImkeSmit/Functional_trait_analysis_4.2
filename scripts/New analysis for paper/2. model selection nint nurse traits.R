@@ -68,8 +68,8 @@ full_formula2 <- as.formula("NIntc_richness_binom ~
                             RASE*log_nurse_meanH + RASE*log_nurse_meanLDMC +
                             #pH*log_nurse_meanH + pH*log_nurse_meanLDMC +
                             #SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
-                            Lat_decimal +Long_decimal + #add these to account for spatial structure instead of (1|site_ID/ID)
-                            (1|nurse_sp)")
+                            Lat_decimal +Long_decimal + 
+                            (1|nurse_sp)")#add these to account for spatial structure instead of (1|site_ID/ID)
 
 
 
@@ -92,7 +92,7 @@ model_selection <- dredge(
   full_model,
   fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC"                                # Use AIC for model ranking
-) #start 15:14
+) #start 09:56
 #maybe we can find a way to exclude the model with only lat and long as predictors in the dredge output. 
 #but maybe that is not correct?
 
