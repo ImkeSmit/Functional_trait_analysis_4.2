@@ -92,7 +92,7 @@ model_selection <- dredge(
   full_model,
   fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC"                                # Use AIC for model ranking
-) 
+) #start 15:14
 #maybe we can find a way to exclude the model with only lat and long as predictors in the dredge output. 
 #but maybe that is not correct?
 
