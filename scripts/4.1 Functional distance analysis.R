@@ -10,7 +10,7 @@ library(MuMIn)
 #library(multcomp)
 #library(multcompView)
 
-#This script gets th euclidean distance between the nurse species and every  other sp in the replicate. 
+#This script gets the euclidean distance between the nurse species and every  other sp in the replicate. 
 #It doesn't average those distances, if there are 3 target sp in the replicate there will be 3 distances.
 #It uses standardised trait values
 #The resulting data is called twosp_dist
