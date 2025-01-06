@@ -98,9 +98,14 @@ model_selection <- dredge(
 #maybe we can find a way to exclude the model with only lat and long as predictors in the dredge output. 
 #but maybe that is not correct?
 
-#create a cluster obeject to run the function over 3 cores
+#create a cluster obeject to run the function over 8 cores
 clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK" 
-clust <- try(makeCluster(getOption("cl.cores", 3), type = clusterType))
+clust <- try(makeCluster(getOption("cl.cores", 8), type = clusterType))
+
+# Export necessary objects and functions to the cluster
+clusterExport(clust, varlist = c("modeldat_final", "full_formula2"), envir = environment())
+clusterEvalQ(clust, library(glmmTMB))
+clusterEvalQ(clust, library(MuMIn))
 
 #peform model selection using 3 cores
 # Perform stepwise model selection using dredge
@@ -108,7 +113,10 @@ model_selection_par <- dredge(
   full_model,
   fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
-cluster = clust) #
+cluster = clust) #start 10:20
+
+# Stop the cluster after use
+stopCluster(clust)
 
 #save model selection results
 write.csv(as.data.frame(model_selection), row.names = FALSE ,"Functional trait data\\paper results\\stepwise_results.csv")
