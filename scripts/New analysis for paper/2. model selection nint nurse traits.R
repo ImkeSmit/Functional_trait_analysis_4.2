@@ -3,6 +3,7 @@
 library(glmmTMB)
 library(MuMIn)
 library(tidyverse)
+library(parallel)
 
 #full model: nint ~ nurse_maxh + nurse_ldmc + graz + climate + soil
                   # + graz:climate + graz:soil + soil:climate + climate:climate +
@@ -91,11 +92,23 @@ options(na.action = "na.fail") # Required for dredge function
 model_selection <- dredge(
   full_model,
   fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
-  rank = "AIC"                                # Use AIC for model ranking
+  rank = "AIC"# Use AIC for model ranking
 ) #start 09:56
 #aigain, does not finish in 12 hrs. Will have to try another way
 #maybe we can find a way to exclude the model with only lat and long as predictors in the dredge output. 
 #but maybe that is not correct?
+
+#create a cluster obeject to run the function over 3 cores
+clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK" 
+clust <- try(makeCluster(getOption("cl.cores", 3), type = clusterType))
+
+#peform model selection using 3 cores
+# Perform stepwise model selection using dredge
+model_selection_par <- dredge(
+  full_model,
+  fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
+  rank = "AIC", # Use AIC for model ranking
+cluster = clust) #
 
 #save model selection results
 write.csv(as.data.frame(model_selection), row.names = FALSE ,"Functional trait data\\paper results\\stepwise_results.csv")
