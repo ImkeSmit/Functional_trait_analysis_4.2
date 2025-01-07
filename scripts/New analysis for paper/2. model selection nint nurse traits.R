@@ -94,7 +94,7 @@ full_formula3 <- as.formula("NIntc_richness_binom ~
 # Fit the full model
 options(na.action = "na.omit")
 full_model <- glmmTMB(
-  formula = full_formula2,
+  formula = full_formula3,
   data = modeldat_final,    
   family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
 )
@@ -103,25 +103,22 @@ full_model <- glmmTMB(
 # Ensure all models maintain random effects by excluding them from being dropped
 options(na.action = "na.fail") # Required for dredge function
 
-
 #create a cluster obeject to run the function over 8 cores
 clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK" 
 clust <- try(makeCluster(getOption("cl.cores", 8), type = clusterType))
 
 # Export necessary objects and functions to the cluster
-clusterExport(clust, varlist = c("modeldat_final", "full_formula2"), envir = environment())
+clusterExport(clust, varlist = c("modeldat_final", "full_formula3"), envir = environment())
 clusterEvalQ(clust, library(glmmTMB))
 clusterEvalQ(clust, library(MuMIn))
 
-#peform model selection using 3 cores
+#peform model selection using 8 cores
 # Perform stepwise model selection using dredge
 model_selection_par <- dredge(
   full_model,
-  fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
+  fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
-cluster = clust) #start 10:20
-#was finished when I cam ehome at 11:00
-#Add a subset argument to not include aridity2 without aridity etc. 
+cluster = clust) #start 16:20
 
 # Stop the cluster after use
 stopCluster(clust)
