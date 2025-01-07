@@ -82,21 +82,10 @@ full_model <- glmmTMB(
   family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
 )
 
-test_model <- glmmTMB(NIntc_richness_binom ~ aridity*log_nurse_meanH +  aridity*log_nurse_meanLDMC + 
-                        aridity2 + Lat_decimal + Long_decimal + (1|nurse_sp), data = modeldat_final, family = binomial)
 
 # Ensure all models maintain random effects by excluding them from being dropped
 options(na.action = "na.fail") # Required for dredge function
 
-# Perform stepwise model selection using dredge
-model_selection <- dredge(
-  full_model,
-  fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
-  rank = "AIC"# Use AIC for model ranking
-) #start 09:56
-#aigain, does not finish in 12 hrs. Will have to try another way
-#maybe we can find a way to exclude the model with only lat and long as predictors in the dredge output. 
-#but maybe that is not correct?
 
 #create a cluster obeject to run the function over 8 cores
 clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK" 
@@ -114,6 +103,8 @@ model_selection_par <- dredge(
   fixed = c("cond(Lat_decimal)","cond(Long_decimal)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
 cluster = clust) #start 10:20
+#was finished when I cam ehome at 11:00
+#Add a subset argument to not include aridity2 without aridity etc. 
 
 # Stop the cluster after use
 stopCluster(clust)
@@ -130,6 +121,10 @@ print(model_selection)
 
 # Extract the best model based on AICc
 best_model <- get.models(model_selection, subset = 1)[[1]] #subset = 1 gets the model with the absolute lowest AIC.
+#NIntc_richness_binom ~ Lat_decimal + Long_decimal + (1 | nurse_sp)
+
+second_best_model <- get.models(model_selection, subset = 2)[[1]]
+#NIntc_richness_binom ~ log_nurse_meanH + Lat_decimal + Long_decimal +      (1 | nurse_sp)
 
 #extract models with AIC difference less than 2
 eq_model <- get.models(model_selection, subset = delta < 2)
