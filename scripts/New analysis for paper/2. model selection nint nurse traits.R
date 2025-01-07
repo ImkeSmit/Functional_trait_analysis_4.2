@@ -74,6 +74,21 @@ full_formula2 <- as.formula("NIntc_richness_binom ~
                             Lat_decimal +Long_decimal + 
                             (1|nurse_sp)")#add these to account for spatial structure instead of (1|site_ID/ID)
 
+#formula without climate*climate interactions
+#with trait*soil interactions
+#This model converges!
+full_formula3 <- as.formula("NIntc_richness_binom ~ 
+                            graz*aridity + graz*RASE + graz*AMT +
+                            graz*pH + graz*SAC +
+                            graz*log_nurse_meanH + graz*log_nurse_meanLDMC +
+                            aridity*log_nurse_meanH + aridity*log_nurse_meanLDMC +
+                            AMT*log_nurse_meanH + AMT*log_nurse_meanLDMC +
+                            RASE*log_nurse_meanH + RASE*log_nurse_meanLDMC +
+                            pH*log_nurse_meanH + pH*log_nurse_meanLDMC +
+                            SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
+                            sin_lat + sin_long + #add these to account for spatial structure instead of (1|site_ID/ID)
+                            (1|nurse_sp)")
+
 
 
 # Fit the full model
