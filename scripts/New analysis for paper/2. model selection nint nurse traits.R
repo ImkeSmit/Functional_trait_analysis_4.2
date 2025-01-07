@@ -110,24 +110,25 @@ cluster = clust) #start 10:20
 stopCluster(clust)
 
 #save model selection results
-write.csv(as.data.frame(model_selection), row.names = FALSE ,"Functional trait data\\paper results\\stepwise_results.csv")
+write.csv(as.data.frame(model_selection_par), row.names = FALSE ,"Functional trait data\\paper results\\stepwise_results.csv")
 
 # View model selection table
-print(model_selection)
+print(model_selection_par)
 #in output: cond(Int) refers to the intercept of the conditional model (test_model in this case).
 #disp(Int) is the intercept of the dispersion model. Since you did not specify a dispersion structure in TMB, this is default settings. do not worry about this column
 #if a column has a number or + in the output, it means the variable was included in that model. 
 
 
 # Extract the best model based on AICc
-best_model <- get.models(model_selection, subset = 1)[[1]] #subset = 1 gets the model with the absolute lowest AIC.
+best_model <- get.models(model_selection_par, subset = 1)[[1]] #subset = 1 gets the model with the absolute lowest AIC.
 #NIntc_richness_binom ~ Lat_decimal + Long_decimal + (1 | nurse_sp)
 
-second_best_model <- get.models(model_selection, subset = 2)[[1]]
-#NIntc_richness_binom ~ log_nurse_meanH + Lat_decimal + Long_decimal +      (1 | nurse_sp)
 
 #extract models with AIC difference less than 2
-eq_model <- get.models(model_selection, subset = delta < 2)
+eq_model <- get.models(
+  model_selection_par, 
+  subset = delta < 2 )
+
 #average these models
 avg_models <- model.avg(eq_model)
 #from vignette:
@@ -137,4 +138,5 @@ avg_models <- model.avg(eq_model)
 #it does not have a tendency of biasing the value away from zero. The ‘full’ average is a type of shrinkage 
 #estimator, and for variables with a weak relationship to the response it is smaller than ‘subset’ estimators.
 formula(avg_models) #get formula of the averaged model
+#NIntc_richness_binom ~ 0 + aridity + Lat_decimal + log_nurse_meanH + log_nurse_meanLDMC + Long_decimal
 summary(avg_models) #get summary of the averaged model
