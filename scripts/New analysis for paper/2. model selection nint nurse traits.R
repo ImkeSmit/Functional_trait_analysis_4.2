@@ -38,7 +38,9 @@ modeldat_final <- modeldat |>
   inner_join(drypop, by = "ID") |> 
   rename(pH = "pH.b", SAC = "SAC.b") |> 
   mutate(AMT2 = AMT^2, 
-         aridity2 = aridity^2) |> 
+         aridity2 = aridity^2, 
+         sin_lat = sin(Lat_decimal), #transform from a circular to a linear variable
+         sin_long = sin(Long_decimal)) |> 
   #remove all rows which have NA values in any of our modelling variables
   drop_na(NIntc_richness_binom, NIntc_cover_binom,NInta_richness_binom, NInta_cover_binom, 
           log_nurse_meanLDMC, log_nurse_meanH, aridity, AMT, RASE, SAC, pH, graz)
@@ -110,9 +112,11 @@ cluster = clust) #start 10:20
 stopCluster(clust)
 
 #save model selection results
-write.csv(as.data.frame(model_selection_par), row.names = FALSE ,"Functional trait data\\paper results\\stepwise_results.csv")
+saveRDS(model_selection_par, "Functional trait data\\paper results\\nint_nurse_trait_dredge_result.rds")
+write.csv(as.data.frame(model_selection_par), row.names = FALSE ,"Functional trait data\\paper results\\nint_nurse_trait_dredge_result.csv")
 
 # View model selection table
+model_selection_par <- readRDS("Functional trait data\\paper results\\nint_nurse_trait_dredge_result.rds")
 print(model_selection_par)
 #in output: cond(Int) refers to the intercept of the conditional model (test_model in this case).
 #disp(Int) is the intercept of the dispersion model. Since you did not specify a dispersion structure in TMB, this is default settings. do not worry about this column
