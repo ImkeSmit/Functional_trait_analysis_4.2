@@ -21,17 +21,17 @@ modeldat$ID <- as.factor(modeldat$ID)
 #import siteinfo, we will use this to add ID to drypop
 siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
   mutate(plotref = str_c(SITE, PLOT, sep = "_")) |> 
-  select(ID, plotref, Lat_decimal, Long_decimal) |> 
+  dplyr::select(ID, plotref, Lat_decimal, Long_decimal) |> 
   distinct() |> 
   na.omit()
 
 #import drypop, so which contains the env covariates
 drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
   mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
-  select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  dplyr::select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
   distinct() |> 
   left_join(siteinfo, by = "plotref") |> 
-  select(!plotref)
+  dplyr::select(!plotref)
 drypop$ID <- as.factor(drypop$ID)
 
 #join the env covariates to the nurse nint data
@@ -128,7 +128,7 @@ stepwise_results <- stepAIC(full_model, direction = "both")
 red_formula <- as.formula("NIntc_richness_binom ~ 
                           graz*aridity + graz*RASE + graz*AMT + 
                           graz*SAC +
-                          graz*LDMC +
+                          graz*log_nurse_meanLDMC +
                           aridity*log_nurse_meanH + aridity*log_nurse_meanLDMC +
                           RASE*log_nurse_meanLDMC +
                           AMT*log_nurse_meanH + AMT*log_nurse_meanLDMC +
@@ -136,6 +136,14 @@ red_formula <- as.formula("NIntc_richness_binom ~
                           SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
                           sin_lat + sin_long + #add these to account for spatial structure instead of (1|site_ID/ID)
                           (1|nurse_sp)")
+
+# Fit the reduced model
+options(na.action = "na.omit")
+red_model <- glmmTMB(
+  formula = red_formula,
+  data = modeldat_final,    
+  family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
+)
 
 
 # Ensure all models maintain random effects by excluding them from being dropped
@@ -146,17 +154,17 @@ clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK
 clust <- try(makeCluster(getOption("cl.cores", 8), type = clusterType))
 
 # Export necessary objects and functions to the cluster
-clusterExport(clust, varlist = c("modeldat_final", "full_formula3"), envir = environment())
+clusterExport(clust, varlist = c("modeldat_final", "red_formula"), envir = environment())
 clusterEvalQ(clust, library(glmmTMB))
 clusterEvalQ(clust, library(MuMIn))
 
 #peform model selection using 8 cores
-# Perform stepwise model selection using dredge
+# Perform model selection using dredge
 model_selection_par <- dredge(
   red_model,
   fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
-cluster = clust) #start 16:20
+cluster = clust) #start 11:41
 
 # Stop the cluster after use
 stopCluster(clust)
