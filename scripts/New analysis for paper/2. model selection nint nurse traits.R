@@ -124,6 +124,20 @@ stepwise_results <- stepAIC(full_model, direction = "both")
 #  pH:log_nurse_meanLDMC + SAC:log_nurse_meanH
 
 
+###reduced formula
+red_formula <- as.formula("NIntc_richness_binom ~ 
+                          graz*aridity + graz*RASE + graz*AMT + 
+                          graz*SAC +
+                          graz*LDMC +
+                          aridity*log_nurse_meanH + aridity*log_nurse_meanLDMC +
+                          RASE*log_nurse_meanLDMC +
+                          AMT*log_nurse_meanH + AMT*log_nurse_meanLDMC +
+                          pH*log_nurse_meanH + pH*log_nurse_meanLDMC +
+                          SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
+                          sin_lat + sin_long + #add these to account for spatial structure instead of (1|site_ID/ID)
+                          (1|nurse_sp)")
+
+
 # Ensure all models maintain random effects by excluding them from being dropped
 options(na.action = "na.fail") # Required for dredge function
 
@@ -139,7 +153,7 @@ clusterEvalQ(clust, library(MuMIn))
 #peform model selection using 8 cores
 # Perform stepwise model selection using dredge
 model_selection_par <- dredge(
-  full_model,
+  red_model,
   fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
 cluster = clust) #start 16:20
