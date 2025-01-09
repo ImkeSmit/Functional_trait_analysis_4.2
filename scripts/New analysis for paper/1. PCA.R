@@ -1,4 +1,8 @@
 #Script to do a PCA of trait data and get the independent traits with the highest loadings on the axes
+library(tidyverse)
+library(tidylog)
+library(ggplot2)
+library(ggbiplot)
 
 #import trait data
 FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv",
@@ -24,7 +28,7 @@ FT_wide <- FT_mean |>
          !is.na(percentC),
          !is.na(percentN)) |> 
   mutate(C_N_ratio = percentC/percentN) |> 
-  select(!c(percentC, percentN))
+  dplyr::select(!c(percentC, percentN))
 
 #standardise trait values
 std_FT_wide <- FT_wide
@@ -65,5 +69,13 @@ plot(all_FT_pca$scores[, 1], all_FT_pca$scores[, 2])
 ##LDMC has highest loading on PC1, correlation is positive
 ##maxH has highest loading on PC2, correlation is positive
 
-
 #So the two traits chosen are LDMC and maxH!
+
+
+###GGplot biplot###
+trait_pca <- ggbiplot(all_FT_pca, choices = c(1,2), 
+         varname.size = 4, varname.color = "black") +
+  geom_point(colour = "azure3", alpha = 0.8)+
+  theme_classic() 
+trait_pca$layers <- c(trait_pca$layers, trait_pca$layers[[2]]) #move the arrows to plot in the foreground
+ggsave("trait_biplot.png", trait_pca, path = "Figures")
