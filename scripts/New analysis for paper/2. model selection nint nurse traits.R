@@ -164,7 +164,7 @@ model_selection_par <- dredge(
   red_model,
   fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
-cluster = clust) #start 11:41
+cluster = clust) #start 11:41, end 17:41
 
 # Stop the cluster after use
 stopCluster(clust)
@@ -183,7 +183,6 @@ print(model_selection_par)
 
 # Extract the best model based on AICc
 best_model <- get.models(model_selection_par, subset = 1)[[1]] #subset = 1 gets the model with the absolute lowest AIC.
-#NIntc_richness_binom ~ Lat_decimal + Long_decimal + (1 | nurse_sp)
 
 
 #extract models with AIC difference less than 2
@@ -199,6 +198,22 @@ avg_models <- model.avg(eq_model)
 #the corresponding coefficient (and its respective variance) is set to zero. Unlike the ‘subset average’, 
 #it does not have a tendency of biasing the value away from zero. The ‘full’ average is a type of shrinkage 
 #estimator, and for variables with a weak relationship to the response it is smaller than ‘subset’ estimators.
+
 formula(avg_models) #get formula of the averaged model
-#NIntc_richness_binom ~ 0 + aridity + Lat_decimal + log_nurse_meanH + log_nurse_meanLDMC + Long_decimal
+#NIntc_richness_binom ~ 0 + AMT + aridity + graz + log_nurse_meanH + 
+#log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
+#  AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + graz:log_nurse_meanLDMC + 
+#  graz:RASE + graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:SAC + 
+#  log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC
+
 summary(avg_models) #get summary of the averaged model
+
+r.squaredGLMM(avg_models)
+
+#get the variable importance
+importance <- sw(avg_models)
+
+
+
+####
+
