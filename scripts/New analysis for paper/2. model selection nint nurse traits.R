@@ -46,7 +46,7 @@ modeldat_final <- modeldat |>
   drop_na(NIntc_richness_binom, NIntc_cover_binom,NInta_richness_binom, NInta_cover_binom, 
           log_nurse_meanLDMC, log_nurse_meanH, aridity, AMT, RASE, SAC, pH, graz)
 
-####define the full model formula ####
+####define the full model formula ###
 #formula without climate*climate interactions
 #with trait*soil interactions
 #This model converges!
@@ -62,85 +62,12 @@ full_formula3 <- as.formula("NIntc_richness_binom ~
                             sin_lat + sin_long + #add these to account for spatial structure instead of (1|site_ID/ID)
                             (1|nurse_sp)")
 
-
+####MODEL SELECTION FOR NINTC RICHNESS####
 
 # Fit the full model
 options(na.action = "na.omit")
 full_model <- glmmTMB(
   formula = full_formula3,
-  data = modeldat_final,    
-  family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
-)
-
-
-#do stepAIC first on the full models to eliminate some variables
-stepwise_results <- stepAIC(full_model, direction = "both")
-#lowest AIC is 3385.36
-#keep all variables in models with delta AIC < 8
-#after the AIC=3391.58 model variables are only removed so we kan keep all in the highest model
-#Step:  AIC=3391.58
-#NIntc_richness_binom ~ graz + aridity + RASE + AMT + pH + SAC + 
-#  log_nurse_meanH + log_nurse_meanLDMC + sin_lat + sin_long + 
-#  graz:aridity + graz:RASE + graz:SAC + graz:log_nurse_meanLDMC + 
-#  aridity:log_nurse_meanH + aridity:log_nurse_meanLDMC + AMT:log_nurse_meanH + 
-#  AMT:log_nurse_meanLDMC + RASE:log_nurse_meanLDMC + pH:log_nurse_meanH + 
-#  pH:log_nurse_meanLDMC + SAC:log_nurse_meanH + SAC:log_nurse_meanLDMC
-
-#Step:  AIC=3389.65
-#NIntc_richness_binom ~ graz + aridity + RASE + AMT + pH + SAC + 
-#  log_nurse_meanH + log_nurse_meanLDMC + sin_long + graz:aridity + 
-#  graz:RASE + graz:SAC + graz:log_nurse_meanLDMC + aridity:log_nurse_meanH + 
-#  aridity:log_nurse_meanLDMC + AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + 
-#  RASE:log_nurse_meanLDMC + pH:log_nurse_meanH + pH:log_nurse_meanLDMC + 
-#  SAC:log_nurse_meanH + SAC:log_nurse_meanLDMC
-
-#Step:  AIC=3388.39
-#NIntc_richness_binom ~ graz + aridity + RASE + AMT + pH + SAC + 
-#  log_nurse_meanH + log_nurse_meanLDMC + sin_long + graz:aridity + 
-#  graz:RASE + graz:SAC + graz:log_nurse_meanLDMC + aridity:log_nurse_meanH + 
-#  aridity:log_nurse_meanLDMC + AMT:log_nurse_meanH + RASE:log_nurse_meanLDMC + 
-#  pH:log_nurse_meanH + pH:log_nurse_meanLDMC + SAC:log_nurse_meanH + 
-#  SAC:log_nurse_meanLDMC
-
-#Step:  AIC=3387.01
-#NIntc_richness_binom ~ graz + aridity + RASE + AMT + pH + SAC + 
-#  log_nurse_meanH + log_nurse_meanLDMC + sin_long + graz:aridity + 
-#  graz:RASE + graz:SAC + graz:log_nurse_meanLDMC + aridity:log_nurse_meanH + 
-#  aridity:log_nurse_meanLDMC + AMT:log_nurse_meanH + RASE:log_nurse_meanLDMC + 
-#  pH:log_nurse_meanH + pH:log_nurse_meanLDMC + SAC:log_nurse_meanH
-
-#Step:  AIC=3385.95
-#NIntc_richness_binom ~ graz + aridity + RASE + AMT + pH + SAC + 
-#  log_nurse_meanH + log_nurse_meanLDMC + sin_long + graz:RASE + 
-#  graz:SAC + graz:log_nurse_meanLDMC + aridity:log_nurse_meanH + 
-#  aridity:log_nurse_meanLDMC + AMT:log_nurse_meanH + RASE:log_nurse_meanLDMC + 
-#  pH:log_nurse_meanH + pH:log_nurse_meanLDMC + SAC:log_nurse_meanH
-
-#Step:  AIC=3385.36
-#NIntc_richness_binom ~ graz + aridity + RASE + AMT + pH + SAC + 
-#  log_nurse_meanH + log_nurse_meanLDMC + graz:RASE + graz:SAC + 
-#  graz:log_nurse_meanLDMC + aridity:log_nurse_meanH + aridity:log_nurse_meanLDMC + 
-#  AMT:log_nurse_meanH + RASE:log_nurse_meanLDMC + pH:log_nurse_meanH + 
-#  pH:log_nurse_meanLDMC + SAC:log_nurse_meanH
-
-
-###reduced formula
-red_formula <- as.formula("NIntc_richness_binom ~ 
-                          graz*aridity + graz*RASE + graz*AMT + 
-                          graz*SAC +
-                          graz*log_nurse_meanLDMC +
-                          aridity*log_nurse_meanH + aridity*log_nurse_meanLDMC +
-                          RASE*log_nurse_meanLDMC +
-                          AMT*log_nurse_meanH + AMT*log_nurse_meanLDMC +
-                          pH*log_nurse_meanH + pH*log_nurse_meanLDMC +
-                          SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
-                          sin_lat + sin_long + #add these to account for spatial structure instead of (1|site_ID/ID)
-                          (1|nurse_sp)")
-
-# Fit the reduced model
-options(na.action = "na.omit")
-red_model <- glmmTMB(
-  formula = red_formula,
   data = modeldat_final,    
   family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
 )
@@ -161,7 +88,7 @@ clusterEvalQ(clust, library(MuMIn))
 #peform model selection using 8 cores
 # Perform model selection using dredge
 model_selection_par <- dredge(
-  red_model,
+  full_model,
   fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
 cluster = clust) #start 11:41, end 17:41
@@ -170,7 +97,7 @@ cluster = clust) #start 11:41, end 17:41
 stopCluster(clust)
 
 #save model selection results
-saveRDS(model_selection_par, "Functional trait data\\paper results\\nint_nurse_trait_dredge_result.rds")
+saveRDS(model_selection_par, "Functional trait data\\paper results\\nint_richness_nurse_trait_dredge_result.rds")
 write.csv(as.data.frame(model_selection_par), row.names = FALSE ,"Functional trait data\\paper results\\nint_nurse_trait_dredge_result.csv")
 
 # View model selection table
@@ -215,5 +142,61 @@ importance <- sw(avg_models)
 
 
 
-####
+####MODEL SELECTION FOR NINTC COVER####
+####define the full model formula ####
+#formula without climate*climate interactions
+#with trait*soil interactions
+#This model converges!
+full_formula4 <- as.formula("NIntc_cover_binom ~ 
+                            graz*aridity + graz*RASE + graz*AMT +
+                            graz*pH + graz*SAC +
+                            graz*log_nurse_meanH + graz*log_nurse_meanLDMC +
+                            aridity*log_nurse_meanH + aridity*log_nurse_meanLDMC +
+                            AMT*log_nurse_meanH + AMT*log_nurse_meanLDMC +
+                            RASE*log_nurse_meanH + RASE*log_nurse_meanLDMC +
+                            pH*log_nurse_meanH + pH*log_nurse_meanLDMC +
+                            SAC*log_nurse_meanH + SAC*log_nurse_meanLDMC +
+                            sin_lat + sin_long + #add these to account for spatial structure instead of (1|site_ID/ID)
+                            (1|nurse_sp)")
 
+
+# Fit the full model
+options(na.action = "na.omit")
+full_model_cov <- glmmTMB(
+  formula = full_formula4,
+  data = modeldat_final,    
+  family = binomial  #had to remove sq terms and soil:climate and soil:trait interactions to make model converge
+)
+
+
+#do stepAIC first on the full models to eliminate some variables
+stepwise_results <- stepAIC(full_model_cov, direction = "both")
+#stepAIC says the best option is to remove no variables!!!
+
+# Ensure all models maintain random effects by excluding them from being dropped
+options(na.action = "na.fail") # Required for dredge function
+
+#create a cluster obeject to run the function over 8 cores
+clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK" 
+clust <- try(makeCluster(getOption("cl.cores", 8), type = clusterType))
+
+# Export necessary objects and functions to the cluster
+clusterExport(clust, varlist = c("modeldat_final", "full_formula4"), envir = environment())
+clusterEvalQ(clust, library(glmmTMB))
+clusterEvalQ(clust, library(MuMIn))
+
+#peform model selection using 8 cores
+# Perform model selection using dredge
+cov_model_selection_par <- dredge(
+  full_model_cov,
+  fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
+  rank = "AIC", # Use AIC for model ranking
+  cluster = clust) #start 18:43 on Thursday, finished 10:00 on Sunday (5 hour break without running)
+
+# Stop the cluster after use
+stopCluster(clust)
+
+#save model selection results
+saveRDS(cov_model_selection_par, "Functional trait data\\paper results\\nint_cover_nurse_trait_dredge_result.rds")
+
+get.models(cov_model_selection_par, subset = 1)[1]
