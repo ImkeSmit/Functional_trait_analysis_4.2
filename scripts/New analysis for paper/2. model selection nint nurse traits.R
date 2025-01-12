@@ -81,7 +81,7 @@ clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK
 clust <- try(makeCluster(getOption("cl.cores", 8), type = clusterType))
 
 # Export necessary objects and functions to the cluster
-clusterExport(clust, varlist = c("modeldat_final", "red_formula"), envir = environment())
+clusterExport(clust, varlist = c("modeldat_final", "full_formula3"), envir = environment())
 clusterEvalQ(clust, library(glmmTMB))
 clusterEvalQ(clust, library(MuMIn))
 
@@ -91,14 +91,13 @@ model_selection_par <- dredge(
   full_model,
   fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
-cluster = clust) #start 11:41, end 17:41
+cluster = clust) #start Sunday 16:33
 
 # Stop the cluster after use
 stopCluster(clust)
 
 #save model selection results
 saveRDS(model_selection_par, "Functional trait data\\paper results\\nint_richness_nurse_trait_dredge_result.rds")
-write.csv(as.data.frame(model_selection_par), row.names = FALSE ,"Functional trait data\\paper results\\nint_nurse_trait_dredge_result.csv")
 
 # View model selection table
 model_selection_par <- readRDS("Functional trait data\\paper results\\nint_nurse_trait_dredge_result.rds")
