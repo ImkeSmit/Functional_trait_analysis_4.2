@@ -10,24 +10,38 @@ library(car)
 trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1) |> 
   filter(trait %in% c("MaxH", "MeanLDMC"))
 trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
+trait_fdist$ID <- as.factor(trait_fdist$ID)
 ##Lets join the results of the CHi2 tests to sla_fdist###
 ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
   select(ID, species, association) |> 
   rename(target = species)
+ass$ID <- as.factor(ass$ID)
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 
 #import siteinfo which has lat and long for each plot
 siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
-  select(ID, Lat_decimal, Long_decimal) |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |>
+  select(ID, plotref, Lat_decimal, Long_decimal) |> 
   mutate(sin_lat = sin(Lat_decimal), 
          sin_long = sin(Long_decimal)) |> 
   select(!c(Lat_decimal, Long_decimal))
+
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  dplyr::select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  dplyr::select(!plotref) |> 
+  rename(pH = pH.b, SAC = SAC.b)
+drypop$ID <- as.factor(drypop$ID)
 
 #join the associations and the coordinates to the trait differences
 trait_ass_join <- trait_fdist |> 
   left_join(ass, by = c("target", "ID")) |> 
   filter(association %in% c("nurse", "bare")) |> #only work with these associations
-  left_join(siteinfo, by = "ID")
+  left_join(drypop, by = "ID") |> 
+  rename(nurse_sp = nurse)
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
@@ -44,10 +58,17 @@ hist(maxh_data$neginv_trait_difference)
 hist(maxh_data$trait_difference)
 
 ###full formula for model selection
-full_formula <- as.formula("trait_difference ~ association*graz + 
-                           association*AMT + association*RASE + association*aridity + 
-                           association* SAC + association*pH +
+full_formula <- as.formula("trait_difference ~ association*GRAZ + 
+                           association*AMT + association*RASE + association*ARIDITY.v3 + 
+                           association*SAC + association*pH +
                            sin_lat + sin_long + (1|nurse_sp)")
+
+maxh_full_model <- glmmTMB(formula = full_formula, data = maxh_data)
+
+options(na.action = "na.fail")
+maxh_model_selection <- dredge(maxh_full_model, 
+                               fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
+                               rank = "AIC") #start16:08
 
 
 
