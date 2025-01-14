@@ -219,8 +219,15 @@ cov_avg_model_formula <-formula(cov_avg_models) #get formula of the averaged mod
 summary(cov_avg_models) #get summary of the averaged model
 
 options(na.action = "na.omit")
-cov_final_model <-glmmTMB(as.formula(cov_avg_model_formula), data = modeldat_final, family = "binomial")
-r.squaredGLMM(cov_final_model) #r squared is not working
+cov_final_model <-glmmTMB(NIntc_cover_binom ~ AMT + aridity + graz + log_nurse_meanH + 
+                            log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
+                            AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + aridity:graz + 
+                            graz:log_nurse_meanH + graz:log_nurse_meanLDMC + graz:RASE + 
+                            graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:RASE + log_nurse_meanH:SAC + 
+                            log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC + (1|nurse_sp), 
+                          data = modeldat_final, family = "binomial")
+cov_null_model <- glmmTMB(NIntc_cover_binom ~ 1+ (1|nurse_sp), data = modeldat_final, family = "binomial")
+r.squaredGLMM(cov_final_model, cov_null_model) #r squared is not working
 
 #get the variable importance
 cov_importance <- sw(cov_avg_models)
