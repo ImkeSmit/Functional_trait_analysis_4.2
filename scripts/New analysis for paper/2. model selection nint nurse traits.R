@@ -100,7 +100,7 @@ stopCluster(clust)
 saveRDS(model_selection_par, "Functional trait data\\paper results\\nint_richness_nurse_trait_dredge_result.rds")
 
 # View model selection table
-model_selection_par <- readRDS("Functional trait data\\paper results\\nint_nurse_trait_dredge_result.rds")
+model_selection_par <- readRDS("Functional trait data\\paper results\\nint_richness_nurse_trait_dredge_result.rds")
 print(model_selection_par)
 #in output: cond(Int) refers to the intercept of the conditional model (test_model in this case).
 #disp(Int) is the intercept of the dispersion model. Since you did not specify a dispersion structure in TMB, this is default settings. do not worry about this column
@@ -125,7 +125,7 @@ avg_models <- model.avg(eq_model)
 #it does not have a tendency of biasing the value away from zero. The ‘full’ average is a type of shrinkage 
 #estimator, and for variables with a weak relationship to the response it is smaller than ‘subset’ estimators.
 
-formula(avg_models) #get formula of the averaged model
+avg_model_formula <-formula(avg_models) #get formula of the averaged model
 #NIntc_richness_binom ~ 0 + AMT + aridity + graz + log_nurse_meanH + 
 #log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
 #  AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + graz:log_nurse_meanLDMC + 
@@ -134,7 +134,9 @@ formula(avg_models) #get formula of the averaged model
 
 summary(avg_models) #get summary of the averaged model
 
-r.squaredGLMM(avg_models)
+options(na.action = "na.omit")
+final_model <-glmmTMB(as.formula(avg_model_formula), data = modeldat_final, family = "binomial")
+r.squaredGLMM(final_model) #r squared is not working
 
 #get the variable importance
 importance <- sw(avg_models)
@@ -198,4 +200,27 @@ stopCluster(clust)
 #save model selection results
 saveRDS(cov_model_selection_par, "Functional trait data\\paper results\\nint_cover_nurse_trait_dredge_result.rds")
 
-get.models(cov_model_selection_par, subset = 1)[1]
+#read in model selection results
+cov_model_selection_par <- readRDS("Functional trait data\\paper results\\nint_cover_nurse_trait_dredge_result.rds")
+
+# Extract the best model based on AICc
+cov_best_model <- get.models(cov_model_selection_par, subset = 1)[[1]] #subset = 1 gets the model with the absolute lowest AIC.
+
+#extract models with AIC difference less than 2
+cov_eq_model <- get.models(
+  cov_model_selection_par, 
+  subset = delta < 2 )
+
+#average these models
+cov_avg_models <- model.avg(cov_eq_model)
+
+cov_avg_model_formula <-formula(cov_avg_models) #get formula of the averaged model
+
+summary(cov_avg_models) #get summary of the averaged model
+
+options(na.action = "na.omit")
+cov_final_model <-glmmTMB(as.formula(cov_avg_model_formula), data = modeldat_final, family = "binomial")
+r.squaredGLMM(cov_final_model) #r squared is not working
+
+#get the variable importance
+cov_importance <- sw(cov_avg_models)
