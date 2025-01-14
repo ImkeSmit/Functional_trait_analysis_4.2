@@ -91,7 +91,7 @@ model_selection_par <- dredge(
   full_model,
   fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
   rank = "AIC", # Use AIC for model ranking
-cluster = clust) #start Sunday 16:33
+cluster = clust) #start Sunday 16:33, end Tuesday 6:30
 
 # Stop the cluster after use
 stopCluster(clust)
