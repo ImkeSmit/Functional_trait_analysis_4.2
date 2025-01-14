@@ -65,30 +65,15 @@ full_formula <- as.formula("trait_difference ~ association*GRAZ +
 
 maxh_full_model <- glmmTMB(formula = full_formula, data = maxh_data)
 
+#rank models with dredge
 options(na.action = "na.fail")
 maxh_model_selection <- dredge(maxh_full_model, 
                                fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
-                               rank = "AIC") #start16:08
+                               rank = "AIC") #start16:08, end 16:12 wow
 
+#get the bets models
+maxh_eq_models <- get.models(maxh_model_selection, subset= delta <2) # the best model is the full model. There is no equivalent model
 
-
-#null model
-maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
-#alternative model
-maxh_mod <- glmmTMB(trait_difference ~ association + (1|nurse) + (1|SITE_ID/ID), data = maxh_data)
-
-summary(maxh_mod)
-Anova(maxh_mod) #significant effect
-anova(maxh_null, maxh_mod) #p = 1.113e-07 ***
-emmeans(maxh_mod, specs = "association")
-r.squaredGLMM(maxh_mod)
-
-#model diagnostics
-simres <- simulateResiduals(maxh_mod)
-plot(simres)#underispersed, HOV violated
-
-ggplot(maxh_data, aes(x = association, y = trait_difference)) +
-  geom_boxplot()
 
 ##Are the means of each association group different from 0?
 #Do Whelch's t.test, which does not assume equal variances
@@ -99,3 +84,43 @@ maxh_test_nurse <- t.test(maxh_data[which(maxh_data$association == "nurse") , ]$
 maxh_test_bare <- t.test(maxh_data[which(maxh_data$association == "bare") , ]$trait_difference, 
                          mu = 0, alternative = "two.sided")
 #p <0.001, true mean greater than 0
+
+
+####MODEL SELECTION FOR MeanLDMC####
+ldmc_data <- trait_ass_join |> 
+  filter(trait == "MeanLDMC") |> 
+  mutate(sqrt_trait_difference = sqrt(trait_difference), 
+         log_trait_difference = log(trait_difference), 
+         neginv_trait_difference = -1/(1+trait_difference))
+hist(ldmc_data$trait_difference)
+
+###full formula for model selection
+full_formula <- as.formula("trait_difference ~ association*GRAZ + 
+                           association*AMT + association*RASE + association*ARIDITY.v3 + 
+                           association*SAC + association*pH +
+                           sin_lat + sin_long + (1|nurse_sp)")
+
+ldmc_full_model <- glmmTMB(formula = full_formula, data = ldmc_data)
+
+#rank models with dredge
+options(na.action = "na.fail")
+ldmc_model_selection <- dredge(ldmc_full_model, 
+                               fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
+                               rank = "AIC") 
+
+#get the bets models
+ldmc_eq_models <- get.models(ldmc_model_selection, subset= delta <2) # the best model is the full model. There is no equivalent model
+
+#average the equivalent models
+avg_ldmc_models <- model.avg(ldmc_eq_models)
+summary(avg_ldmc_models)
+
+##Are the means of each association group different from 0?
+#Do Whelch's t.test, which does not assume equal variances
+meanldmc_test_nurse <- t.test(ldmc_data[which(ldmc_data$association == "nurse") , ]$trait_difference, 
+                              mu = 0, alternative = "two.sided")
+#p <0.001, mean greater than 0
+
+meanldmc_test_bare <- t.test(ldmc_data[which(ldmc_data$association == "bare") , ]$trait_difference, 
+                             mu = 0, alternative = "two.sided")
+#p <0.001, mean greater than 0
