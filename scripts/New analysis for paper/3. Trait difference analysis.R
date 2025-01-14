@@ -3,6 +3,7 @@
 library(tidyverse)
 library(tidylog)
 library(glmmTMB)
+library(MuMIn)
 library(car)
 
 #Import pairwise differences between traits
@@ -15,15 +16,24 @@ ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis 
   rename(target = species)
 #remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
 
+#import siteinfo which has lat and long for each plot
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  select(ID, Lat_decimal, Long_decimal) |> 
+  mutate(sin_lat = sin(Lat_decimal), 
+         sin_long = sin(Long_decimal)) |> 
+  select(!c(Lat_decimal, Long_decimal))
+
+#join the associations and the coordinates to the trait differences
 trait_ass_join <- trait_fdist |> 
   left_join(ass, by = c("target", "ID")) |> 
-  filter(association %in% c("nurse", "bare")) #only work with these associations
+  filter(association %in% c("nurse", "bare")) |> #only work with these associations
+  left_join(siteinfo, by = "ID")
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$ID <- as.factor(trait_ass_join$ID)
 
-
+####MODEL SELECTION FOR MAXH####
 #MaxH model#
 maxh_data <- trait_ass_join |> 
   filter(trait == "MaxH") |> 
@@ -33,10 +43,13 @@ maxh_data <- trait_ass_join |>
 hist(maxh_data$neginv_trait_difference)
 hist(maxh_data$trait_difference)
 
-#how many of each association?
-maxh_data |> 
-  group_by(association) |> 
-  summarise(obs = n()) #751 bare, 1963 nurse
+###full formula for model selection
+full_formula <- as.formula("trait_difference ~ association*graz + 
+                           association*AMT + association*RASE + association*aridity + 
+                           association* SAC + association*pH +
+                           sin_lat + sin_long + (1|nurse_sp)")
+
+
 
 #null model
 maxh_null <- glmmTMB(trait_difference ~ 1 + (1|nurse) + (1|SITE_ID/ID), data = maxh_data) #cannot use transformations because of zeroes and negative values
