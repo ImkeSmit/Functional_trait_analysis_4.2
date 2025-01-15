@@ -140,7 +140,8 @@ r.squaredGLMM(final_model) #r squared is not working
 
 #get the variable importance
 importance <- sw(avg_models)
-
+#save to csv file
+write.csv(as.data.frame(importance), "Functional trait data\\paper results\\nint_rich_model_weights.csv")
 
 
 ####MODEL SELECTION FOR NINTC COVER####
