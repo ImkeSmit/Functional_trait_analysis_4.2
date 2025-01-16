@@ -46,6 +46,7 @@ trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$ID <- as.factor(trait_ass_join$ID)
+trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
 
 ####MODEL SELECTION FOR MAXH####
 #MaxH model#
@@ -72,8 +73,17 @@ maxh_model_selection <- dredge(maxh_full_model,
                                rank = "AIC") #start16:08, end 16:12 wow
 
 #get the bets models
-maxh_eq_models <- get.models(maxh_model_selection, subset= delta <2) # the best model is the full model. There is no equivalent model
+maxh_eq_models <- get.models(maxh_model_selection, subset= delta <2) #2 equivalent models
 
+avg_maxh_mod <- model.avg(maxh_eq_models)
+
+#model coeffiecients
+summary(avg_maxh_mod)
+
+#variable importance
+sw(avg_maxh_mod) #only association:SAC is just included in one model
+
+r.squaredGLMM(maxh_full_model)
 
 ##Are the means of each association group different from 0?
 #Do Whelch's t.test, which does not assume equal variances
@@ -109,8 +119,7 @@ ldmc_model_selection <- dredge(ldmc_full_model,
                                rank = "AIC") 
 
 #get the bets models
-ldmc_eq_models <- get.models(ldmc_model_selection, subset= delta <2) # the best model is the full model. There is no equivalent model
-
+ldmc_eq_models <- get.models(ldmc_model_selection, subset= delta <2) # 2 best models
 #average the equivalent models
 avg_ldmc_models <- model.avg(ldmc_eq_models)
 summary(avg_ldmc_models)
