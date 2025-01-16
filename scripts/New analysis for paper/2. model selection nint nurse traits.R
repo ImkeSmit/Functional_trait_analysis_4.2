@@ -232,3 +232,6 @@ r.squaredGLMM(cov_final_model, cov_null_model) #r squared is not working
 
 #get the variable importance
 cov_importance <- sw(cov_avg_models)
+
+#save to csv file
+write.csv(as.data.frame(cov_importance), "Functional trait data\\paper results\\nint_cov_model_weights.csv")
