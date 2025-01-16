@@ -78,3 +78,37 @@ modeldat_final <- modeldat |>
   #remove all rows which have NA values in any of our modelling variables
   drop_na(NIntc_richness_binom, NIntc_cover_binom,NInta_richness_binom, NInta_cover_binom, 
           log_nurse_meanLDMC, log_nurse_meanH, aridity, AMT, RASE, SAC, pH, graz)
+
+
+###Get core df to make predictions over
+pred_dat_core <- modeldat_final |> 
+  select(ID, site_ID, nurse_sp, graz, RASE, SAC, aridity, pH, AMT,
+         log_nurse_meanH, log_nurse_meanLDMC) |> 
+  distinct(ID, nurse_sp, .keep_all = T)
+
+#best models
+nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~ AMT + aridity + graz + log_nurse_meanH + 
+                                    log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
+                                    AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + graz:log_nurse_meanLDMC + 
+                                    graz:RASE + graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:SAC + 
+                                    log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC +
+                                    sin_lat + sin_long + (1|nurse_sp),
+                                  family = binomial, data = modeldat_final)
+
+nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ AMT + aridity + graz + log_nurse_meanH + 
+                                 log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
+                                 AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + aridity:graz + 
+                                 graz:log_nurse_meanH + graz:log_nurse_meanLDMC + graz:RASE + 
+                                 graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:RASE + log_nurse_meanH:SAC + 
+                                 log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC + 
+                                 sin_lat + sin_long + (1|nurse_sp), 
+                               data = modeldat_final, family = binomial)
+
+###NINtc richness~ SAC
+pred_dat1 <- pred_dat_core |> 
+  mutate(graz = 1, AMT = mean(AMT), RASE = mean(RASE), aridity = mean(aridity), log_nurse_meanLDMC = mean(log_nurse_meanLDMC), 
+         log_nurse_meanH = mean(log_nurse_meanH)) #set all variables except CN to their mean
+
+pred_dat1$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat1, type = "response")
+pred_dat1$nintc_richness_true_prediction <- 2*pred_dat1$nintc_richness_binom_prediction -1 #backtransform from binomial
+
