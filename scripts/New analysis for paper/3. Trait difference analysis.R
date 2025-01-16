@@ -97,7 +97,7 @@ hist(ldmc_data$trait_difference)
 ###full formula for model selection
 full_formula <- as.formula("trait_difference ~ association*GRAZ + 
                            association*AMT + association*RASE + association*ARIDITY.v3 + 
-                           association*SAC + association*pH +
+                           association*SAC + association*pH + 
                            sin_lat + sin_long + (1|nurse_sp)")
 
 ldmc_full_model <- glmmTMB(formula = full_formula, data = ldmc_data)
