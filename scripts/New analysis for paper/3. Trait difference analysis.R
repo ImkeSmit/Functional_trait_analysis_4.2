@@ -124,6 +124,10 @@ ldmc_eq_models <- get.models(ldmc_model_selection, subset= delta <2) # 2 best mo
 avg_ldmc_models <- model.avg(ldmc_eq_models)
 summary(avg_ldmc_models)
 
+sw(avg_ldmc_models)
+
+r.squaredGLMM(ldmc_full_model)
+
 ##Are the means of each association group different from 0?
 #Do Whelch's t.test, which does not assume equal variances
 meanldmc_test_nurse <- t.test(ldmc_data[which(ldmc_data$association == "nurse") , ]$trait_difference, 
