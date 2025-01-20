@@ -458,7 +458,7 @@ temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
 
-rich_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
+rich_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
   geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
@@ -486,3 +486,11 @@ rich_aridity <- ggplot(modeldat_final, aes(y = NIntc_richness, x = aridity)) +
   geom_line(data = pred_dat5, aes(x = aridity, y = nintc_richness_true_prediction), color = brewer.pal(8, "YlOrRd")[6], lwd = 1.5) +
   labs(y = expression(NInt[C]~richness), x = "Aridity") +
   theme_classic()
+
+rich_combo <- ggarrange(rich_LDMC_graz, rich_RASE_graz, rich_SAC_graz, rich_aridity,
+                        rich_LDMC_RASE, rich_LDMC_AMT, rich_H_RASE, rich_H_AMT, 
+                        rich_LDMC_SAC, rich_LDMC_pH, rich_H_pH, nrow = 3, ncol = 4, align = "hv",
+                        labels = c("a", "b", "c", 'd', "e", "f", "g", "h", "i", "j", "k", "l"))
+
+ggsave("nintc_richness_nurse_trait_effects.png", rich_combo, width = 4500, height = 2500, 
+       units = "px", path = "Figures")
