@@ -82,18 +82,18 @@ modeldat_final <- modeldat |>
 
 ###Get core df to make predictions over
 pred_dat_core <- modeldat_final |> 
-  select(ID, site_ID, nurse_sp, graz, RASE, SAC, aridity, pH, AMT,
-         log_nurse_meanH, log_nurse_meanLDMC) |> 
+  select(ID, nurse_sp, graz, RASE, SAC, aridity, pH, AMT,
+         log_nurse_meanH, log_nurse_meanLDMC, sin_lat, sin_long) |> 
   distinct(ID, nurse_sp, .keep_all = T)
 
-#best models
+#best models (averaged model formula)
 nintc_richness_bestmod <- glmmTMB(NIntc_richness_binom ~ AMT + aridity + graz + log_nurse_meanH + 
                                     log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
                                     AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + graz:log_nurse_meanLDMC + 
                                     graz:RASE + graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:SAC + 
                                     log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC +
-                                    sin_lat + sin_long + (1|nurse_sp),
-                                  family = binomial, data = modeldat_final)
+                                    sin_lat + sin_long,
+                                  family = binomial, data = modeldat_final) #no RE for plotting
 
 nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ AMT + aridity + graz + log_nurse_meanH + 
                                  log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
@@ -101,14 +101,25 @@ nintc_cover_bestmod <- glmmTMB(NIntc_cover_binom ~ AMT + aridity + graz + log_nu
                                  graz:log_nurse_meanH + graz:log_nurse_meanLDMC + graz:RASE + 
                                  graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:RASE + log_nurse_meanH:SAC + 
                                  log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC + 
-                                 sin_lat + sin_long + (1|nurse_sp), 
+                                 sin_lat + sin_long, 
                                data = modeldat_final, family = binomial)
 
-###NINtc richness~ SAC
+###NINtc richness~ RASE*graz
 pred_dat1 <- pred_dat_core |> 
-  mutate(graz = 1, AMT = mean(AMT), RASE = mean(RASE), aridity = mean(aridity), log_nurse_meanLDMC = mean(log_nurse_meanLDMC), 
-         log_nurse_meanH = mean(log_nurse_meanH)) #set all variables except CN to their mean
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         AMT = mean(AMT), aridity = mean(aridity),
+         pH = mean(pH), SAC = mean(SAC),
+         log_nurse_meanLDMC = mean(log_nurse_meanLDMC), 
+         log_nurse_meanH = mean(log_nurse_meanH)) 
 
 pred_dat1$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat1, type = "response")
 pred_dat1$nintc_richness_true_prediction <- 2*pred_dat1$nintc_richness_binom_prediction -1 #backtransform from binomial
 
+plot1 <- ggplot(modeldat_final, aes(y = NIntc_richness, x = RASE)) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = RASE, y = nintc_richness_true_prediction, color = graz), lwd = 1.5) +
+  scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
+                     values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
+  labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "RASE") +
+  theme_classic() +
+  theme(legend.position = "right")
