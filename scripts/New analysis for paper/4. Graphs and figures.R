@@ -247,3 +247,242 @@ rich_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_me
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
   theme_classic() 
+
+###NIntc richness ~ RASE*H
+#to show the effect of H dependent on AMT, we should create categories of AMT
+temp1 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         aridity = mean(aridity),
+         pH = mean(pH), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
+         log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
+temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
+  mutate(RASE = mean(RASE), label = "mean")
+temp3 <- temp1 |> 
+  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd")
+temp4 <- temp1 |> 
+  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd")
+
+temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
+temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
+temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
+temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  scale_color_manual(name = "Value of RASE", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  theme_classic() 
+
+
+
+###NIntc richness ~ RASE*LDMC
+temp1 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         aridity = mean(aridity),
+         pH = mean(pH), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
+         log_nurse_meanH = mean(log_nurse_meanH))
+temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
+  mutate(RASE = mean(RASE), label = "mean")
+temp3 <- temp1 |> 
+  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd")
+temp4 <- temp1 |> 
+  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd")
+
+temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
+temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
+temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
+temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  scale_color_manual(name = "Value of RASE", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
+  theme_classic() 
+
+
+
+###NIntc richness ~ pH*H
+temp1 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         aridity = mean(aridity),
+         RASE = mean(RASE), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
+         log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
+temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
+  mutate(pH = mean(pH), label = "mean")
+temp3 <- temp1 |> 
+  mutate(pH = mean(pH) + sd(pH), label = "mean + sd")
+temp4 <- temp1 |> 
+  mutate(pH = mean(pH) - sd(pH), label = "mean - sd")
+
+temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
+temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
+temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
+temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_H_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  scale_color_manual(name = "Value of pH", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  theme_classic()
+
+
+
+###NIntc richness ~ pH*LDMC
+temp1 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         aridity = mean(aridity),
+         RASE = mean(RASE), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
+         log_nurse_meanH = mean(log_nurse_meanH))
+temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
+  mutate(pH = mean(pH), label = "mean")
+temp3 <- temp1 |> 
+  mutate(pH = mean(pH) + sd(pH), label = "mean + sd")
+temp4 <- temp1 |> 
+  mutate(pH = mean(pH) - sd(pH), label = "mean - sd")
+
+temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
+temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
+temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
+temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  scale_color_manual(name = "Value of pH", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
+  theme_classic()
+
+
+
+
+###NIntc richness ~ SAC*H
+temp1 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         aridity = mean(aridity),
+         RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), #set other variables to their mean
+         log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
+temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
+  mutate(SAC = mean(SAC), label = "mean")
+temp3 <- temp1 |> 
+  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd")
+temp4 <- temp1 |> 
+  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd")
+
+temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
+temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
+temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
+temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  scale_color_manual(name = "Value of SAC", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  theme_classic()
+
+
+
+###NIntc richness ~ SAC*LDMC
+temp1 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         aridity = mean(aridity),
+         RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), #set other variables to their mean
+         log_nurse_meanH = mean(log_nurse_meanH))
+temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
+  mutate(SAC = mean(SAC), label = "mean")
+temp3 <- temp1 |> 
+  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd")
+temp4 <- temp1 |> 
+  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd")
+
+temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
+temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
+temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
+temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  scale_color_manual(name = "Value of SAC", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
+  theme_classic()
+
+
+###NIntc richness ~ aridity
+pred_dat5 <- pred_dat_core |> 
+  filter(graz == 1) |>  #we only need one level of graz
+  mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
+         RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), SAC = mean(SAC), #set other variables to their mean
+         log_nurse_meanH = mean(log_nurse_meanH), log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
+
+pred_dat5$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat5, type = "response")
+pred_dat5$nintc_richness_true_prediction <- 2*pred_dat5$nintc_richness_binom_prediction -1 #backtransform from binomial
+
+rich_aridity <- ggplot(modeldat_final, aes(y = NIntc_richness, x = aridity)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat5, aes(x = aridity, y = nintc_richness_true_prediction), color = brewer.pal(8, "YlOrRd")[6], lwd = 1.5) +
+  labs(y = expression(NInt[C]~richness), x = "Aridity") +
+  theme_classic()
