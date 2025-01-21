@@ -1028,7 +1028,8 @@ blank4 <- ggplot() + geom_blank()
 
 cov_combo <- ggarrange(cov_LDMC_graz, cov_H_graz, cov_RASE_graz, cov_SAC_graz, cov_arid_graz,
                        cov_LDMC_RASE, cov_LDMC_AMT, cov_H_RASE, cov_H_AMT, blank1,
-                       cov_LDMC_SAC, cov_LDMC_pH, cov_H_pH,blank2, blank3, nrow = 3, ncol = 5, align = "hv")
+                       cov_LDMC_SAC, cov_LDMC_pH, cov_H_pH,blank2, blank3, nrow = 3, ncol = 5, align = "hv"
+                       , labels = "auto")
 
 ggsave("nintc_cover_nurse_trait_effects.png", cov_combo, width = 5500, height = 2500, 
        units = "px", path = "Figures")
