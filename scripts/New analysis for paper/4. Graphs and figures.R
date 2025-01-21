@@ -127,12 +127,15 @@ pred_dat1 <- pred_dat_core |>
 pred_dat1$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat1, type = "response")
 pred_dat1$nintc_richness_true_prediction <- 2*pred_dat1$nintc_richness_binom_prediction -1 #backtransform from binomial
 
+
 rich_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = RASE)) +
   geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = RASE, y = nintc_richness_true_prediction, color = graz), lwd = 1.5) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "RASE") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")+
   theme_classic() +
   theme(legend.position = "right")
 
@@ -154,7 +157,9 @@ rich_SAC_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = SAC)) +
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "SAC") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 ###NIntc richness ~ LDMC*graz
 pred_dat3 <- pred_dat_core |> 
@@ -173,7 +178,9 @@ rich_LDMC_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_m
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "log(LDMC)") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 ###NIntc richness ~ AMT*H
 #to show the effect of H dependent on AMT, we should create categories of AMT
@@ -209,7 +216,9 @@ rich_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.11", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 ###NIntc richness ~ LDMC*H
@@ -246,7 +255,9 @@ rich_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_me
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.12", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 ###NIntc richness ~ RASE*H
 #to show the effect of H dependent on AMT, we should create categories of AMT
@@ -282,7 +293,9 @@ rich_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_mean
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.10", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -319,7 +332,9 @@ rich_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_m
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.12", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -356,7 +371,9 @@ rich_H_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -393,7 +410,9 @@ rich_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_mea
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -431,7 +450,9 @@ rich_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.09", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -468,7 +489,9 @@ rich_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_me
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.09", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 ###NIntc richness ~ aridity
@@ -485,11 +508,13 @@ rich_aridity <- ggplot(modeldat_final, aes(y = NIntc_richness, x = aridity)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat5, aes(x = aridity, y = nintc_richness_true_prediction), color = brewer.pal(8, "YlOrRd")[6], lwd = 1.5) +
   labs(y = expression(NInt[C]~richness), x = "Aridity") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.12", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 rich_combo <- ggarrange(rich_LDMC_graz, rich_RASE_graz, rich_SAC_graz, rich_aridity,
                         rich_LDMC_RASE, rich_LDMC_AMT, rich_H_RASE, rich_H_AMT, 
-                        rich_LDMC_SAC, rich_LDMC_pH, rich_H_pH, nrow = 3, ncol = 4, align = "hv",
+                        rich_LDMC_SAC, rich_LDMC_pH, rich_H_SAC, rich_H_pH, nrow = 3, ncol = 4, align = "hv",
                         labels = c("a", "b", "c", 'd', "e", "f", "g", "h", "i", "j", "k", "l"))
 
 ggsave("nintc_richness_nurse_trait_effects.png", rich_combo, width = 4500, height = 2500, 
@@ -590,7 +615,9 @@ cov_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = RASE)) +
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "RASE") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 ###NIntc cover ~ SAC*graz
 pred_dat2 <- pred_dat_core |> 
@@ -610,7 +637,10 @@ cov_SAC_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = SAC)) +
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "SAC") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+
 
 ###NIntc cover ~ LDMC*graz
 pred_dat3 <- pred_dat_core |> 
@@ -629,7 +659,9 @@ cov_LDMC_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanL
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 ###NIntc cover ~ H*graz
@@ -649,7 +681,10 @@ cov_H_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) 
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.07", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+
 
 ###NIntc cover ~ AMT*H
 #to show the effect of H dependent on AMT, we should create categories of AMT
@@ -685,11 +720,12 @@ cov_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.80", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
-###NIntc cover ~ LDMC*H
-#to show the effect of H dependent on LDMC, we should create categories of AMT
+###NIntc cover ~ LDMC*AMT
 temp1 <- pred_dat_core |> 
   filter(graz == 1) |>  #we only need one level of graz
   mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
@@ -722,7 +758,9 @@ cov_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLD
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 ###NIntc cover ~ RASE*H
 #to show the effect of H dependent on AMT, we should create categories of AMT
@@ -758,7 +796,9 @@ cov_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) 
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -795,7 +835,9 @@ cov_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanL
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
-  theme_classic() 
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -832,7 +874,9 @@ cov_H_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.94", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -869,7 +913,9 @@ cov_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDM
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -907,7 +953,9 @@ cov_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 
@@ -944,7 +992,9 @@ cov_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLD
                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
-  theme_classic()
+  theme_classic() +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.13", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 ###NIntc cover ~ aridity*graz
@@ -965,7 +1015,9 @@ cov_arid_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = aridity)) +
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "Aridity") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.26", 
+           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
 
 
 #combine the figures
