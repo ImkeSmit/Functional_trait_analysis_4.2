@@ -1097,7 +1097,6 @@ H_bestmod <- glmmTMB(trait_difference ~ association*GRAZ +
 
 
 ####diff ~ass*AMT
-
 #get data to make predictions over
 #we need every value of the other vars for every level of association, so duplicate the df
 temp1 <- maxh_data |> 
@@ -1120,7 +1119,215 @@ H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
   scale_color_manual(labels = c("bare-associated", "dominant-associated"),
-                     values = c("darkgreen", "chartreuse2")) +
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Trait difference", x = "AMT", color = "Association") +
   theme_classic()
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+H_ass_AMT <- plot_grid(H_ass_AMT, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*aridity
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- maxh_data |> 
+  mutate(GRAZ = 1, RASE = mean(RASE), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- maxh_data |> 
+  mutate(GRAZ = 1, RASE = mean(RASE), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+
+
+H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
+  geom_jitter(height = 2, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Trait difference", x = "Aridity", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+H_ass_arid <- plot_grid(H_ass_arid, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+
+####diff ~ass*RASE
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- maxh_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- maxh_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+
+
+H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
+  geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Trait difference", x = "RASE", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+H_ass_RASE <- plot_grid(H_ass_RASE, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*pH
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- maxh_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- maxh_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+
+
+H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
+  geom_jitter(height = 2, width = 0.1, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Trait difference", x = "pH", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+H_ass_pH <- plot_grid(H_ass_pH, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*SAC
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- maxh_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         pH = mean(pH), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- maxh_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         pH = mean(pH), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+
+
+H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
+  geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Trait difference", x = "SAC", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 0.54", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+H_ass_SAC <- plot_grid(H_ass_SAC, text_annotation, 
+                      ncol = 1, 
+                      rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*graz
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- maxh_data |> 
+  mutate(ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         pH = mean(pH), RASE = mean(RASE), SAC = mean(SAC), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long))
+
+#for this one we will need a different model including the RE to introduce some variation
+H_bestmod_alt <- glmmTMB(trait_difference ~ association*GRAZ + 
+                       association*AMT + association*RASE + association*ARIDITY.v3 + 
+                       association*SAC + association*pH +
+                       sin_lat + sin_long + (1|nurse_sp), data = maxh_data) 
+
+temp1$trait_diff_prediction <- predict(H_bestmod, temp1, type = "response")
+temp1$error_max <- temp1$trait_diff_prediction + predict(H_bestmod, temp1, type = "response", se.fit = T)$se.fit
+temp1$error_min <- temp1$trait_diff_prediction - predict(H_bestmod, temp1, type = "response", se.fit = T)$se.fit
+
+
+H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = association)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymax = error_max, ymin = error_min), width = 0.4, position = position_dodge(width = 0.9)) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
+  labs(y = "Trait difference", x = "Grazing pressure", fill = "Association") +
+  theme_classic() +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+H_ass_graz <- plot_grid(H_ass_graz, text_annotation, 
+                       ncol = 1, 
+                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
 
