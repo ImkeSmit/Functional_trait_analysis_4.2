@@ -1038,7 +1038,7 @@ ggsave("nintc_cover_nurse_trait_effects.png", cov_combo, width = 5500, height = 
 
 
 
-####FUNCTIONAL DIFFERENCE GRAPHS####
+####FUNCTIONAL DIFFERENCE GRAPHS (H)####
 #Import pairwise differences between traits
 trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1) |> 
   filter(trait %in% c("MaxH", "MeanLDMC"))
@@ -1358,4 +1358,327 @@ H_ass_combo <- ggarrange(H_ass_arid, H_ass_AMT, H_ass_RASE, H_ass_graz, H_ass_pH
                          nrow = 2, ncol = 3, labels = "auto")
 
 ggsave("diff_H_association.png", H_ass_combo, path = 'Figures', 
+       width = 4000, height = 2000, units = "px")
+
+
+
+
+
+####FUNCTIONAL DIFFERENCE GRAPHS (LDMC)####
+#Import pairwise differences between traits
+trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1) |> 
+  filter(trait %in% c("MaxH", "MeanLDMC"))
+trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
+trait_fdist$ID <- as.factor(trait_fdist$ID)
+##Lets join the results of the CHi2 tests to sla_fdist###
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(target = species)
+ass$ID <- as.factor(ass$ID)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
+
+#import siteinfo which has lat and long for each plot
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |>
+  select(ID, plotref, Lat_decimal, Long_decimal) |> 
+  mutate(sin_lat = sin(Lat_decimal), 
+         sin_long = sin(Long_decimal)) |> 
+  select(!c(Lat_decimal, Long_decimal))
+
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  dplyr::select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  dplyr::select(!plotref) |> 
+  rename(pH = pH.b, SAC = SAC.b)
+drypop$ID <- as.factor(drypop$ID)
+
+#join the associations and the coordinates to the trait differences
+trait_ass_join <- trait_fdist |> 
+  left_join(ass, by = c("target", "ID")) |> 
+  filter(association %in% c("nurse", "bare")) |> #only work with these associations
+  left_join(drypop, by = "ID") |> 
+  rename(nurse_sp = nurse)
+trait_ass_join$association <- as.factor(trait_ass_join$association)
+trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
+trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
+trait_ass_join$ID <- as.factor(trait_ass_join$ID)
+trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
+
+
+
+####FIGURE FOR LDMC###
+ldmc_data <- trait_ass_join |> 
+  filter(trait == "MeanLDMC")
+
+#####best model for difference in H
+LDMC_bestmod <- glmmTMB(trait_difference ~ association*GRAZ + 
+                       association*AMT + association*RASE + association*ARIDITY.v3 + 
+                       association*SAC + association*pH +
+                       sin_lat + sin_long, data = ldmc_data) 
+
+
+####diff ~ass*AMT
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- ldmc_data |> 
+  mutate(GRAZ = 1, RASE = mean(RASE), ARIDITY.v3 = mean(ARIDITY.v3), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- ldmc_data |> 
+  mutate(GRAZ = 1, RASE = mean(RASE), ARIDITY.v3 = mean(ARIDITY.v3), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(LDMC_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+
+LDMC_ass_AMT <- ggplot(ldmc_data, aes(x = AMT, y = trait_difference)) +
+  geom_jitter(height = 0.01, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Difference in LDMC", x = "AMT", color = "Association") +
+  theme_classic() +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+LDMC_ass_AMT <- plot_grid(LDMC_ass_AMT, text_annotation, 
+                       ncol = 1, 
+                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*aridity
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- ldmc_data |> 
+  mutate(GRAZ = 1, RASE = mean(RASE), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- ldmc_data |> 
+  mutate(GRAZ = 1, RASE = mean(RASE), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(LDMC_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+
+
+LDMC_ass_arid <- ggplot(ldmc_data, aes(x = ARIDITY.v3, y = trait_difference)) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Difference in LDMC", x = "Aridity", color = "Association") +
+  theme_classic() +
+  guides(fill = "none") +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+LDMC_ass_arid <- plot_grid(LDMC_ass_arid, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+
+####diff ~ass*RASE
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- ldmc_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- ldmc_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), pH = mean(pH), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(LDMC_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+
+LDMC_ass_RASE <- ggplot(ldmc_data, aes(x = RASE, y = trait_difference)) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Difference in LDMC", x = "RASE", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
+
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+LDMC_ass_RASE <- plot_grid(LDMC_ass_RASE, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*pH
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- ldmc_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- ldmc_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         SAC = mean(SAC), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(LDMC_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+
+
+LDMC_ass_pH <- ggplot(ldmc_data, aes(x = pH, y = trait_difference)) +
+  geom_jitter(height = 0.01, width = 0.1, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Difference in LDMC", x = "pH", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+LDMC_ass_pH <- plot_grid(LDMC_ass_pH, text_annotation, 
+                      ncol = 1, 
+                      rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*SAC
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- ldmc_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         pH = mean(pH), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "nurse")
+temp2 <- ldmc_data |> 
+  mutate(GRAZ = 1, ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         pH = mean(pH), RASE = mean(RASE), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long), 
+         association = "bare")
+
+pred_dat1 <- bind_rows(temp1, temp2)
+
+pred_dat1$trait_diff_prediction <- predict(LDMC_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+
+
+LDMC_ass_SAC <- ggplot(ldmc_data, aes(x = SAC, y = trait_difference)) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  labs(y = "Difference in LDMC", x = "SAC", color = "Association") +
+  theme_classic() +
+  theme(legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 0.54", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+LDMC_ass_SAC <- plot_grid(LDMC_ass_SAC, text_annotation, 
+                       ncol = 1, 
+                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+
+####diff ~ass*graz
+#get data to make predictions over
+#we need every value of the other vars for every level of association, so duplicate the df
+temp1 <- ldmc_data |> 
+  mutate(ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
+         pH = mean(pH), RASE = mean(RASE), SAC = mean(SAC), 
+         sin_lat = mean(sin_lat), sin_long = mean(sin_long))
+
+temp1$trait_diff_prediction <- predict(LDMC_bestmod, temp1, type = "response")
+temp1$error_max <- temp1$trait_diff_prediction + predict(LDMC_bestmod, temp1, type = "response", se.fit = T)$se.fit
+temp1$error_min <- temp1$trait_diff_prediction - predict(LDMC_bestmod, temp1, type = "response", se.fit = T)$se.fit
+
+
+LDMC_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = association)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymax = error_max, ymin = error_min), width = 0.4, position = position_dodge(width = 0.9)) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
+  labs(y = "Difference in LDMC", x = "Grazing pressure", fill = "Association") +
+  theme_classic() +
+  theme(legend.position = "right")
+
+# Create the annotation as a separate text plot
+text_annotation <- ggdraw() +
+  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+
+# Arrange the plot and the annotation
+LDMC_ass_graz <- plot_grid(LDMC_ass_graz, text_annotation, 
+                        ncol = 1, 
+                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+
+
+LDMC_ass_combo <- ggarrange(LDMC_ass_arid, LDMC_ass_AMT, LDMC_ass_RASE, LDMC_ass_graz, LDMC_ass_pH, LDMC_ass_SAC, 
+                         nrow = 2, ncol = 3, labels = "auto")
+
+ggsave("diff_LDMC_association.png", LDMC_ass_combo, path = 'Figures', 
        width = 4000, height = 2000, units = "px")
