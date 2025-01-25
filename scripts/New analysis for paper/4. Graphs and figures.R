@@ -6,6 +6,7 @@ library(tidylog)
 library(glmmTMB)
 library(MuMIn)
 library(RColorBrewer)
+library(cowplot)
 
 ####AKAIKE WEIGHTS FIGURE####
 #import akaike weights of nint richness model
@@ -1113,7 +1114,8 @@ temp2 <- maxh_data |>
 pred_dat1 <- bind_rows(temp1, temp2)
 
 pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
-
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
@@ -1121,7 +1123,11 @@ H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
   scale_color_manual(labels = c("bare-associated", "dominant-associated"),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Trait difference", x = "AMT", color = "Association") +
-  theme_classic()
+  theme_classic() +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
@@ -1151,15 +1157,21 @@ temp2 <- maxh_data |>
 pred_dat1 <- bind_rows(temp1, temp2)
 
 pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 
 H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Trait difference", x = "Aridity", color = "Association") +
   theme_classic() +
+  guides(fill = "none") +
   theme(legend.position = "right")
 
 # Create the annotation as a separate text plot
@@ -1191,7 +1203,8 @@ temp2 <- maxh_data |>
 pred_dat1 <- bind_rows(temp1, temp2)
 
 pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
-
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
   geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
@@ -1200,7 +1213,12 @@ H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Trait difference", x = "RASE", color = "Association") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
+  
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
@@ -1230,6 +1248,8 @@ temp2 <- maxh_data |>
 pred_dat1 <- bind_rows(temp1, temp2)
 
 pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 
 H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
@@ -1239,7 +1259,11 @@ H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Trait difference", x = "pH", color = "Association") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
@@ -1269,6 +1293,8 @@ temp2 <- maxh_data |>
 pred_dat1 <- bind_rows(temp1, temp2)
 
 pred_dat1$trait_diff_prediction <- predict(H_bestmod, pred_dat1, type = "response")
+pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 
 H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
@@ -1278,7 +1304,11 @@ H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Trait difference", x = "SAC", color = "Association") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
+  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+                    values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
+  guides(fill = "none")
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
@@ -1298,12 +1328,6 @@ temp1 <- maxh_data |>
   mutate(ARIDITY.v3 = mean(ARIDITY.v3), AMT = mean(AMT), 
          pH = mean(pH), RASE = mean(RASE), SAC = mean(SAC), 
          sin_lat = mean(sin_lat), sin_long = mean(sin_long))
-
-#for this one we will need a different model including the RE to introduce some variation
-H_bestmod_alt <- glmmTMB(trait_difference ~ association*GRAZ + 
-                       association*AMT + association*RASE + association*ARIDITY.v3 + 
-                       association*SAC + association*pH +
-                       sin_lat + sin_long + (1|nurse_sp), data = maxh_data) 
 
 temp1$trait_diff_prediction <- predict(H_bestmod, temp1, type = "response")
 temp1$error_max <- temp1$trait_diff_prediction + predict(H_bestmod, temp1, type = "response", se.fit = T)$se.fit
@@ -1330,4 +1354,8 @@ H_ass_graz <- plot_grid(H_ass_graz, text_annotation,
                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
+H_ass_combo <- ggarrange(H_ass_arid, H_ass_AMT, H_ass_RASE, H_ass_graz, H_ass_pH, H_ass_SAC, 
+                         nrow = 2, ncol = 3, labels = "auto")
 
+ggsave("diff_H_association.png", H_ass_combo, path = 'Figures', 
+       width = 4000, height = 2000, units = "px")
