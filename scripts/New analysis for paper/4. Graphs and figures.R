@@ -1120,18 +1120,20 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Trait difference", x = "AMT", color = "Association") +
+  labs(y = "Difference in H", x = "AMT", color = " ") +
   theme_classic() +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
+  guides(fill = "none") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
 H_ass_AMT <- plot_grid(H_ass_AMT, text_annotation, 
@@ -1165,18 +1167,20 @@ H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Trait difference", x = "Aridity", color = "Association") +
+  labs(y = "Difference in H", x = "Aridity", color = "") +
   theme_classic() +
   guides(fill = "none") +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
 H_ass_arid <- plot_grid(H_ass_arid, text_annotation, 
@@ -1209,20 +1213,22 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
   geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Trait difference", x = "RASE", color = "Association") +
+  labs(y = "Difference in H", x = "RASE", color = "") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
+  guides(fill = "none") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
   
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
 H_ass_RASE <- plot_grid(H_ass_RASE, text_annotation, 
@@ -1255,19 +1261,21 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.1, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Trait difference", x = "pH", color = "Association") +
+  labs(y = "Difference in H", x = "pH", color = "") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
+  guides(fill = "none") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
 H_ass_pH <- plot_grid(H_ass_pH, text_annotation, 
@@ -1300,19 +1308,21 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
   geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Trait difference", x = "SAC", color = "Association") +
+  labs(y = "Difference in H", x = "SAC", color = "") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
+  guides(fill = "none") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
-  draw_text("importance = 0.54", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+  draw_text("importance = 0.54", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
 H_ass_SAC <- plot_grid(H_ass_SAC, text_annotation, 
@@ -1337,16 +1347,18 @@ temp1$error_min <- temp1$trait_diff_prediction - predict(H_bestmod, temp1, type 
 H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = association)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   geom_errorbar(aes(ymax = error_max, ymin = error_min), width = 0.4, position = position_dodge(width = 0.9)) +
-  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
-  labs(y = "Trait difference", x = "Grazing pressure", fill = "Association") +
+  labs(y = "Difference in H", x = "Grazing pressure", fill = "") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
 H_ass_graz <- plot_grid(H_ass_graz, text_annotation, 
