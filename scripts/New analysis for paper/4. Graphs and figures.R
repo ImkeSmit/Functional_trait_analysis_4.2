@@ -1129,16 +1129,17 @@ H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+        legend.text = element_text(size = 16)) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
 
 # Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+#text_annotation <- ggdraw() +
+#  draw_text("importance = 1.00", size = 16, hjust = 2, vjust = 0, x = 20, y = 20) # Adjust text position as needed
 
 # Arrange the plot and the annotation
-H_ass_AMT <- plot_grid(H_ass_AMT, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+#test <- plot_grid(text_annotation, H_ass_AMT,
+#                        ncol = 1, 
+#                        rel_heights = c(0.5, 0.5)) # Adjust height ratio to give space for the text
 
 
 
@@ -1176,16 +1177,18 @@ H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   guides(fill = "none") +
   theme(legend.position = "right") +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+        legend.text = element_text(size = 16)) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
+  
 
 # Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+#text_annotation <- ggdraw() +
+#  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
-H_ass_arid <- plot_grid(H_ass_arid, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+#H_ass_arid <- plot_grid(H_ass_arid, text_annotation, 
+#                        ncol = 1, 
+#                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
 
@@ -1223,17 +1226,18 @@ H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+        legend.text = element_text(size = 16)) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
   
 
 # Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+#text_annotation <- ggdraw() +
+#  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
-H_ass_RASE <- plot_grid(H_ass_RASE, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+#H_ass_RASE <- plot_grid(H_ass_RASE, text_annotation, 
+#                        ncol = 1, 
+#                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
 
@@ -1271,16 +1275,17 @@ H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+        legend.text = element_text(size = 16)) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
 
 # Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+#text_annotation <- ggdraw() +
+#  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
-H_ass_pH <- plot_grid(H_ass_pH, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+#H_ass_pH <- plot_grid(H_ass_pH, text_annotation, 
+#                        ncol = 1, 
+#                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
 
@@ -1318,16 +1323,17 @@ H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+        legend.text = element_text(size = 16)) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.54", hjust= 1, vjust = 1, size = 5)
 
 # Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 0.54", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+#text_annotation <- ggdraw() +
+#  draw_text("importance = 0.54", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
-H_ass_SAC <- plot_grid(H_ass_SAC, text_annotation, 
-                      ncol = 1, 
-                      rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+#H_ass_SAC <- plot_grid(H_ass_SAC, text_annotation, 
+#                      ncol = 1, 
+#                      rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
 
@@ -1354,23 +1360,25 @@ H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = asso
   theme_classic() +
   theme(legend.position = "right") +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+        legend.text = element_text(size = 18)) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
 
 # Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
+#text_annotation <- ggdraw() +
+#  draw_text("importance = 1.00", size = 16, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
 # Arrange the plot and the annotation
-H_ass_graz <- plot_grid(H_ass_graz, text_annotation, 
-                       ncol = 1, 
-                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+#H_ass_graz <- plot_grid(H_ass_graz, text_annotation, 
+#                       ncol = 1, 
+#                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
 H_ass_combo <- ggarrange(H_ass_arid, H_ass_AMT, H_ass_RASE, H_ass_graz, H_ass_pH, H_ass_SAC, 
-                         nrow = 2, ncol = 3, labels = "auto")
+                         nrow = 2, ncol = 3, labels = "auto", font.label = list(size = 16), 
+                         legend.grob = get_legend(H_ass_graz), legend = "right")
 
 ggsave("diff_H_association.png", H_ass_combo, path = 'Figures', 
-       width = 4000, height = 2000, units = "px")
+       width = 4200, height = 2200, units = "px")
 
 
 
