@@ -46,6 +46,18 @@ modeldat_final <- modeldat |>
   drop_na(NIntc_richness_binom, NIntc_cover_binom,NInta_richness_binom, NInta_cover_binom, 
           log_nurse_meanLDMC, log_nurse_meanH, aridity, AMT, RASE, SAC, pH, graz)
 
+#how many replicates included?
+n_reps <- modeldat_final |> 
+  distinct(ID, replicate_no) |> 
+  summarise(nreps = n())
+percent_reps_included <- n_reps$nreps/3735 *100 #66.96, we get the 3735 from the nint_trait_models script
+
+#how many dominant sp
+n_doms <- modeldat_final |> 
+  distinct(nurse_sp) |> 
+  summarise(n_nurses = n())
+
+
 ####define the full model formula ###
 #formula without climate*climate interactions
 #with trait*soil interactions
