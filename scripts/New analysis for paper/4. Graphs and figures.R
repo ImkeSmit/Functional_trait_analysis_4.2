@@ -127,6 +127,8 @@ pred_dat1 <- pred_dat_core |>
 
 pred_dat1$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat1, type = "response")
 pred_dat1$nintc_richness_true_prediction <- 2*pred_dat1$nintc_richness_binom_prediction -1 #backtransform from binomial
+pred_dat1$se_max <- pred_dat1$nintc_richness_true_prediction + 2*(predict(nintc_richness_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit) -1
+pred_dat1$se_min <- pred_dat1$nintc_richness_true_prediction + 2*(predict(nintc_richness_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit) -1
 
 
 rich_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = RASE)) +
@@ -136,9 +138,14 @@ rich_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = RASE)) +
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "RASE") +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")+
+           hjust = 1.1, vjust = -0.5, size = 5, color = "black")+
   theme_classic() +
-  theme(legend.position = "right")
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(y = nintc_richness_true_prediction, ymin = se_min, ymax = se_max, x = RASE, fill = graz), alpha = 0.4) +
+  scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
+                    values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" )) +
+  guides(fill = "none")
 
 ###NIntc richness ~ SAC*graz
 pred_dat2 <- pred_dat_core |> 
