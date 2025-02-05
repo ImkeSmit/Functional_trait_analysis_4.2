@@ -3,7 +3,7 @@
 library(tidyverse)
 library(tidylog)
 library(vegan)
-library(DescTools)
+#library(DescTools)
 library(glmmTMB)
 library(car)
 library(ggplot2)
@@ -211,6 +211,8 @@ hist(modeldat_final$RASE)
 hist(modeldat_final$aridity)
 hist(modeldat_final$pH)
 hist(modeldat_final$SAC)
+hist(modeldat_final$RAI)
+range(modeldat_final$RAI)
 
 ####descriptive stats####
 #number of dominant species
