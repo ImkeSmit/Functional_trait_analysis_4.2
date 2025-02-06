@@ -147,7 +147,13 @@ avg_model_formula <-formula(avg_models) #get formula of the averaged model
 summary(avg_models) #get summary of the averaged model
 
 options(na.action = "na.omit")
-final_model <-glmmTMB(as.formula(avg_model_formula), data = modeldat_final, family = "binomial")
+final_model <-glmmTMB(NIntc_richness_binom ~ AMT + aridity + graz + log_nurse_meanH + 
+                        log_nurse_meanLDMC + pH + RASE + SAC + sin_lat + sin_long + 
+                        AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + graz:log_nurse_meanLDMC + 
+                        graz:RASE + graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:SAC + 
+                        log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC+
+                        sin_lat + sin_long + (1|nurse_sp), data = modeldat_final, family = "binomial")
+summary(final_model)
 r.squaredGLMM(final_model) #r squared is not working
 
 #get the variable importance
