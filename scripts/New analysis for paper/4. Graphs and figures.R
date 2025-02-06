@@ -45,6 +45,12 @@ sw_combo <- ggarrange(rich_sw_bar, cov_sw_bar, nrow = 1, ncol = 2, labels = c("a
 ggsave("sw_bar.png", plot = sw_combo, path = "Figures", height = 1000, width = 2000, units = 'px')
 
 ####GRID OF VARIABLE EFFECTS ON NINTC RICHNESS####
+#set global theme for all plots
+my_theme <- theme(axis.title = element_text(size = 20), 
+                  axis.text = element_text(size = 17), 
+                  legend.title = element_text(size = 19), 
+                  legend.text = element_text(size = 18))
+
 #import modelling data
 modeldat <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) 
 modeldat$nurse_sp <- as.factor(modeldat$nurse_sp)
@@ -127,22 +133,25 @@ pred_dat1 <- pred_dat_core |>
 
 pred_dat1$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat1, type = "response")
 pred_dat1$nintc_richness_true_prediction <- 2*pred_dat1$nintc_richness_binom_prediction -1 #backtransform from binomial
-pred_dat1$se_max <- pred_dat1$nintc_richness_true_prediction + 2*(predict(nintc_richness_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit) -1
-pred_dat1$se_min <- pred_dat1$nintc_richness_true_prediction + 2*(predict(nintc_richness_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit) -1
-
+#get the mean +- standard error
+pred_dat1$se_max_binom <- pred_dat1$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+pred_dat1$se_min_binom <- pred_dat1$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
+#backtransform SE
+pred_dat1$se_max_t <- 2*pred_dat1$se_max -1
+pred_dat1$se_min_t <- 2*pred_dat1$se_min -1
 
 rich_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = RASE)) +
-  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = RASE, y = nintc_richness_true_prediction, color = graz), lwd = 1.5) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "RASE") +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 5, color = "black")+
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black")+
   theme_classic() +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
-  geom_ribbon(data = pred_dat1, aes(y = nintc_richness_true_prediction, ymin = se_min, ymax = se_max, x = RASE, fill = graz), alpha = 0.4) +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = pred_dat1, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, x = RASE, fill = graz), alpha = 0.4) +
   scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
                     values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" )) +
   guides(fill = "none")
@@ -157,9 +166,16 @@ pred_dat2 <- pred_dat_core |>
 
 pred_dat2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat2, type = "response")
 pred_dat2$nintc_richness_true_prediction <- 2*pred_dat2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+pred_dat2$se_max_binom <- pred_dat2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, pred_dat2, type = "response", se.fit = T)$se.fit
+pred_dat2$se_min_binom <- pred_dat2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, pred_dat2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+pred_dat2$se_max_t <- 2*pred_dat2$se_max -1
+pred_dat2$se_min_t <- 2*pred_dat2$se_min -1
+
 
 rich_SAC_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = SAC)) +
-  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat2, aes(x = SAC, y = nintc_richness_true_prediction, color = graz), lwd = 1.5) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
@@ -167,7 +183,14 @@ rich_SAC_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = SAC)) +
   theme_classic() +
   theme(legend.position = "right") +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  theme_classic() +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = pred_dat2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, x = SAC, fill = graz), alpha = 0.4) +
+  scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
+                    values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" )) +
+  guides(fill = "none")
 
 ###NIntc richness ~ LDMC*graz
 pred_dat3 <- pred_dat_core |> 
@@ -178,17 +201,31 @@ pred_dat3 <- pred_dat_core |>
 
 pred_dat3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat3, type = "response")
 pred_dat3$nintc_richness_true_prediction <- 2*pred_dat3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+pred_dat3$se_max_binom <- pred_dat3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, pred_dat3, type = "response", se.fit = T)$se.fit
+pred_dat3$se_min_binom <- pred_dat3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, pred_dat3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+pred_dat3$se_max_t <- 2*pred_dat3$se_max -1
+pred_dat3$se_min_t <- 2*pred_dat3$se_min -1
+
 
 rich_LDMC_graz <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = graz), lwd = 1.5) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~richness), x = "log(LDMC)") +
-  theme_classic() +
   theme(legend.position = "right") +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  theme_classic() +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = pred_dat3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                    x = log_nurse_meanLDMC, fill = graz), alpha = 0.4) +
+  scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
+                    values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" )) +
+  guides(fill = "none")
 
 ###NIntc richness ~ AMT*H
 #to show the effect of H dependent on AMT, we should create categories of AMT
@@ -199,37 +236,74 @@ temp1 <- pred_dat_core |>
          pH = mean(pH), RASE = mean(RASE), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
 temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
-  mutate(AMT = mean(AMT), label = "mean")
+  mutate(AMT = mean(AMT), label = "mean", 
+         value = as.character(round(mean(AMT), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(AMT = mean(AMT) + sd(AMT), label = "mean + sd")
+  mutate(AMT = mean(AMT) + sd(AMT), label = "mean + sd", 
+         value = as.character(round(mean(AMT) + sd(AMT), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(AMT = mean(AMT) - sd(AMT), label = "mean - sd")
+  mutate(AMT = mean(AMT) - sd(AMT), label = "mean - sd", 
+         value = as.character(round(mean(AMT) - sd(AMT), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of AMT", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.11", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                    x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                    x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                    x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of AMT", 
+                     breaks = c("mean", "mean + sd", "mean - sd"), 
+                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
+  
 
 
-###NIntc richness ~ LDMC*H
+###NIntc richness ~ LDMC*AMT
 #to show the effect of H dependent on LDMC, we should create categories of AMT
 temp1 <- pred_dat_core |> 
   filter(graz == 1) |>  #we only need one level of graz
@@ -238,34 +312,73 @@ temp1 <- pred_dat_core |>
          pH = mean(pH), RASE = mean(RASE), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
 temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
-  mutate(AMT = mean(AMT), label = "mean")
+  mutate(AMT = mean(AMT), label = "mean", 
+         value = as.character(round(mean(AMT), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(AMT = mean(AMT) + sd(AMT), label = "mean + sd")
+  mutate(AMT = mean(AMT) + sd(AMT), label = "mean + sd", 
+         value = as.character(round(mean(AMT) + sd(AMT), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(AMT = mean(AMT) - sd(AMT), label = "mean - sd")
+  mutate(AMT = mean(AMT) - sd(AMT), label = "mean - sd", 
+         value = as.character(round(mean(AMT) - sd(AMT), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of AMT", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.12", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of AMT", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
+
+
+
 
 ###NIntc richness ~ RASE*H
 #to show the effect of H dependent on AMT, we should create categories of AMT
@@ -275,35 +388,71 @@ temp1 <- pred_dat_core |>
          aridity = mean(aridity),
          pH = mean(pH), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
-temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
-  mutate(RASE = mean(RASE), label = "mean")
+temp2 <- temp1 |> #create dataframes for 3 different values of RASE, then rbind tem
+  mutate(RASE = mean(RASE), label = "mean", 
+         value = as.character(round(mean(RASE), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd")
+  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd", 
+         value = as.character(round(mean(RASE) + sd(RASE), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd")
+  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd", 
+         value = as.character(round(mean(RASE) - sd(RASE), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of RASE", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.10", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of RASE", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -314,35 +463,71 @@ temp1 <- pred_dat_core |>
          aridity = mean(aridity),
          pH = mean(pH), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
-temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
-  mutate(RASE = mean(RASE), label = "mean")
+temp2 <- temp1 |> #create dataframes for 3 different values of RASE, then rbind tem
+  mutate(RASE = mean(RASE), label = "mean", 
+         value = as.character(round(mean(RASE), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd")
+  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd", 
+         value = as.character(round(mean(RASE) + sd(RASE), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd")
+  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd", 
+         value = as.character(round(mean(RASE) - sd(RASE), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of RASE", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names)  +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.12", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black")+
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of RASE", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -353,35 +538,71 @@ temp1 <- pred_dat_core |>
          aridity = mean(aridity),
          RASE = mean(RASE), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
-temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(pH = mean(pH), label = "mean")
+temp2 <- temp1 |> #create dataframes for 3 different values of RASE, then rbind tem
+  mutate(pH = mean(pH), label = "mean", 
+         value = as.character(round(mean(pH), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(pH = mean(pH) + sd(pH), label = "mean + sd")
+  mutate(pH = mean(pH) + sd(pH), label = "mean + sd", 
+         value = as.character(round(mean(pH) + sd(pH), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(pH = mean(pH) - sd(pH), label = "mean - sd")
+  mutate(pH = mean(pH) - sd(pH), label = "mean - sd", 
+         value = as.character(round(mean(pH) - sd(pH), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_H_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of pH", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names)  +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of pH", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -392,35 +613,71 @@ temp1 <- pred_dat_core |>
          aridity = mean(aridity),
          RASE = mean(RASE), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
-temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(pH = mean(pH), label = "mean")
+temp2 <- temp1 |> #create dataframes for 3 different values of RASE, then rbind tem
+  mutate(pH = mean(pH), label = "mean", 
+         value = as.character(round(mean(pH), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(pH = mean(pH) + sd(pH), label = "mean + sd")
+  mutate(pH = mean(pH) + sd(pH), label = "mean + sd", 
+         value = as.character(round(mean(pH) + sd(pH), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(pH = mean(pH) - sd(pH), label = "mean - sd")
+  mutate(pH = mean(pH) - sd(pH), label = "mean - sd", 
+         value = as.character(round(mean(pH) - sd(pH), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of pH", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of pH", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -432,35 +689,71 @@ temp1 <- pred_dat_core |>
          aridity = mean(aridity),
          RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
-temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(SAC = mean(SAC), label = "mean")
+temp2 <- temp1 |> #create dataframes for 3 different values of RASE, then rbind tem
+  mutate(SAC = mean(SAC), label = "mean", 
+         value = as.character(round(mean(SAC), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd")
+  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd", 
+         value = as.character(round(mean(SAC) + sd(SAC), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd")
+  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd", 
+         value = as.character(round(mean(SAC) - sd(SAC), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of SAC", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~richness), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.09", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+   #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+  geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of SAC", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -471,35 +764,71 @@ temp1 <- pred_dat_core |>
          aridity = mean(aridity),
          RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
-temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(SAC = mean(SAC), label = "mean")
+temp2 <- temp1 |> #create dataframes for 3 different values of RASE, then rbind tem
+  mutate(SAC = mean(SAC), label = "mean", 
+         value = as.character(round(mean(SAC), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd")
+  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd", 
+         value = as.character(round(mean(SAC) + sd(SAC), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd")
+  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd", 
+         value = as.character(round(mean(SAC) - sd(SAC), digits = 1)))
 
 temp2$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp2, type = "response")
 temp2$nintc_richness_true_prediction <- 2*temp2$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp3, type = "response")
 temp3$nintc_richness_true_prediction <- 2*temp3$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, temp4, type = "response")
 temp4$nintc_richness_true_prediction <- 2*temp4$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of SAC", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                    breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                    values = colour_names) +
   labs(y = expression(NInt[C]~richness), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.09", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+    #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+     #     legend.title = element_text(size = 17), legend.text = element_text(size = 16), legend.position = "right") +
+    geom_ribbon(data = temp2, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                  x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
+    geom_ribbon(data = temp3, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                  x = log_nurse_meanLDMC, fill = "mean + sd"), alpha = 0.4) +
+    geom_ribbon(data = temp4, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                  x = log_nurse_meanLDMC, fill = "mean - sd"), alpha = 0.4) +
+    scale_fill_manual(name = "Value of SAC", 
+                      breaks = c("mean", "mean + sd", "mean - sd"), 
+                      values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                                 "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+    guides(fill = "none")
 
 
 ###NIntc richness ~ aridity
@@ -511,21 +840,44 @@ pred_dat5 <- pred_dat_core |>
 
 pred_dat5$nintc_richness_binom_prediction <- predict(nintc_richness_bestmod, pred_dat5, type = "response")
 pred_dat5$nintc_richness_true_prediction <- 2*pred_dat5$nintc_richness_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+pred_dat5$se_max_binom <- pred_dat5$nintc_richness_binom_prediction + predict(nintc_richness_bestmod, pred_dat5, type = "response", se.fit = T)$se.fit
+pred_dat5$se_min_binom <- pred_dat5$nintc_richness_binom_prediction - predict(nintc_richness_bestmod, pred_dat5, type = "response", se.fit = T)$se.fit
+#backtransform SE
+pred_dat5$se_max_t <- 2*pred_dat5$se_max -1
+pred_dat5$se_min_t <- 2*pred_dat5$se_min -1
 
 rich_aridity <- ggplot(modeldat_final, aes(y = NIntc_richness, x = aridity)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat5, aes(x = aridity, y = nintc_richness_true_prediction), color = brewer.pal(8, "YlOrRd")[6], lwd = 1.5) +
   labs(y = expression(NInt[C]~richness), x = "Aridity") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.12", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
+  #theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12)) +
+  geom_ribbon(data = pred_dat5, aes(y = nintc_richness_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = aridity), alpha = 0.4, fill = brewer.pal(8, "YlOrRd")[6]) +
+  guides(fill = "none")
+  
 
 rich_combo <- ggarrange(rich_LDMC_graz, rich_RASE_graz, rich_SAC_graz, rich_aridity,
                         rich_LDMC_RASE, rich_LDMC_AMT, rich_H_RASE, rich_H_AMT, 
                         rich_LDMC_SAC, rich_LDMC_pH, rich_H_SAC, rich_H_pH, nrow = 3, ncol = 4, align = "hv",
                         labels = c("a", "b", "c", 'd', "e", "f", "g", "h", "i", "j", "k", "l"))
-
 ggsave("nintc_richness_nurse_trait_effects.png", rich_combo, width = 4500, height = 2500, 
+       units = "px", path = "Figures")
+
+#apply the theme to all the plots
+plots <- lapply(list(rich_LDMC_graz, rich_RASE_graz, rich_SAC_graz, rich_aridity,
+                     rich_LDMC_RASE, rich_LDMC_AMT, rich_H_RASE, rich_H_AMT, 
+                     rich_LDMC_SAC, rich_LDMC_pH, rich_H_SAC, rich_H_pH), function(p) p + my_theme)
+
+
+rich_combo2 <- plot_grid(plotlist = plots, 
+                         nrow = 3, ncol = 4, label_size = 24,
+                         labels = "auto", align = "hv")
+
+ggsave("nintc_richness_nurse_trait_effects2.png", rich_combo2, width = 7000, height = 4000, 
        units = "px", path = "Figures")
 
 
