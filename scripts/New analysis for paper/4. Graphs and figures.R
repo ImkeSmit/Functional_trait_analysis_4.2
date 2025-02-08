@@ -1247,7 +1247,7 @@ cov_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLD
 
 
 ###NIntc cover ~ RASE*H
-#to show the effect of H dependent on AMT, we should create categories of AMT
+#to show the effect of H dependent on AMT, we should create categories of RASE
 temp1 <- pred_dat_core |> 
   filter(graz == 1) |>  #we only need one level of graz
   mutate(sin_lat = mean(sin_lat), sin_long = mean(sin_long),
@@ -1255,33 +1255,69 @@ temp1 <- pred_dat_core |>
          pH = mean(pH), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
 temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
-  mutate(RASE = mean(RASE), label = "mean")
+  mutate(RASE = mean(RASE), label = "mean", 
+         value = as.character(round(mean(RASE), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd")
+  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd", 
+         value = as.character(round(mean(RASE) + sd(RASE))))
 temp4 <- temp1 |> 
-  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd")
+  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd", 
+         value = as.character(round(mean(RASE) - sd(RASE))))
 
 temp2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp2, type = "response")
 temp2$nintc_cover_true_prediction <- 2*temp2$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp3, type = "response")
 temp3$nintc_cover_true_prediction <- 2*temp3$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp4, type = "response")
 temp4$nintc_cover_true_prediction <- 2*temp4$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean - sd"), lwd = 1.5) +
-  scale_color_manual(name = "Value of AMT", 
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  scale_color_manual(name = "Value of RASE", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of RASE", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
+  
   
 
 
@@ -1294,34 +1330,70 @@ temp1 <- pred_dat_core |>
          pH = mean(pH), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
 temp2 <- temp1 |> #create dataframes for 3 different values of AMT, then rbind tem
-  mutate(RASE = mean(RASE), label = "mean")
+  mutate(RASE = mean(RASE), label = "mean", 
+         value = as.character(round(mean(RASE), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd")
+  mutate(RASE = mean(RASE) + sd(RASE), label = "mean + sd", 
+         value = as.character(round(mean(RASE) + sd(RASE))))
 temp4 <- temp1 |> 
-  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd")
+  mutate(RASE = mean(RASE) - sd(RASE), label = "mean - sd", 
+         value = as.character(round(mean(RASE) - sd(RASE))))
 
 temp2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp2, type = "response")
 temp2$nintc_cover_true_prediction <- 2*temp2$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp3, type = "response")
 temp3$nintc_cover_true_prediction <- 2*temp3$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp4, type = "response")
 temp4$nintc_cover_true_prediction <- 2*temp4$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of RASE", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of RASE", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
+
+  
 
 
 
@@ -1333,34 +1405,68 @@ temp1 <- pred_dat_core |>
          RASE = mean(RASE), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
 temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(pH = mean(pH), label = "mean")
+  mutate(pH = mean(pH), label = "mean", 
+         value = as.character(round(mean(pH), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(pH = mean(pH) + sd(pH), label = "mean + sd")
+  mutate(pH = mean(pH) + sd(pH), label = "mean + sd",
+         value = as.character(round(mean(pH) + sd(pH), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(pH = mean(pH) - sd(pH), label = "mean - sd")
+  mutate(pH = mean(pH) - sd(pH), label = "mean - sd", 
+         value = as.character(round(mean(pH) - sd(pH), digits = 1)))
 
 temp2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp2, type = "response")
 temp2$nintc_cover_true_prediction <- 2*temp2$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp3, type = "response")
 temp3$nintc_cover_true_prediction <- 2*temp3$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp4, type = "response")
 temp4$nintc_cover_true_prediction <- 2*temp4$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_H_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of pH", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.94", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of pH", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -1372,34 +1478,69 @@ temp1 <- pred_dat_core |>
          RASE = mean(RASE), AMT = mean(AMT), SAC = mean(SAC), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
 temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(pH = mean(pH), label = "mean")
+  mutate(pH = mean(pH), label = "mean", 
+         value = as.character(round(mean(pH), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(pH = mean(pH) + sd(pH), label = "mean + sd")
+  mutate(pH = mean(pH) + sd(pH), label = "mean + sd",
+         value = as.character(round(mean(pH) + sd(pH), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(pH = mean(pH) - sd(pH), label = "mean - sd")
+  mutate(pH = mean(pH) - sd(pH), label = "mean - sd", 
+         value = as.character(round(mean(pH) - sd(pH), digits = 1)))
 
 temp2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp2, type = "response")
 temp2$nintc_cover_true_prediction <- 2*temp2$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp3, type = "response")
 temp3$nintc_cover_true_prediction <- 2*temp3$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp4, type = "response")
 temp4$nintc_cover_true_prediction <- 2*temp4$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of pH", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of pH", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
+
 
 
 
@@ -1412,34 +1553,68 @@ temp1 <- pred_dat_core |>
          RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), #set other variables to their mean
          log_nurse_meanLDMC = mean(log_nurse_meanLDMC))
 temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(SAC = mean(SAC), label = "mean")
+  mutate(SAC = mean(SAC), label = "mean", 
+         value = as.character(round(mean(SAC), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd")
+  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd", 
+         value = as.character(round(mean(SAC) + sd(SAC), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd")
+  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd", 
+         value = as.character(round(mean(SAC) - sd(SAC), digits = 1)))
 
 temp2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp2, type = "response")
 temp2$nintc_cover_true_prediction <- 2*temp2$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp3, type = "response")
 temp3$nintc_cover_true_prediction <- 2*temp3$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp4, type = "response")
 temp4$nintc_cover_true_prediction <- 2*temp4$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of SAC", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean + sd"), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanH, fill = "mean - sd"), alpha = 0.4) +
+  scale_fill_manual(name = "Value of SAC", 
+                    breaks = c("mean", "mean + sd", "mean - sd"), 
+                    values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
+                               "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+  guides(fill = "none")
 
 
 
@@ -1451,34 +1626,67 @@ temp1 <- pred_dat_core |>
          RASE = mean(RASE), AMT = mean(AMT), pH = mean(pH), #set other variables to their mean
          log_nurse_meanH = mean(log_nurse_meanH))
 temp2 <- temp1 |> #create dataframes for 3 different values of pH, then rbind tem
-  mutate(SAC = mean(SAC), label = "mean")
+  mutate(SAC = mean(SAC), label = "mean", 
+         value = as.character(round(mean(SAC), digits = 1)))
 temp3 <- temp1 |> 
-  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd")
+  mutate(SAC = mean(SAC) + sd(SAC), label = "mean + sd", 
+         value = as.character(round(mean(SAC) + sd(SAC), digits = 1)))
 temp4 <- temp1 |> 
-  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd")
+  mutate(SAC = mean(SAC) - sd(SAC), label = "mean - sd", 
+         value = as.character(round(mean(SAC) - sd(SAC), digits = 1)))
 
 temp2$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp2, type = "response")
 temp2$nintc_cover_true_prediction <- 2*temp2$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp2$se_max_binom <- temp2$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+temp2$se_min_binom <- temp2$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp2, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp2$se_max_t <- 2*temp2$se_max -1
+temp2$se_min_t <- 2*temp2$se_min -1
 
 temp3$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp3, type = "response")
 temp3$nintc_cover_true_prediction <- 2*temp3$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp3$se_max_binom <- temp3$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+temp3$se_min_binom <- temp3$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp3, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp3$se_max_t <- 2*temp3$se_max -1
+temp3$se_min_t <- 2*temp3$se_min -1
 
 temp4$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, temp4, type = "response")
 temp4$nintc_cover_true_prediction <- 2*temp4$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+temp4$se_max_binom <- temp4$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+temp4$se_min_binom <- temp4$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, temp4, type = "response", se.fit = T)$se.fit
+#backtransform SE
+temp4$se_max_t <- 2*temp4$se_max -1
+temp4$se_min_t <- 2*temp4$se_min -1
+
+colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer.pal(8, "YlOrRd")[4])
+names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean"), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean + sd"), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = "mean - sd"), lwd = 1.5) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of SAC", 
-                     breaks = c("mean", "mean + sd", "mean - sd"), 
-                     values = c("mean" = brewer.pal(8, "YlOrRd")[6], "mean + sd" = brewer.pal(8, "YlOrRd")[8], 
-                                "mean - sd" = brewer.pal(8, "YlOrRd")[4])) +
+                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.13", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 7, color = "black")+
+  geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = unique(value)), alpha = 0.4) +
+  geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = unique(value)), alpha = 0.4) +
+  geom_ribbon(data = temp4, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
+                                x = log_nurse_meanLDMC, fill = unique(value)), alpha = 0.4) +
+  scale_fill_manual(name = "Value of SAC", 
+                    breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
+                    values = colour_names) +
+  guides(fill = "none")
 
 
 ###NIntc cover ~ aridity*graz
@@ -1491,6 +1699,13 @@ pred_dat7 <- pred_dat_core |>
 
 pred_dat7$nintc_cover_binom_prediction <- predict(nintc_cover_bestmod, pred_dat7, type = "response")
 pred_dat7$nintc_cover_true_prediction <- 2*pred_dat7$nintc_cover_binom_prediction -1 #backtransform from binomial
+#get the mean +- standard error
+pred_dat7$se_max_binom <- pred_dat7$nintc_cover_binom_prediction + predict(nintc_cover_bestmod, pred_dat7, type = "response", se.fit = T)$se.fit
+pred_dat7$se_min_binom <- pred_dat7$nintc_cover_binom_prediction - predict(nintc_cover_bestmod, pred_dat7, type = "response", se.fit = T)$se.fit
+#backtransform SE
+pred_dat7$se_max_t <- 2*pred_dat7$se_max -1
+pred_dat7$se_min_t <- 2*pred_dat7$se_min -1
+
 
 cov_arid_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = aridity)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
@@ -1499,9 +1714,18 @@ cov_arid_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = aridity)) +
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "Aridity") +
   theme_classic() +
-  theme(legend.position = "right") +
+  #theme(legend.position = "right") +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.26", 
-           hjust = 1.1, vjust = -0.5, size = 4, color = "black")
+           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  geom_ribbon(data = pred_dat7, aes(y = nintc_cover_true_prediction, 
+                                    ymin = se_min_t, ymax = se_max_t, x = aridity, fill = graz), alpha = 0.4) +
+  scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
+                    values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" )) +
+  guides(fill = "none")
+
+
+
+
 
 
 #combine the figures
