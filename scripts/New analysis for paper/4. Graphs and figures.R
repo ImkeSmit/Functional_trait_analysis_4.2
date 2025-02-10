@@ -877,11 +877,6 @@ ggsave("nintc_richness_nurse_trait_effects2.png", rich_combo2, width = 7000, hei
 
 
 ####GRID OF VARIABLE EFFECTS ON NINTC COVER####
-my_cover_theme <- theme(axis.title = element_text(size = 22), 
-                  axis.text = element_text(size = 19), 
-                  legend.title = element_text(size = 11), 
-                  legend.text = element_text(size = 20), 
-                  legend.position = "right")
 
 #import modelling data
 modeldat <- read.csv("Functional trait data\\Clean data\\nint_nurse_traits.csv", row.names = 1) 
@@ -974,15 +969,15 @@ pred_dat1$se_min_t <- 2*pred_dat1$se_min -1
 
 
 cov_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = RASE)) +
-  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = RASE, y = nintc_cover_true_prediction, color = graz), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = pred_dat1, aes(x = RASE, y = nintc_cover_true_prediction, color = graz), lwd = 2) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "RASE") +
   theme_classic() +
   #theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat1, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = RASE, fill = graz), alpha = 0.4) +
   scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
@@ -1010,15 +1005,15 @@ pred_dat2$se_min_t <- 2*pred_dat2$se_min -1
 
 
 cov_SAC_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = SAC)) +
-  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat2, aes(x = SAC, y = nintc_cover_true_prediction, color = graz), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = pred_dat2, aes(x = SAC, y = nintc_cover_true_prediction, color = graz), lwd = 2) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "SAC") +
   theme_classic() +
   #theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat2, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = SAC, fill = graz), alpha = 0.4) +
   scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
@@ -1044,15 +1039,15 @@ pred_dat3$se_min_t <- 2*pred_dat3$se_min -1
 
 
 cov_LDMC_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = graz), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = pred_dat3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = graz), lwd = 2) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
   theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat3, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = log_nurse_meanLDMC, fill = graz), alpha = 0.4) +
   scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
@@ -1078,15 +1073,15 @@ pred_dat8$se_min_t <- 2*pred_dat8$se_min -1
 
 
 cov_H_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat8, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = graz), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = pred_dat8, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = graz), lwd = 2) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
   theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.07", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.07", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat8, aes(y = nintc_cover_true_prediction, 
                     ymin = se_min_t, ymax = se_max_t, x = log_nurse_meanH, fill = graz), alpha = 0.4) +
   scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
@@ -1145,17 +1140,17 @@ names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 
 cov_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of AMT", 
                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.80", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.80", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1220,17 +1215,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of AMT", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1295,17 +1290,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of RASE", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1370,17 +1365,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size =3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of RASE", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1445,17 +1440,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_H_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of pH", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.94", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.94", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1518,17 +1513,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of pH", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1593,17 +1588,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of SAC", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1666,17 +1661,17 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 cov_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDMC)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
-  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = temp2, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp3, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
+  geom_line(data = temp4, aes(x = log_nurse_meanLDMC, y = nintc_cover_true_prediction, color = unique(value)), lwd = 2) +
   scale_color_manual(name = "Value of SAC", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.13", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black")+
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.13", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black")+
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = unique(value)), alpha = 0.4) +
   geom_ribbon(data = temp3, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
@@ -1708,15 +1703,15 @@ pred_dat7$se_min_t <- 2*pred_dat7$se_min -1
 
 
 cov_arid_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = aridity)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat7, aes(x = aridity, y = nintc_cover_true_prediction, color = graz), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 3) +
+  geom_line(data = pred_dat7, aes(x = aridity, y = nintc_cover_true_prediction, color = graz), lwd = 2) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "Aridity") +
   theme_classic() +
   #theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "importance = 0.26", 
-           hjust = 1.1, vjust = -0.5, size = 7, color = "black") +
+  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.26", 
+           hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat7, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = aridity, fill = graz), alpha = 0.4) +
   scale_fill_manual(labels = c("ungrazed", "low", "medium", "high"),
@@ -1725,21 +1720,27 @@ cov_arid_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = aridity)) +
 
 
 
-
-
-
 #combine the figures
 blank1 <- ggplot() + geom_blank() +theme_classic()
-blank2 <- ggplot() + geom_blank() +theme_classic()
-blank3 <- ggplot() + geom_blank() +theme_classic()
-blank4 <- ggplot() + geom_blank()
 
-cov_combo <- ggarrange(cov_LDMC_graz, cov_H_graz, cov_RASE_graz, cov_SAC_graz, cov_arid_graz,
-                       cov_LDMC_RASE, cov_LDMC_AMT, cov_H_RASE, cov_H_AMT, blank1,
-                       cov_LDMC_SAC, cov_LDMC_pH, cov_H_SAC, cov_H_pH, blank3, nrow = 3, ncol = 5, align = "hv"
-                       , labels = "auto")
+my_cover_theme <- theme(axis.title = element_text(size = 24), 
+                        axis.text = element_text(size = 21), 
+                        legend.title = element_text(size = 23), 
+                        legend.text = element_text(size = 22), 
+                        legend.position = "right")
 
-ggsave("nintc_cover_nurse_trait_effects.png", cov_combo, width = 5500, height = 2500, 
+
+cover_plots <- lapply(list(cov_LDMC_graz, cov_H_graz, cov_RASE_graz, cov_SAC_graz, cov_arid_graz,
+                     cov_LDMC_RASE, cov_LDMC_AMT, cov_H_RASE, cov_H_AMT, blank1,
+                     cov_LDMC_SAC, cov_LDMC_pH, cov_H_SAC, cov_H_pH), function(p) p + my_cover_theme)
+
+
+cov_combo2 <- plot_grid(plotlist = cover_plots, 
+                         nrow = 3, ncol = 5, label_size = 24,
+                         labels = c("a", "b", "c", "d", "e", "f", "g", "h", "i", 
+                                    " ", "j", "k", "l", "m"), align = "hv")
+
+ggsave("nintc_cover_nurse_trait_effects2.png", cov_combo2, width = 10000, height = 6000, 
        units = "px", path = "Figures")
 
 
@@ -1829,15 +1830,15 @@ H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
   geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in H", x = "AMT", color = " ") +
+  labs(y = " ", x = "AMT", color = " ") +
   theme_classic() +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16)) +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 #text_annotation <- ggdraw() +
@@ -1882,10 +1883,9 @@ H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   labs(y = "Difference in H", x = "Aridity", color = "") +
   theme_classic() +
   guides(fill = "none") +
-  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16)) +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
+        legend.text = element_text(size = 16))
   
 
 # Create the annotation as a separate text plot
@@ -1925,16 +1925,16 @@ H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
   geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in H", x = "RASE", color = "") +
+  labs(y = "", x = "RASE", color = "") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16)) +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
+        legend.text = element_text(size = 16))
   
 
 # Create the annotation as a separate text plot
@@ -1974,16 +1974,16 @@ H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
   geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in H", x = "pH", color = "") +
+  labs(y = "", x = "pH", color = "") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16)) +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 #text_annotation <- ggdraw() +
@@ -2022,16 +2022,16 @@ H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
   geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in H", x = "SAC", color = "") +
+  labs(y = " ", x = "SAC", color = "") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.54", hjust= 1, vjust = 1, size = 5)+
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16)) +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 0.54", hjust= 1, vjust = 1, size = 5)
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 #text_annotation <- ggdraw() +
@@ -2066,9 +2066,9 @@ H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = asso
   labs(y = "Difference in H", x = "Grazing pressure", fill = "") +
   theme_classic() +
   theme(legend.position = "right") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)+
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 18)) +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)
+        legend.text = element_text(size = 16))
 
 # Create the annotation as a separate text plot
 #text_annotation <- ggdraw() +
@@ -2080,11 +2080,24 @@ H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = asso
 #                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
+####Arrange the plots
+#Apply common theme to all the plots
+
 H_ass_combo <- ggarrange(H_ass_arid, H_ass_AMT, H_ass_RASE, H_ass_graz, H_ass_pH, H_ass_SAC, 
                          nrow = 2, ncol = 3, labels = "auto", font.label = list(size = 16), 
                          legend.grob = get_legend(H_ass_graz), legend = "right")
 
-ggsave("diff_H_association.png", H_ass_combo, path = 'Figures', 
+H_ass_combo2 <- ggarrange(H_ass_arid, H_ass_AMT, H_ass_RASE, H_ass_graz, H_ass_pH, H_ass_SAC, labels = "auto", 
+                          font.label = list(size = 16), 
+                          legend.grob = get_legend(H_ass_graz), 
+                          ncol = 3, nrow = 2, legend = "right", 
+                          align = "hv", # Ensures proper alignment
+                          widths = c(1, 1, 1), # Adjust column spacing
+                          heights = c(1, 1),   # Adjust row spacing
+                          hjust = -3) # Increase spacing
+
+
+ggsave("diff_H_association2.png", H_ass_combo2, path = 'Figures', 
        width = 4200, height = 2200, units = "px")
 
 
