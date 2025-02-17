@@ -2183,24 +2183,17 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_AMT <- ggplot(ldmc_data, aes(x = AMT, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in LDMC", x = "AMT", color = "Association") +
+  labs(y = " ", x = "AMT", color = "Association") +
   theme_classic() +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
-
-# Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
-
-# Arrange the plot and the annotation
-LDMC_ass_AMT <- plot_grid(LDMC_ass_AMT, text_annotation, 
-                       ncol = 1, 
-                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
-
+  guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 
 ####diff ~ass*aridity
@@ -2228,23 +2221,16 @@ LDMC_ass_arid <- ggplot(ldmc_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Difference in LDMC", x = "Aridity", color = "Association") +
   theme_classic() +
   guides(fill = "none") +
-  theme(legend.position = "right")
-
-# Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
-
-# Arrange the plot and the annotation
-LDMC_ass_arid <- plot_grid(LDMC_ass_arid, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 
 
@@ -2272,25 +2258,19 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_RASE <- ggplot(ldmc_data, aes(x = RASE, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in LDMC", x = "RASE", color = "Association") +
+  labs(y = " ", x = "RASE", color = "Association") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
+  guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
-
-# Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
-
-# Arrange the plot and the annotation
-LDMC_ass_RASE <- plot_grid(LDMC_ass_RASE, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
 
 
 
@@ -2318,24 +2298,19 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_pH <- ggplot(ldmc_data, aes(x = pH, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 0.1, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in LDMC", x = "pH", color = "Association") +
+  labs(y = " ", x = "pH", color = "Association") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
-  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
-
-# Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
-
-# Arrange the plot and the annotation
-LDMC_ass_pH <- plot_grid(LDMC_ass_pH, text_annotation, 
-                      ncol = 1, 
-                      rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+  guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
+  
 
 
 
@@ -2363,24 +2338,18 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_SAC <- ggplot(ldmc_data, aes(x = SAC, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
   geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
-  scale_color_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in LDMC", x = "SAC", color = "Association") +
+  labs(y = " ", x = "SAC", color = "Association") +
   theme_classic() +
   theme(legend.position = "right") +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
-  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  guides(fill = "none")
-
-# Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 0.54", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
-
-# Arrange the plot and the annotation
-LDMC_ass_SAC <- plot_grid(LDMC_ass_SAC, text_annotation, 
-                       ncol = 1, 
-                       rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+  guides(fill = "none") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.54", hjust= 1, vjust = 1, size = 5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16))
 
 
 
@@ -2400,21 +2369,32 @@ temp1$error_min <- temp1$trait_diff_prediction - predict(LDMC_bestmod, temp1, ty
 LDMC_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = association)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   geom_errorbar(aes(ymax = error_max, ymin = error_min), width = 0.4, position = position_dodge(width = 0.9)) +
-  scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
+  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
-  labs(y = "Difference in LDMC", x = "Grazing pressure", fill = "Association") +
+  labs(y = "Difference in LDMC", x = "Grazing pressure", fill = " ") +
   theme_classic() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
+        legend.text = element_text(size = 16), legend.title = element_text(size = 17))
 
-# Create the annotation as a separate text plot
-text_annotation <- ggdraw() +
-  draw_text("importance = 1.00", size = 10, hjust = 0, x = 0.7, y = 3) # Adjust text position as needed
 
-# Arrange the plot and the annotation
-LDMC_ass_graz <- plot_grid(LDMC_ass_graz, text_annotation, 
-                        ncol = 1, 
-                        rel_heights = c(1, 0.1)) # Adjust height ratio to give space for the text
+LDMC_ass_combo2 <- ggarrange(LDMC_ass_arid, LDMC_ass_AMT, LDMC_ass_RASE, LDMC_ass_graz, LDMC_ass_pH, LDMC_ass_SAC,
+                             labels = "auto", 
+                          font.label = list(size = 16), 
+                          legend.grob = get_legend(LDMC_ass_graz), 
+                          ncol = 3, nrow = 2, legend = "right", 
+                          align = "hv", # Ensures proper alignment
+                          widths = c(1, 1, 1), # Adjust column spacing
+                          heights = c(1, 1),   # Adjust row spacing
+                          hjust = -3) # Increase spacing
+
+
+ggsave("diff_LDMC_association2.png", LDMC_ass_combo2, path = 'Figures', 
+       width = 4200, height = 2200, units = "px")
+
+
 
 
 LDMC_ass_combo <- ggarrange(LDMC_ass_arid, LDMC_ass_AMT, LDMC_ass_RASE, LDMC_ass_graz, LDMC_ass_pH, LDMC_ass_SAC, 
