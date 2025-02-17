@@ -976,7 +976,7 @@ cov_RASE_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = RASE)) +
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "RASE") +
   theme_classic() +
   #theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat1, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = RASE, fill = graz), alpha = 0.4) +
@@ -1012,7 +1012,7 @@ cov_SAC_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = SAC)) +
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "SAC") +
   theme_classic() +
   #theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat2, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = SAC, fill = graz), alpha = 0.4) +
@@ -1046,7 +1046,7 @@ cov_LDMC_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanL
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
   theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat3, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = log_nurse_meanLDMC, fill = graz), alpha = 0.4) +
@@ -1080,7 +1080,7 @@ cov_H_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) 
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
   theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.07", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.07", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat8, aes(y = nintc_cover_true_prediction, 
                     ymin = se_min_t, ymax = se_max_t, x = log_nurse_meanH, fill = graz), alpha = 0.4) +
@@ -1149,7 +1149,7 @@ cov_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
                     values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.80", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.80", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
@@ -1224,7 +1224,7 @@ cov_LDMC_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLD
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
@@ -1299,7 +1299,7 @@ cov_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) 
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
@@ -1374,7 +1374,7 @@ cov_LDMC_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanL
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
@@ -1449,7 +1449,7 @@ cov_H_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.94", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.94", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
@@ -1522,7 +1522,7 @@ cov_LDMC_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLDM
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 1.00", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = "mean"), alpha = 0.4) +
@@ -1597,7 +1597,7 @@ cov_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(H)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.06", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanH, fill = "mean"), alpha = 0.4) +
@@ -1670,7 +1670,7 @@ cov_LDMC_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanLD
                      values = colour_names) +
   labs(y = expression(NInt[C]~cover), x = "log(LDMC)") +
   theme_classic() +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.13", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.13", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black")+
   geom_ribbon(data = temp2, aes(y = nintc_cover_true_prediction, ymin = se_min_t, ymax = se_max_t, 
                                 x = log_nurse_meanLDMC, fill = unique(value)), alpha = 0.4) +
@@ -1710,7 +1710,7 @@ cov_arid_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = aridity)) +
   labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "Aridity") +
   theme_classic() +
   #theme(legend.position = "right") +
-  annotate("text", x = Inf, y = -Inf, label = "Imp = 0.26", 
+  annotate("text", x = Inf, y = -Inf, label = "importance = 0.26", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
   geom_ribbon(data = pred_dat7, aes(y = nintc_cover_true_prediction, 
                                     ymin = se_min_t, ymax = se_max_t, x = aridity, fill = graz), alpha = 0.4) +
@@ -1729,19 +1729,31 @@ my_cover_theme <- theme(axis.title = element_text(size = 24),
                         legend.text = element_text(size = 22), 
                         legend.position = "right")
 
+##main text plot:
 
-cover_plots <- lapply(list(cov_LDMC_graz, cov_H_graz, cov_RASE_graz, cov_SAC_graz, cov_arid_graz,
-                     cov_LDMC_RASE, cov_LDMC_AMT, cov_H_RASE, cov_H_AMT, blank1,
-                     cov_LDMC_SAC, cov_LDMC_pH, cov_H_SAC, cov_H_pH), function(p) p + my_cover_theme)
-
-
-cov_combo2 <- plot_grid(plotlist = cover_plots, 
-                         nrow = 3, ncol = 5, label_size = 24,
-                         labels = c("a", "b", "c", "d", "e", "f", "g", "h", "i", 
-                                    " ", "j", "k", "l", "m"), align = "hv")
-
-ggsave("nintc_cover_nurse_trait_effects2.png", cov_combo2, width = 10000, height = 6000, 
+cover_plots_maintext <- lapply(list(cov_H_graz,cov_arid_graz,blank1,
+                                    cov_H_AMT,cov_H_SAC, cov_LDMC_SAC), function(p) p + my_cover_theme)
+cov_combo2_maintext <- plot_grid(plotlist = cover_plots_maintext, 
+                        nrow = 2, ncol = 3, label_size = 24,
+                        labels = c("a", "b", " ","c", "d", "e"), align = "hv")
+ggsave("nintc_cover_nurse_trait_effects2_maintext.png", cov_combo2_maintext, width = 7000, height = 4000, 
        units = "px", path = "Figures")
+
+
+##The rest go in the appendix:
+
+cover_plots_appendix <- lapply(list(cov_LDMC_graz, cov_RASE_graz, cov_SAC_graz,
+                                    cov_LDMC_RASE, cov_LDMC_AMT, cov_H_RASE,
+                                    cov_LDMC_pH, cov_H_pH, blank1), function(p) p + my_cover_theme)
+cov_combo2_appendix <- plot_grid(plotlist = cover_plots_appendix, 
+                        nrow = 3, ncol = 3, label_size = 24,
+                        labels = c("a", "b", "c", "d", "e", "f", "g", "h", " "), align = "hv")
+
+ggsave("nintc_cover_nurse_trait_effects2_appendix.png", cov_combo2_appendix, width = 7000, height = 5000, 
+       units = "px", path = "Figures")
+
+
+
 
 
 
