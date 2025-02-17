@@ -1743,7 +1743,7 @@ ggsave("nintc_cover_nurse_trait_effects2_maintext.png", cov_combo2_maintext, wid
 ##The rest go in the appendix:
 
 cover_plots_appendix <- lapply(list(cov_LDMC_graz, cov_RASE_graz, cov_SAC_graz,
-                                    cov_LDMC_RASE, cov_LDMC_AMT, cov_H_RASE,
+                                    cov_LDMC_RASE,cov_H_RASE,cov_LDMC_AMT,
                                     cov_LDMC_pH, cov_H_pH, blank1), function(p) p + my_cover_theme)
 cov_combo2_appendix <- plot_grid(plotlist = cover_plots_appendix, 
                         nrow = 3, ncol = 3, label_size = 24,
