@@ -250,7 +250,11 @@ cov_final_model <-glmmTMB(NIntc_cover_binom ~ AMT + aridity + graz + log_nurse_m
                             log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC + (1|nurse_sp), 
                           data = modeldat_final, family = "binomial")
 cov_null_model <- glmmTMB(NIntc_cover_binom ~ 1+ (1|nurse_sp), data = modeldat_final, family = "binomial")
-r.squaredGLMM(cov_final_model, cov_null_model) #r squared is not working
+r.squaredGLMM(cov_final_model) #r squared is not working
+
+#use performance package to calculate R2 since Mumin isn't working
+library(performance)
+performance::r2(cov_final_model)
 
 #get the variable importance
 cov_importance <- sw(cov_avg_models)
