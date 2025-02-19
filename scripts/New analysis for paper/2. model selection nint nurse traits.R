@@ -152,9 +152,13 @@ final_model <-glmmTMB(NIntc_richness_binom ~ AMT + aridity + graz + log_nurse_me
                         AMT:log_nurse_meanH + AMT:log_nurse_meanLDMC + graz:log_nurse_meanLDMC + 
                         graz:RASE + graz:SAC + log_nurse_meanH:pH + log_nurse_meanH:SAC + 
                         log_nurse_meanLDMC:pH + log_nurse_meanLDMC:RASE + log_nurse_meanLDMC:SAC+
-                        sin_lat + sin_long + (1|nurse_sp), data = modeldat_final, family = "binomial")
+                        sin_lat + sin_long + (1|nurse_sp), data = modeldat_final, family = "binomial", weights = NULL)
 summary(final_model)
 r.squaredGLMM(final_model) #r squared is not working
+
+# Alternative method because Mumin doesn't work
+library(performance)
+performance::r2(final_model)
 
 #get the variable importance
 importance <- sw(avg_models)
