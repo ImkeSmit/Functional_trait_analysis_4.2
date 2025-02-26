@@ -83,7 +83,7 @@ summary(avg_maxh_mod)
 #variable importance
 sw(avg_maxh_mod) #only association:SAC is just included in one model
 
-r.squaredGLMM(maxh_full_model)
+performance::r2(maxh_full_model)
 
 ##Are the means of each association group different from 0?
 #Do Whelch's t.test, which does not assume equal variances
@@ -126,7 +126,7 @@ summary(avg_ldmc_models)
 
 sw(avg_ldmc_models)
 
-r.squaredGLMM(ldmc_full_model)
+performance::r2(ldmc_full_model)
 
 ##Are the means of each association group different from 0?
 #Do Whelch's t.test, which does not assume equal variances
