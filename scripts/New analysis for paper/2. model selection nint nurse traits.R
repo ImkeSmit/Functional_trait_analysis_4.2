@@ -57,6 +57,12 @@ n_doms <- modeldat_final |>
   distinct(nurse_sp) |> 
   summarise(n_nurses = n())
 
+#how many of eacg graz level
+n_graz <- modeldat_final |> 
+  distinct(graz, ID) |> 
+  group_by(graz) |> 
+  summarise(n = n()) #dont have 97 plots anymore because some plots do not have LDMC for the nurse
+
 
 ####define the full model formula ###
 #formula without climate*climate interactions
