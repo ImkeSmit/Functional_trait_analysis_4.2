@@ -29,7 +29,7 @@ siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation anal
 #import drypop, so which contains the env covariates
 drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
   mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
-  dplyr::select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  dplyr::select(plotref, Country, AMT, RAI, RASE, pH.b, SAC.b) |> 
   distinct() |> 
   left_join(siteinfo, by = "plotref") |> 
   dplyr::select(!plotref) |> 
@@ -47,6 +47,13 @@ trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$ID <- as.factor(trait_ass_join$ID)
 trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
+
+#how many reps from how many plots
+nreps <- trait_ass_join |> 
+  distinct(ID, replicate) |> 
+  summarise(n = n()) #1412
+
+length(unique(trait_ass_join$ID)) #49
 
 ####MODEL SELECTION FOR MAXH####
 #MaxH model#

@@ -28,7 +28,7 @@ siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation anal
 #import drypop, so which contains the env covariates
 drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
   mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
-  dplyr::select(plotref, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  dplyr::select(plotref, Country, AMT, RAI, RASE, pH.b, SAC.b) |> 
   distinct() |> 
   left_join(siteinfo, by = "plotref") |> 
   dplyr::select(!plotref)
@@ -44,7 +44,9 @@ modeldat_final <- modeldat |>
          sin_long = sin(Long_decimal)) |> 
   #remove all rows which have NA values in any of our modelling variables
   drop_na(NIntc_richness_binom, NIntc_cover_binom,NInta_richness_binom, NInta_cover_binom, 
-          log_nurse_meanLDMC, log_nurse_meanH, aridity, AMT, RASE, SAC, pH, graz)
+          log_nurse_meanLDMC, log_nurse_meanH, aridity, AMT, RASE, SAC, pH, graz) 
+#we lose many plots because of the na dropping
+#if we do this again we should create separate datasets for the nintc richness and nintc cover becayuse the nintc cover is more gappy
 
 #how many replicates included?
 n_reps <- modeldat_final |> 
@@ -57,11 +59,23 @@ n_doms <- modeldat_final |>
   distinct(nurse_sp) |> 
   summarise(n_nurses = n())
 
-#how many of eacg graz level
+#how many of eacg graz level in modeldat_final
 n_graz <- modeldat_final |> 
   distinct(graz, ID) |> 
   group_by(graz) |> 
   summarise(n = n()) #dont have 97 plots anymore because some plots do not have LDMC for the nurse
+
+#how many of eacg graz level in modeldat
+n_graz <- modeldat |> 
+  distinct(graz, ID) |> 
+  group_by(graz) |> 
+  summarise(n = n()) #dont have 97 plots anymore because some plots do not have LDMC for the nurse
+
+#how many plots
+length(unique(modeldat_final$ID)) #74
+
+#how mnay countries
+unique(modeldat_final$Country) #9 countries
 
 
 ####define the full model formula ###
