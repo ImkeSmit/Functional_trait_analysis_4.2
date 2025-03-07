@@ -1838,8 +1838,8 @@ pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_da
 pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
-  geom_jitter(height = 2, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 2, width = 0.5, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "AMT", color = " ") +
@@ -1885,8 +1885,8 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 
 
 H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
-  geom_jitter(height = 2, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 2, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 2) +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
@@ -1933,8 +1933,8 @@ pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(H_bestmod, pred_da
 pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
-  geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "", x = "RASE", color = "") +
@@ -1982,8 +1982,8 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 
 
 H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
-  geom_jitter(height = 2, width = 0.1, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 2, width = 0.1, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "", x = "pH", color = "") +
@@ -2030,8 +2030,8 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 
 
 H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
-  geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "SAC", color = "") +
@@ -2193,8 +2193,8 @@ pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred
 pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 LDMC_ass_AMT <- ggplot(ldmc_data, aes(x = AMT, y = trait_difference)) +
-  geom_jitter(height = 0.01, width = 0.5, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.5, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "AMT", color = "Association") +
@@ -2230,8 +2230,8 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 
 
 LDMC_ass_arid <- ggplot(ldmc_data, aes(x = ARIDITY.v3, y = trait_difference)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 2) +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
@@ -2268,8 +2268,8 @@ pred_dat1$se_max <- pred_dat1$trait_diff_prediction + predict(LDMC_bestmod, pred
 pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred_dat1, type = "response", se.fit = T)$se.fit
 
 LDMC_ass_RASE <- ggplot(ldmc_data, aes(x = RASE, y = trait_difference)) +
-  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "RASE", color = "Association") +
@@ -2308,8 +2308,8 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 
 
 LDMC_ass_pH <- ggplot(ldmc_data, aes(x = pH, y = trait_difference)) +
-  geom_jitter(height = 0.01, width = 0.1, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 0.1, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "pH", color = "Association") +
@@ -2348,8 +2348,8 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 
 
 LDMC_ass_SAC <- ggplot(ldmc_data, aes(x = SAC, y = trait_difference)) +
-  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 1.5) +
-  geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 1.5) +
+  geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 2) +
+  geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 2) +
   scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "SAC", color = "Association") +
