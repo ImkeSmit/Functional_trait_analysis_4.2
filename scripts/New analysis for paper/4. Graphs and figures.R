@@ -276,14 +276,14 @@ colour_names <- c(brewer.pal(8, "YlOrRd")[6], brewer.pal(8, "YlOrRd")[8], brewer
 names(colour_names) <- c(temp2$value[1], temp3$value[1], temp4$value[1])
 
 rich_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)) +
-  geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
+  geom_jitter(height = 0.01, width = 0.01, color =  "azure3", alpha = 0.4, size = 2) +
   geom_line(data = temp2, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   geom_line(data = temp3, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   geom_line(data = temp4, aes(x = log_nurse_meanH, y = nintc_richness_true_prediction, color = unique(value)), lwd = 1.5) +
   scale_color_manual(name = "Value of AMT", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
-  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  labs(y = expression(NInt[C]~richness), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.11", 
            hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
@@ -436,7 +436,7 @@ rich_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_mean
   scale_color_manual(name = "Value of RASE", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
-  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  labs(y = expression(NInt[C]~richness), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.10", 
            hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
@@ -586,7 +586,7 @@ rich_H_pH <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH)
   scale_color_manual(name = "Value of pH", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names)  +
-  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  labs(y = expression(NInt[C]~richness), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 1.00", 
            hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
@@ -737,7 +737,7 @@ rich_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_richness, x = log_nurse_meanH
   scale_color_manual(name = "Value of SAC", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
-  labs(y = expression(NInt[C]~richness), x = "log(H)") +
+  labs(y = expression(NInt[C]~richness), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.09", 
            hjust = 1.1, vjust = -0.5, size = 6, color = "black") +
@@ -1077,7 +1077,7 @@ cov_H_graz <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) 
   geom_line(data = pred_dat8, aes(x = log_nurse_meanH, y = nintc_cover_true_prediction, color = graz), lwd = 2) +
   scale_color_manual(labels = c("ungrazed", "low", "medium", "high"),
                      values = c("darkgreen", "chartreuse2" , "darkolivegreen3", "darkgoldenrod4", "azure4" ))+
-  labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(H)") +
+  labs(color = "Grazing pressure", y = expression(NInt[C]~cover), x = "log(Height)") +
   theme_classic() +
   theme(legend.position = "right") +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.07", 
@@ -1147,7 +1147,7 @@ cov_H_AMT <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
   scale_color_manual(name = "Value of AMT", 
                     breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                     values = colour_names) +
-  labs(y = expression(NInt[C]~cover), x = "log(H)") +
+  labs(y = expression(NInt[C]~cover), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.80", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
@@ -1297,7 +1297,7 @@ cov_H_RASE <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) 
   scale_color_manual(name = "Value of RASE", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
-  labs(y = expression(NInt[C]~cover), x = "log(H)") +
+  labs(y = expression(NInt[C]~cover), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
@@ -1447,7 +1447,7 @@ cov_H_pH <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
   scale_color_manual(name = "Value of pH", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
-  labs(y = expression(NInt[C]~cover), x = "log(H)") +
+  labs(y = expression(NInt[C]~cover), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.94", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
@@ -1595,7 +1595,7 @@ cov_H_SAC <- ggplot(modeldat_final, aes(y = NIntc_cover, x = log_nurse_meanH)) +
   scale_color_manual(name = "Value of SAC", 
                      breaks = c(unique(temp4$value), unique(temp2$value), unique(temp3$value)), 
                      values = colour_names) +
-  labs(y = expression(NInt[C]~cover), x = "log(H)") +
+  labs(y = expression(NInt[C]~cover), x = "log(Height)") +
   theme_classic() +
   annotate("text", x = Inf, y = -Inf, label = "importance = 0.06", 
            hjust = 1.1, vjust = -0.5, size = 9, color = "black") +
@@ -1840,7 +1840,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_AMT <- ggplot(maxh_data, aes(x = AMT, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.5, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "AMT", color = " ") +
   theme_classic() +
@@ -1888,11 +1888,11 @@ H_ass_arid <- ggplot(maxh_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 2) +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  labs(y = "Difference in H", x = "Aridity", color = "") +
+  labs(y = "Difference in height", x = "Aridity", color = "") +
   theme_classic() +
   guides(fill = "none") +
   annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
@@ -1935,7 +1935,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_RASE <- ggplot(maxh_data, aes(x = RASE, y = trait_difference)) +
   geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "", x = "RASE", color = "") +
   theme_classic() +
@@ -1984,7 +1984,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_pH <- ggplot(maxh_data, aes(x = pH, y = trait_difference)) +
   geom_jitter(height = 2, width = 0.1, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "", x = "pH", color = "") +
   theme_classic() +
@@ -2032,7 +2032,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(H_bestmod, pred_da
 H_ass_SAC <- ggplot(maxh_data, aes(x = SAC, y = trait_difference)) +
   geom_jitter(height = 2, width = 2, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "SAC", color = "") +
   theme_classic() +
@@ -2072,10 +2072,10 @@ temp1$error_min <- temp1$trait_diff_prediction - predict(H_bestmod, temp1, type 
 H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = association)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   geom_errorbar(aes(ymax = error_max, ymin = error_min), width = 0.4, position = position_dodge(width = 0.9)) +
-  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_fill_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
-  labs(y = "Difference in H", x = "Grazing pressure", fill = "") +
+  labs(y = "Difference in height", x = "Grazing pressure", fill = "") +
   theme_classic() +
   theme(legend.position = "right") +
   annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)+
@@ -2195,7 +2195,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_AMT <- ggplot(ldmc_data, aes(x = AMT, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 0.5, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = AMT, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "AMT", color = "Association") +
   theme_classic() +
@@ -2233,9 +2233,9 @@ LDMC_ass_arid <- ggplot(ldmc_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 0.01, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = ARIDITY.v3, y = trait_diff_prediction, color = association), lwd = 2) +
   geom_ribbon(data = pred_dat1, aes(ymin = se_min, ymax = se_max, fill = association), alpha = 0.4) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
-  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_fill_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = "Difference in LDMC", x = "Aridity", color = "Association") +
   theme_classic() +
@@ -2270,7 +2270,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_RASE <- ggplot(ldmc_data, aes(x = RASE, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = RASE, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "RASE", color = "Association") +
   theme_classic() +
@@ -2310,7 +2310,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_pH <- ggplot(ldmc_data, aes(x = pH, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 0.1, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = pH, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "pH", color = "Association") +
   theme_classic() +
@@ -2350,7 +2350,7 @@ pred_dat1$se_min <- pred_dat1$trait_diff_prediction - predict(LDMC_bestmod, pred
 LDMC_ass_SAC <- ggplot(ldmc_data, aes(x = SAC, y = trait_difference)) +
   geom_jitter(height = 0.01, width = 2, color = "azure3", alpha = 0.4, size = 2) +
   geom_line(data = pred_dat1, aes(x = SAC, y = trait_diff_prediction, color = association), lwd = 2) +
-  scale_color_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_color_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                      values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   labs(y = " ", x = "SAC", color = "Association") +
   theme_classic() +
@@ -2381,7 +2381,7 @@ temp1$error_min <- temp1$trait_diff_prediction - predict(LDMC_bestmod, temp1, ty
 LDMC_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = association)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
   geom_errorbar(aes(ymax = error_max, ymin = error_min), width = 0.4, position = position_dodge(width = 0.9)) +
-  scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
+  scale_fill_manual(labels = c(expression("∆"["Do"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   scale_x_discrete(labels = c("Ungrazed", "Low", "Medium", "High")) +
   labs(y = "Difference in LDMC", x = "Grazing pressure", fill = " ") +
