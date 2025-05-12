@@ -42,12 +42,17 @@ trait_ass_join <- trait_fdist |>
   left_join(ass, by = c("target", "ID")) |> 
   filter(association %in% c("nurse", "bare")) |> #only work with these associations
   left_join(drypop, by = "ID") |> 
-  rename(nurse_sp = nurse)
+  rename(nurse_sp = nurse) |> 
+  mutate(plot_replicate = paste(ID, replicate, sep = "_")) 
+# we create this variable so that each spatial sampling unit has a unique name. 
+#Replicate 2 in plot 1 is not the same as replicate 2 in plot 2
+
 trait_ass_join$association <- as.factor(trait_ass_join$association)
 trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$ID <- as.factor(trait_ass_join$ID)
 trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
+trait_ass_join$plot_replicate <- as.factor(trait_ass_join$replicate)
 
 #how many reps from how many plots
 nreps <- trait_ass_join |> 
@@ -70,7 +75,8 @@ hist(maxh_data$trait_difference)
 full_formula <- as.formula("trait_difference ~ association*GRAZ + 
                            association*AMT + association*RASE + association*ARIDITY.v3 + 
                            association*SAC + association*pH +
-                           sin_lat + sin_long + (1|nurse_sp)+ (1|replicate)")
+                           sin_lat + sin_long + (1|nurse_sp/plot_replicate)")
+                           #plot_replicate is nested within nurse sp. 
 
 maxh_full_model <- glmmTMB(formula = full_formula, data = maxh_data)
 
@@ -78,7 +84,7 @@ maxh_full_model <- glmmTMB(formula = full_formula, data = maxh_data)
 options(na.action = "na.fail")
 maxh_model_selection <- dredge(maxh_full_model, 
                                fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
-                               rank = "AIC") #start16:08, end 16:12 wow
+                               rank = "AIC") #start 13:12
 
 #get the bets models
 maxh_eq_models <- get.models(maxh_model_selection, subset= delta <2) #2 equivalent models
