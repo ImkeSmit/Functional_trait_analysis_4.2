@@ -145,7 +145,7 @@ countrynames <- c("algeria", "argentina", "australia", "chile", "chinachong", "c
                   "israel", "namibiablaum", "namibiawang", "southafrica",  "spainmaestre", "spainrey")
 for(i in 1:length(data_files)) {                              
   assign(paste0(countrynames[i]),                                   
-         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis\\Facilitation data\\Countriesv3\\",
+         read.csv2(paste0("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\Countriesv3\\",
                           data_files[i])))
 }
 
@@ -182,7 +182,7 @@ for (t in 1:length(countrynames)) {
           select(Species.within.quadrat)
         
         #get the species that are in both nurse and bare microsites
-        both_sp <- c(bare_sp[match(bare_sp$Species.within.quadrat, nurse_sp$Species.within.quadrat) , ])
+        both_sp <- intersect(nurse_sp$Species.within.quadrat, bare_sp$Species.within.quadrat)
         both_sp <- both_sp[!is.na(both_sp)]
         #if there are no species in both microsites, assign NA
         if(length(both_sp) == 0) {
