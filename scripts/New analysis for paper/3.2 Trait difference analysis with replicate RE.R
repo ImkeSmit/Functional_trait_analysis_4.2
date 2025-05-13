@@ -52,7 +52,7 @@ trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
 trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
 trait_ass_join$ID <- as.factor(trait_ass_join$ID)
 trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
-trait_ass_join$plot_replicate <- as.factor(trait_ass_join$replicate)
+trait_ass_join$plot_replicate <- as.factor(trait_ass_join$plot_replicate)
 
 #how many reps from how many plots
 nreps <- trait_ass_join |> 
@@ -84,7 +84,7 @@ maxh_full_model <- glmmTMB(formula = full_formula, data = maxh_data)
 options(na.action = "na.fail")
 maxh_model_selection <- dredge(maxh_full_model, 
                                fixed = c("cond(sin_lat)","cond(sin_long)"), #random effects are automatically included in all models due to the structure of tMB
-                               rank = "AIC") #start 13:12
+                               rank = "AIC") #start 13:12, end 13:26
 
 #get the bets models
 maxh_eq_models <- get.models(maxh_model_selection, subset= delta <2) #2 equivalent models
