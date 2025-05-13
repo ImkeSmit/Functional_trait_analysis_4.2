@@ -474,7 +474,7 @@ for(p in 1:length(IDlist)) {
           if(t == 1 & p == 1) { #only for the first run of the loop
           
             trait_diff <- as.data.frame(pairwise_fdist(distmat = trait_diff_matrix, sp_positions = positions_plot)) #add the positions/associations of species
-            trait_diff$trait <- traitlist
+            trait_diff$trait <- traitlist[t]
             trait_diff <- trait_diff |> 
               distinct() #for some reason it duplicates species, must be something that happens in the pairwise distance calculation.
             #just remove these duplicates
