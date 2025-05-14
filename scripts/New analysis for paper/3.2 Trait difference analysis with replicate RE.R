@@ -75,7 +75,7 @@ hist(maxh_data$trait_difference)
 full_formula <- as.formula("trait_difference ~ association*GRAZ + 
                            association*AMT + association*RASE + association*ARIDITY.v3 + 
                            association*SAC + association*pH +
-                           sin_lat + sin_long + (1|nurse_sp/plot_replicate)")
+                           sin_lat + sin_long + (1|nurse_sp) + (1|plot_replicate)")
                            #plot_replicate is nested within nurse sp. 
 
 maxh_full_model <- glmmTMB(formula = full_formula, data = maxh_data)
