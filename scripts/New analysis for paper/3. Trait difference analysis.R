@@ -51,7 +51,7 @@ trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
 #how many reps from how many plots
 nreps <- trait_ass_join |> 
   distinct(ID, replicate) |> 
-  summarise(n = n()) #1412
+  summarise(n = n()) #1448
 
 length(unique(trait_ass_join$ID)) #49
 
