@@ -156,6 +156,7 @@ avg_models <- model.avg(eq_model)
 #the corresponding coefficient (and its respective variance) is set to zero. Unlike the ‘subset average’, 
 #it does not have a tendency of biasing the value away from zero. The ‘full’ average is a type of shrinkage 
 #estimator, and for variables with a weak relationship to the response it is smaller than ‘subset’ estimators.
+#WE REPORT THE FULL AVERAGE
 
 avg_model_formula <-formula(avg_models) #get formula of the averaged model
 #NIntc_richness_binom ~ 0 + AMT + aridity + graz + log_nurse_meanH + 
