@@ -126,7 +126,7 @@ ldmc_model_selection <- dredge(ldmc_full_model,
                                rank = "AIC") 
 
 #get the bets models
-ldmc_eq_models <- get.models(ldmc_model_selection, subset= delta <2) # 2 best models
+ldmc_eq_models <- get.models(ldmc_model_selection, subset= delta <2) # 3 best models
 #average the equivalent models
 avg_ldmc_models <- model.avg(ldmc_eq_models)
 summary(avg_ldmc_models)
