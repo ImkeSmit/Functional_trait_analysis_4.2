@@ -2203,7 +2203,7 @@ LDMC_ass_AMT <- ggplot(ldmc_data, aes(x = AMT, y = trait_difference)) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.84", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
         legend.text = element_text(size = 16))
 
@@ -2279,7 +2279,7 @@ LDMC_ass_RASE <- ggplot(ldmc_data, aes(x = RASE, y = trait_difference)) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.57", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
         legend.text = element_text(size = 16))
 
@@ -2359,7 +2359,7 @@ LDMC_ass_SAC <- ggplot(ldmc_data, aes(x = SAC, y = trait_difference)) +
   scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 0.54", hjust= 1, vjust = 1, size = 5) +
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
   theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
         legend.text = element_text(size = 16))
 
