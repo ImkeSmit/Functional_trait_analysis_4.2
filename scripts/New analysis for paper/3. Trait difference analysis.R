@@ -85,7 +85,7 @@ maxh_eq_models <- get.models(maxh_model_selection, subset= delta <2) #2 equivale
 avg_maxh_mod <- model.avg(maxh_eq_models)
 
 #model coeffiecients
-summary(avg_maxh_mod)
+summary(avg_maxh_mod) #report the full average
 
 #variable importance
 sw(avg_maxh_mod) #only association:SAC is just included in one model
