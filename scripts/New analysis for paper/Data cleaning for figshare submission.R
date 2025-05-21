@@ -51,3 +51,59 @@ nint_nurse_trait_data_for_export <- modeldat_final |>
 write.xlsx(nint_nurse_trait_data_for_export,
             "C:\\Users\\imke6\\Documents\\Msc Projek\\Interaction-environment manuscript (mock paper)\\submission to GEB\\data submission\\nint_nurse_trait_env_data.xlsx" 
             )
+
+
+####2. Trait difference analysis####
+#copy code from script for trait difference analysis:
+#Import pairwise differences between traits
+trait_fdist <- read.csv("Functional trait data\\results\\trait_differences_between_2sp_traits_vary.csv", row.names = 1) |> 
+  filter(trait %in% c("MaxH", "MeanLDMC"))
+trait_fdist$SITE_ID <- as.factor(trait_fdist$SITE_ID)
+trait_fdist$ID <- as.factor(trait_fdist$ID)
+##Lets join the results of the CHi2 tests to sla_fdist###
+ass <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\results\\Chisq_results_6Feb2024.csv", row.names = 1) |> 
+  select(ID, species, association) |> 
+  rename(target = species)
+ass$ID <- as.factor(ass$ID)
+#remember that these associations were calculated were calculated at the plot scale. Eg in a specific plot, a species has a significant association with nurse microsites
+
+#import siteinfo which has lat and long for each plot
+siteinfo <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Facilitation analysis clone\\Facilitation data\\BIODESERT_sites_information.csv") |> 
+  mutate(plotref = str_c(SITE, PLOT, sep = "_")) |>
+  select(ID, plotref, Lat_decimal, Long_decimal) |> 
+  mutate(sin_lat = sin(Lat_decimal), 
+         sin_long = sin(Long_decimal)) |> 
+  select(!c(Lat_decimal, Long_decimal))
+
+#import drypop, so which contains the env covariates
+drypop <- read.csv("C:\\Users\\imke6\\Documents\\Msc Projek\\Functional trait analysis clone\\Functional trait data\\Raw data\\drypop_20MAy.csv") |> 
+  mutate(plotref = str_c(Site, Plot, sep = "_")) |> #create a variable to identify each plot
+  dplyr::select(plotref, Country, AMT, RAI, RASE, pH.b, SAC.b) |> 
+  distinct() |> 
+  left_join(siteinfo, by = "plotref") |> 
+  dplyr::select(!plotref) |> 
+  rename(pH = pH.b, SAC = SAC.b)
+drypop$ID <- as.factor(drypop$ID)
+
+#join the associations and the coordinates to the trait differences
+trait_ass_join <- trait_fdist |> 
+  left_join(ass, by = c("target", "ID")) |> 
+  filter(association %in% c("nurse", "bare")) |> #only work with these associations
+  left_join(drypop, by = "ID") |> 
+  rename(nurse_sp = nurse)
+trait_ass_join$association <- as.factor(trait_ass_join$association)
+trait_ass_join$nurse <- as.factor(trait_ass_join$nurse)
+trait_ass_join$SITE_ID <- as.factor(trait_ass_join$SITE_ID)
+trait_ass_join$ID <- as.factor(trait_ass_join$ID)
+trait_ass_join$GRAZ <- as.factor(trait_ass_join$GRAZ)
+
+
+###remove unnecessary variables
+trait_difference_data_for_export <- trait_ass_join |> 
+  select(SITE_ID, ID, replicate,trait, trait_difference, nurse_sp, target,association, GRAZ, ARIDITY.v3,  
+         AMT, RASE, pH, SAC, sin_lat, sin_long) |> 
+  rename(site_ID = SITE_ID, 
+         replicate_no = replicate, 
+         aridity = ARIDITY.v3, 
+         graz = GRAZ)
+  
