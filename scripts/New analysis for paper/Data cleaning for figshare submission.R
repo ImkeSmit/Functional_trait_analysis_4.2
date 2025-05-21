@@ -106,4 +106,8 @@ trait_difference_data_for_export <- trait_ass_join |>
          replicate_no = replicate, 
          aridity = ARIDITY.v3, 
          graz = GRAZ)
-  
+
+#write the data to an excel file
+write.xlsx(trait_difference_data_for_export,
+           "C:\\Users\\imke6\\Documents\\Msc Projek\\Interaction-environment manuscript (mock paper)\\submission to GEB\\data submission\\trait_difference_data.xlsx" 
+)
