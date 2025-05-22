@@ -111,3 +111,19 @@ trait_difference_data_for_export <- trait_ass_join |>
 write.xlsx(trait_difference_data_for_export,
            "C:\\Users\\imke6\\Documents\\Msc Projek\\Interaction-environment manuscript (mock paper)\\submission to GEB\\data submission\\trait_difference_data.xlsx" 
 )
+
+
+
+####3. PCA data####
+#copy code from PCA script:
+FT <- read.csv("Functional trait data\\Clean data\\FT_filled_match_facilitation_plots_plotspecific_species_graz_conserved.csv",
+               row.names = 1)
+#delete unnessecary variables
+FT_for_export <- FT |> 
+  select(ID, SITE_ID, taxon, trait, value) |> 
+  rename(site_ID = SITE_ID)
+
+#write the data to an excel file
+write.xlsx(FT_for_export,
+           "C:\\Users\\imke6\\Documents\\Msc Projek\\Interaction-environment manuscript (mock paper)\\submission to GEB\\data submission\\alltraits.xlsx" 
+)
