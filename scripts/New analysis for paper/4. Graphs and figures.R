@@ -872,6 +872,9 @@ rich_combo2 <- plot_grid(plotlist = plots,
 
 ggsave("nintc_richness_nurse_trait_effects2.png", rich_combo2, width = 7000, height = 4000, 
        units = "px", path = "Figures")
+#save high res image for paper:
+ggsave("Figure2_nintc_richness_nurse_trait_effects2.pdf", rich_combo2, dpi = 600, path = "Figures", 
+       width = 14000, height = 8000, units = "px",)
 
 
 
