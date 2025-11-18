@@ -2089,9 +2089,9 @@ H_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = asso
   labs(y = "Difference in height", x = "Grazing pressure", fill = "") +
   theme_classic() +
   theme(legend.position = "right") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5)+
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5.5)+
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
 
 # Create the annotation as a separate text plot
 #text_annotation <- ggdraw() +
@@ -2122,6 +2122,10 @@ H_ass_combo2 <- ggarrange(H_ass_arid, H_ass_AMT, H_ass_RASE, H_ass_graz, H_ass_p
 
 ggsave("diff_H_association2.png", H_ass_combo2, path = 'Figures', 
        width = 4200, height = 2200, units = "px")
+
+#save high res image for publication
+ggsave("Figure4_diff_H_association2.png", H_ass_combo2, path = 'Figures', 
+       width = 8400, height = 4400, units = "px", dpi = 600)
 
 
 
