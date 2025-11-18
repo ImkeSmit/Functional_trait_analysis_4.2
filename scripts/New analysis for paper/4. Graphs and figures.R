@@ -2218,9 +2218,9 @@ LDMC_ass_AMT <- ggplot(ldmc_data, aes(x = AMT, y = trait_difference)) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 0.84", hjust= 1, vjust = 1, size = 5) +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.84", hjust= 1, vjust = 1, size = 5.5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
 
 
 ####diff ~ass*aridity
@@ -2255,9 +2255,9 @@ LDMC_ass_arid <- ggplot(ldmc_data, aes(x = ARIDITY.v3, y = trait_difference)) +
   labs(y = "Difference in LDMC", x = "Aridity", color = "Association") +
   theme_classic() +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5.5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
 
 
 
@@ -2294,9 +2294,9 @@ LDMC_ass_RASE <- ggplot(ldmc_data, aes(x = RASE, y = trait_difference)) +
   scale_fill_manual(labels = c("bare-associated", "dominant-associated"),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 0.57", hjust= 1, vjust = 1, size = 5) +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 0.57", hjust= 1, vjust = 1, size = 5.5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
 
 
 
@@ -2334,9 +2334,9 @@ LDMC_ass_pH <- ggplot(ldmc_data, aes(x = pH, y = trait_difference)) +
   scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5.5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
   
 
 
@@ -2374,9 +2374,9 @@ LDMC_ass_SAC <- ggplot(ldmc_data, aes(x = SAC, y = trait_difference)) +
   scale_fill_manual(labels = c(expression("∆"["Db"]), expression("∆"["Dd"])),
                     values = c(brewer.pal(8, "Dark2")[7], brewer.pal(8, "Dark2")[1])) +
   guides(fill = "none") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5.5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
 
 
 
@@ -2402,9 +2402,9 @@ LDMC_ass_graz <- ggplot(temp1, aes(x = GRAZ, y = trait_diff_prediction, fill = a
   labs(y = "Difference in LDMC", x = "Grazing pressure", fill = " ") +
   theme_classic() +
   theme(legend.position = "right") +
-  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5) +
-  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 12), 
-        legend.text = element_text(size = 16), legend.title = element_text(size = 17))
+  annotate("text", x = Inf, y = Inf, label = "Importance = 1.00", hjust= 1, vjust = 1, size = 5.5) +
+  theme(axis.title = element_text(size = 18), axis.text = element_text(size = 14), 
+        legend.text = element_text(size = 18))
 
 
 LDMC_ass_combo2 <- ggarrange(LDMC_ass_arid, LDMC_ass_AMT, LDMC_ass_RASE, LDMC_ass_graz, LDMC_ass_pH, LDMC_ass_SAC,
@@ -2420,12 +2420,10 @@ LDMC_ass_combo2 <- ggarrange(LDMC_ass_arid, LDMC_ass_AMT, LDMC_ass_RASE, LDMC_as
 
 ggsave("diff_LDMC_association2.png", LDMC_ass_combo2, path = 'Figures', 
        width = 4200, height = 2200, units = "px")
+#save high res figure
+ggsave("Figure5_diff_LDMC_association2.png", LDMC_ass_combo2, path = 'Figures', 
+       width = 8400, height = 4400, units = "px", dpi = 600)
 
 
 
 
-LDMC_ass_combo <- ggarrange(LDMC_ass_arid, LDMC_ass_AMT, LDMC_ass_RASE, LDMC_ass_graz, LDMC_ass_pH, LDMC_ass_SAC, 
-                         nrow = 2, ncol = 3, labels = "auto")
-
-ggsave("diff_LDMC_association.png", LDMC_ass_combo, path = 'Figures', 
-       width = 4000, height = 2000, units = "px")
