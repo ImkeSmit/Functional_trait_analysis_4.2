@@ -1742,6 +1742,10 @@ cov_combo2_maintext <- plot_grid(plotlist = cover_plots_maintext,
 ggsave("nintc_cover_nurse_trait_effects2_maintext.png", cov_combo2_maintext, width = 7000, height = 4000, 
        units = "px", path = "Figures")
 
+#high res figure for publication:
+ggsave("Figure3_nintc_cover_nurse_trait_effects2_maintext.pdf", cov_combo2_maintext, 
+       width = 14000, height = 8000, units = "px",dpi = 600, path = "Figures")
+
 
 ##The rest go in the appendix:
 
@@ -1754,6 +1758,10 @@ cov_combo2_appendix <- plot_grid(plotlist = cover_plots_appendix,
 
 ggsave("nintc_cover_nurse_trait_effects2_appendix.png", cov_combo2_appendix, width = 7000, height = 5000, 
        units = "px", path = "Figures")
+
+#high res figure for publication:
+ggsave("FigureA3_nintc_cover_nurse_trait_effects2_appendix.pdf", cov_combo2_appendix, 
+       width = 14000, height = 10000, units = "px",dpi = 600, path = "Figures")
 
 
 
