@@ -878,7 +878,6 @@ ggsave("Figure2_nintc_richness_nurse_trait_effects2.pdf", rich_combo2, dpi = 600
 
 
 
-
 ####GRID OF VARIABLE EFFECTS ON NINTC COVER####
 
 #import modelling data
