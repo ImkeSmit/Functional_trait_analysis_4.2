@@ -77,5 +77,7 @@ trait_pca <- ggbiplot(all_FT_pca, choices = c(1,2),
          varname.size = 4, varname.color = "black") +
   geom_point(colour = "azure3", alpha = 0.8)+
   theme_classic() 
-trait_pca$layers <- c(trait_pca$layers, trait_pca$layers[[2]]) #move the arrows to plot in the foreground
+trait_pca$layers <- c(trait_pca$layers, trait_pca$layers[[2]], trait_pca$layers[[3]]) #move the arrows to plot in the foreground
 ggsave("trait_biplot.png", trait_pca, path = "Figures")
+#save high res figure
+ggsave("FigureA2_trait_biplot.pdf", trait_pca, path = "Figures", dpi = 600)
